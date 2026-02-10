@@ -1,0 +1,14 @@
+# Extract headers and a specific column from CSV
+$csv = input
+
+$headers = csv.headers $csv
+log "=== Headers ==="
+log $headers
+
+$names = csv.column $csv "name"
+log "=== Names Column ==="
+log $names
+
+$ages = csv.column $csv "age"
+log "=== Ages Column ==="
+log $ages

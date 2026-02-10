@@ -1,0 +1,12 @@
+# Round-trip: parse CSV then stringify back
+$csv = input
+
+# Parse into objects
+$data = csv.parse $csv
+log "=== Parsed Objects ==="
+log $data
+
+# Stringify back to CSV
+$output = csv.stringify $data
+log "=== Stringified CSV ==="
+log $output

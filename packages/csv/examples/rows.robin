@@ -1,0 +1,6 @@
+# Parse CSV into raw rows (array of arrays)
+$csv = input
+$rows = csv.rows $csv
+
+log "=== Raw Rows ==="
+log $rows

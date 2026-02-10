@@ -1,0 +1,6 @@
+# Parse CSV data into objects
+$csv = input
+$data = csv.parse $csv
+
+log "=== Parsed CSV ==="
+log $data

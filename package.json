@@ -1,0 +1,5 @@
+{
+  "name": "robinpath-modules",
+  "private": true,
+  "workspaces": ["packages/*"]
+}
