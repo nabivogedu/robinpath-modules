@@ -101,6 +101,7 @@ const sendWebhook: BuiltinHandler = async (args) => {
   if (opts.username) body.username = String(opts.username);
   if (opts.iconEmoji) body.icon_emoji = String(opts.iconEmoji);
   if (opts.blocks) body.blocks = opts.blocks;
+  if (opts.attachments) body.attachments = opts.attachments;
 
   const response = await fetch(webhookUrl, {
     method: "POST",
