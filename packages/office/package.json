@@ -1,0 +1,24 @@
+{
+  "name": "@robinpath/office",
+  "version": "0.1.0",
+  "description": "Microsoft Office document creation and reading (Word, Excel, PowerPoint) for RobinPath",
+  "publishConfig": { "access": "public" },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" } },
+  "files": ["dist"],
+  "scripts": { "build": "tsc", "test": "node --import tsx --test tests/*.test.ts" },
+  "peerDependencies": { "@wiredwp/robinpath": ">=0.20.0" },
+  "dependencies": {
+    "docx": "^9.0.0",
+    "mammoth": "^1.8.0",
+    "exceljs": "^4.4.0",
+    "pptxgenjs": "^3.12.0"
+  },
+  "devDependencies": {
+    "@wiredwp/robinpath": "^0.30.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

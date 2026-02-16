@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(node -e:*)",
+      "Bash(npx tsc)",
+      "Bash(node --import tsx src/run.ts:*)"
+    ]
+  }
+}
