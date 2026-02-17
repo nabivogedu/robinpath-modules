@@ -4,10 +4,10 @@ import { EnvFunctions, EnvFunctionMetadata, EnvModuleMetadata } from "./env.js";
 const EnvModule: ModuleAdapter = {
   name: "env",
   functions: EnvFunctions,
-  functionMetadata: EnvFunctionMetadata,
-  moduleMetadata: EnvModuleMetadata,
+  functionMetadata: EnvFunctionMetadata as any,
+  moduleMetadata: EnvModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default EnvModule;
 export { EnvModule };

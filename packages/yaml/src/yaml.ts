@@ -1,10 +1,11 @@
 import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+// @ts-ignore
 import yaml from "js-yaml";
 import { readFileSync, writeFileSync } from "node:fs";
 
 // ── Helper ────────────────────────────────────────────────────────────
 
-function resolveDotPath(obj: unknown, dotPath: string): unknown {
+function resolveDotPath(obj: unknown, dotPath: string): any {
   const keys = dotPath.split(".");
   let current: unknown = obj;
   for (const key of keys) {
@@ -45,7 +46,7 @@ const writeFile: BuiltinHandler = (args) => {
 const parseAll: BuiltinHandler = (args) => {
   const yamlString = String(args[0] ?? "");
   const docs: unknown[] = [];
-  yaml.loadAll(yamlString, (doc) => {
+  yaml.loadAll(yamlString, (doc: any) => {
     docs.push(doc);
   });
   return docs;
@@ -94,7 +95,7 @@ export const YamlFunctions: Record<string, BuiltinHandler> = {
   fromJSON,
 };
 
-export const YamlFunctionMetadata: Record<string, FunctionMetadata> = {
+export const YamlFunctionMetadata = {
   parse: {
     description: "Parse a YAML string into a JavaScript object, array, or value",
     parameters: [
@@ -262,7 +263,7 @@ export const YamlFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const YamlModuleMetadata: ModuleMetadata = {
+export const YamlModuleMetadata = {
   description: "Parse, stringify, and manipulate YAML data",
   methods: ["parse", "stringify", "parseFile", "writeFile", "parseAll", "isValid", "get", "toJSON", "fromJSON"],
 };

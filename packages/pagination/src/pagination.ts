@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const fetchAll: BuiltinHandler = async (args) => {
   const url = String(args[0] ?? "");
@@ -21,7 +21,7 @@ const fetchAll: BuiltinHandler = async (args) => {
       pageUrl.searchParams.set(limitParam, String(pageSize));
       pageUrl.searchParams.set(offsetParam, String(offset));
 
-      const response = await fetch(pageUrl.toString(), { headers });
+      const response: Response = await fetch(pageUrl.toString(), { headers });
       const data = await response.json() as Record<string, unknown>;
       const items = (data[itemsKey] ?? data.results ?? data.items ?? []) as unknown[];
       allItems.push(...items);
@@ -37,7 +37,7 @@ const fetchAll: BuiltinHandler = async (args) => {
       const pageUrl = new URL(url);
       if (cursor) pageUrl.searchParams.set(cursorParam, cursor);
 
-      const response = await fetch(pageUrl.toString(), { headers });
+      const response: Response = await fetch(pageUrl.toString(), { headers });
       const data = await response.json() as Record<string, unknown>;
       const items = (data[itemsKey] ?? data.results ?? data.items ?? []) as unknown[];
       allItems.push(...items);
@@ -54,7 +54,7 @@ const fetchAll: BuiltinHandler = async (args) => {
       pageUrl.searchParams.set(pageParam, String(page));
       if (opts.limitParam) pageUrl.searchParams.set(String(opts.limitParam), String(pageSize));
 
-      const response = await fetch(pageUrl.toString(), { headers });
+      const response: Response = await fetch(pageUrl.toString(), { headers });
       const data = await response.json() as Record<string, unknown>;
       const items = (data[itemsKey] ?? data.results ?? data.items ?? []) as unknown[];
       allItems.push(...items);
@@ -65,13 +65,13 @@ const fetchAll: BuiltinHandler = async (args) => {
     let nextUrl: string | null = url;
 
     for (let page = 0; page < maxPages && nextUrl; page++) {
-      const response = await fetch(nextUrl, { headers });
+      const response: Response = await fetch(nextUrl, { headers });
       const data = await response.json() as Record<string, unknown>;
       const items = (data[itemsKey] ?? data.results ?? data.items ?? []) as unknown[];
       allItems.push(...items);
 
       // Check Link header
-      const linkHeader = response.headers.get("link");
+      const linkHeader: string | null = response.headers.get("link");
       nextUrl = null;
       if (linkHeader) {
         const match = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
@@ -100,7 +100,7 @@ const fetchPage: BuiltinHandler = async (args) => {
   pageUrl.searchParams.set(pageParam, String(page));
   pageUrl.searchParams.set(limitParam, String(pageSize));
 
-  const response = await fetch(pageUrl.toString(), { headers });
+  const response: Response = await fetch(pageUrl.toString(), { headers });
   const data = await response.json() as Record<string, unknown>;
   const items = (data[itemsKey] ?? data.results ?? data.items ?? []) as unknown[];
 
@@ -110,7 +110,7 @@ const fetchPage: BuiltinHandler = async (args) => {
 const parseLinkHeader: BuiltinHandler = (args) => {
   const header = String(args[0] ?? "");
   const links: Record<string, string> = {};
-  const parts = header.split(",").map((s) => s.trim());
+  const parts = header.split(",").map((s: any) => s.trim());
   for (const part of parts) {
     const match = part.match(/<([^>]+)>;\s*rel="([^"]+)"/);
     if (match) links[match[2]!] = match[1]!;
@@ -130,14 +130,14 @@ const buildPageUrl: BuiltinHandler = (args) => {
 
 export const PaginationFunctions: Record<string, BuiltinHandler> = { fetchAll, fetchPage, parseLinkHeader, buildPageUrl };
 
-export const PaginationFunctionMetadata: Record<string, FunctionMetadata> = {
+export const PaginationFunctionMetadata = {
   fetchAll: { description: "Auto-paginate an API and collect all items", parameters: [{ name: "url", dataType: "string", description: "API base URL", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{strategy: offset|cursor|page|link, headers, maxPages, pageSize, itemsKey, ...}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{items, total}", example: 'pagination.fetchAll "https://api.example.com/users" {"strategy": "offset", "pageSize": 100}' },
   fetchPage: { description: "Fetch a single page of results", parameters: [{ name: "url", dataType: "string", description: "API URL", formInputType: "text", required: true }, { name: "page", dataType: "number", description: "Page number", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{pageSize, headers, itemsKey}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{items, page, pageSize, hasMore, total}", example: 'pagination.fetchPage "https://api.example.com/users" 2 {"pageSize": 20}' },
   parseLinkHeader: { description: "Parse a Link header into rel-url pairs", parameters: [{ name: "header", dataType: "string", description: "Link header value", formInputType: "text", required: true }], returnType: "object", returnDescription: "{next, prev, first, last} URLs", example: 'pagination.parseLinkHeader $linkHeader' },
   buildPageUrl: { description: "Build a paginated URL with page/limit parameters", parameters: [{ name: "baseUrl", dataType: "string", description: "Base URL", formInputType: "text", required: true }, { name: "page", dataType: "number", description: "Page number", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{limit, pageParam, limitParam}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Complete URL with pagination params", example: 'pagination.buildPageUrl "https://api.example.com/users" 3 {"limit": 50}' },
 };
 
-export const PaginationModuleMetadata: ModuleMetadata = {
+export const PaginationModuleMetadata = {
   description: "Auto-paginate APIs with offset, cursor, page-number, and Link-header strategies",
   methods: ["fetchAll", "fetchPage", "parseLinkHeader", "buildPageUrl"],
 };

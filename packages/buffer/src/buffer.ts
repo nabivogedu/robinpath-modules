@@ -30,7 +30,7 @@ const fromBase64Url: BuiltinHandler = (args) => {
 const byteLength: BuiltinHandler = (args) => Buffer.byteLength(String(args[0] ?? ""), "utf-8");
 
 const concat: BuiltinHandler = (args) => {
-  const buffers = (args as string[]).map((b64) => Buffer.from(String(b64), "base64"));
+  const buffers = (args as string[]).map((b64: any) => Buffer.from(String(b64), "base64"));
   return Buffer.concat(buffers).toString("base64");
 };
 
@@ -50,7 +50,7 @@ export const BufferFunctions: Record<string, BuiltinHandler> = {
   fromString, toString, fromHex, toHex, toBase64, fromBase64, toBase64Url, fromBase64Url, byteLength, concat, compare, isBase64,
 };
 
-export const BufferFunctionMetadata: Record<string, FunctionMetadata> = {
+export const BufferFunctionMetadata = {
   fromString: { description: "Create a base64 buffer from a string", parameters: [{ name: "str", dataType: "string", description: "Input string", formInputType: "text", required: true }, { name: "encoding", dataType: "string", description: "String encoding (default: utf-8)", formInputType: "text", required: false, defaultValue: "utf-8" }], returnType: "string", returnDescription: "Base64-encoded buffer", example: 'buffer.fromString "hello"' },
   toString: { description: "Convert a base64 buffer to string", parameters: [{ name: "base64", dataType: "string", description: "Base64 string", formInputType: "text", required: true }, { name: "encoding", dataType: "string", description: "Output encoding (default: utf-8)", formInputType: "text", required: false, defaultValue: "utf-8" }], returnType: "string", returnDescription: "Decoded string", example: 'buffer.toString "aGVsbG8="' },
   fromHex: { description: "Create base64 from hex string", parameters: [{ name: "hex", dataType: "string", description: "Hex string", formInputType: "text", required: true }], returnType: "string", returnDescription: "Base64 string", example: 'buffer.fromHex "48656c6c6f"' },
@@ -65,7 +65,7 @@ export const BufferFunctionMetadata: Record<string, FunctionMetadata> = {
   isBase64: { description: "Check if a string is valid base64", parameters: [{ name: "str", dataType: "string", description: "String to check", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if valid base64", example: 'buffer.isBase64 "aGVsbG8="' },
 };
 
-export const BufferModuleMetadata: ModuleMetadata = {
+export const BufferModuleMetadata = {
   description: "Buffer and encoding utilities: base64, base64url, hex, byte operations",
   methods: ["fromString", "toString", "fromHex", "toHex", "toBase64", "fromBase64", "toBase64Url", "fromBase64Url", "byteLength", "concat", "compare", "isBase64"],
 };

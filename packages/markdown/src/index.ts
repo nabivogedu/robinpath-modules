@@ -4,10 +4,10 @@ import { MarkdownFunctions, MarkdownFunctionMetadata, MarkdownModuleMetadata } f
 const MarkdownModule: ModuleAdapter = {
   name: "markdown",
   functions: MarkdownFunctions,
-  functionMetadata: MarkdownFunctionMetadata,
-  moduleMetadata: MarkdownModuleMetadata,
+  functionMetadata: MarkdownFunctionMetadata as any,
+  moduleMetadata: MarkdownModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default MarkdownModule;
 export { MarkdownModule };

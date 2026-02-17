@@ -4,10 +4,10 @@ import { AuthFunctions, AuthFunctionMetadata, AuthModuleMetadata } from "./auth.
 const AuthModule: ModuleAdapter = {
   name: "auth",
   functions: AuthFunctions,
-  functionMetadata: AuthFunctionMetadata,
-  moduleMetadata: AuthModuleMetadata,
+  functionMetadata: AuthFunctionMetadata as any,
+  moduleMetadata: AuthModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default AuthModule;
 export { AuthModule };

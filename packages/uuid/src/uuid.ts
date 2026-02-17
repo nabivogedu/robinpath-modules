@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { randomUUID, createHash } from "node:crypto";
 
 // -- Helpers ----------------------------------------------------------------
@@ -124,7 +124,7 @@ export const UuidFunctions: Record<string, BuiltinHandler> = {
   nil,
 };
 
-export const UuidFunctionMetadata: Record<string, FunctionMetadata> = {
+export const UuidFunctionMetadata = {
   v4: {
     description: "Generate a random UUID v4",
     parameters: [],
@@ -223,7 +223,7 @@ export const UuidFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const UuidModuleMetadata: ModuleMetadata = {
+export const UuidModuleMetadata = {
   description: "UUID generation, parsing, and validation utilities (v4, v5, nil)",
   methods: [
     "v4",

@@ -4,10 +4,10 @@ import { CryptoFunctions, CryptoFunctionMetadata, CryptoModuleMetadata } from ".
 const CryptoModule: ModuleAdapter = {
   name: "crypto",
   functions: CryptoFunctions,
-  functionMetadata: CryptoFunctionMetadata,
-  moduleMetadata: CryptoModuleMetadata,
+  functionMetadata: CryptoFunctionMetadata as any,
+  moduleMetadata: CryptoModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default CryptoModule;
 export { CryptoModule };

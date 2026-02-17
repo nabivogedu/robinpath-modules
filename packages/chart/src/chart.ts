@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createCanvas } from "@napi-rs/canvas";
 import { Chart, registerables } from "chart.js";
 import type { ChartConfiguration } from "chart.js";
@@ -228,7 +228,7 @@ export const ChartFunctions: Record<string, BuiltinHandler> = {
   create, addDataset, update, save, toBase64, toBuffer, destroy,
 };
 
-export const ChartFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ChartFunctionMetadata = {
   create: {
     description: "Create a new chart (bar, line, pie, doughnut, scatter, radar, polarArea, bubble)",
     parameters: [
@@ -295,7 +295,7 @@ export const ChartFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const ChartModuleMetadata: ModuleMetadata = {
+export const ChartModuleMetadata = {
   description: "Generate chart images (PNG/JPEG) using Chart.js. Supports bar, line, pie, doughnut, scatter, radar, polarArea, and bubble charts with auto-coloring and customizable titles, legends, and dimensions.",
   methods: ["create", "addDataset", "update", "save", "toBase64", "toBuffer", "destroy"],
 };

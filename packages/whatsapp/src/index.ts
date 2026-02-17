@@ -4,10 +4,10 @@ import { WhatsappFunctions, WhatsappFunctionMetadata, WhatsappModuleMetadata } f
 const WhatsappModule: ModuleAdapter = {
   name: "whatsapp",
   functions: WhatsappFunctions,
-  functionMetadata: WhatsappFunctionMetadata,
-  moduleMetadata: WhatsappModuleMetadata,
+  functionMetadata: WhatsappFunctionMetadata as any,
+  moduleMetadata: WhatsappModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default WhatsappModule;
 export { WhatsappModule };

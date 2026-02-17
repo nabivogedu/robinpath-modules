@@ -4,10 +4,10 @@ import { ChartFunctions, ChartFunctionMetadata, ChartModuleMetadata } from "./ch
 const ChartModule: ModuleAdapter = {
   name: "chart",
   functions: ChartFunctions,
-  functionMetadata: ChartFunctionMetadata,
-  moduleMetadata: ChartModuleMetadata,
+  functionMetadata: ChartFunctionMetadata as any,
+  moduleMetadata: ChartModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ChartModule;
 export { ChartModule };

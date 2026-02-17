@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getToken(): string {
   return token;
 }
 
-async function notionApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function notionApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getToken();
   const res = await fetch(`https://api.notion.com/v1${path}`, {
     method,
@@ -122,11 +122,11 @@ export const NotionFunctions: Record<string, BuiltinHandler> = {
   search,
 };
 
-export const NotionFunctionMetadata: Record<string, object> = {
+export const NotionFunctionMetadata = {
   setToken: {
     description: "Set the Notion integration token.",
     parameters: [
-      { name: "token", dataType: "string", description: "Notion internal integration token", formInputType: "password", required: true },
+      { name: "token", dataType: "string", description: "Notion internal integration token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -231,8 +231,7 @@ export const NotionFunctionMetadata: Record<string, object> = {
 };
 
 export const NotionModuleMetadata = {
-  name: "notion",
   description: "Create, read, update, and query Notion pages and databases via the Notion API.",
-  icon: "file-text",
   category: "productivity",
+  methods: Object.keys(NotionFunctions),
 };

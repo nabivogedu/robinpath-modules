@@ -4,10 +4,10 @@ import { HtmlFunctions, HtmlFunctionMetadata, HtmlModuleMetadata } from "./html.
 const HtmlModule: ModuleAdapter = {
   name: "html",
   functions: HtmlFunctions,
-  functionMetadata: HtmlFunctionMetadata,
-  moduleMetadata: HtmlModuleMetadata,
+  functionMetadata: HtmlFunctionMetadata as any,
+  moduleMetadata: HtmlModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default HtmlModule;
 export { HtmlModule };

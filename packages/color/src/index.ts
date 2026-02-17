@@ -4,10 +4,10 @@ import { ColorFunctions, ColorFunctionMetadata, ColorModuleMetadata } from "./co
 const ColorModule: ModuleAdapter = {
   name: "color",
   functions: ColorFunctions,
-  functionMetadata: ColorFunctionMetadata,
-  moduleMetadata: ColorModuleMetadata,
+  functionMetadata: ColorFunctionMetadata as any,
+  moduleMetadata: ColorModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ColorModule;
 export { ColorModule };

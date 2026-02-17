@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { randomBytes } from "node:crypto";
 
 // ── Internal State ──────────────────────────────────────────────────
@@ -164,7 +164,7 @@ const retry: BuiltinHandler = (args) => {
   const q = getQueue(queueName);
 
   // Check dead letter queue first
-  const dlIndex = q.deadLetter.findIndex((j) => j.id === jobId);
+  const dlIndex = q.deadLetter.findIndex((j: any) => j.id === jobId);
   if (dlIndex >= 0) {
     const job = q.deadLetter.splice(dlIndex, 1)[0]!;
     job.status = "pending";
@@ -254,7 +254,7 @@ const deadLetter: BuiltinHandler = (args) => {
   const queueName = String(args[0] ?? "default");
   const limit = parseInt(String(args[1] ?? "50"), 10);
   const q = getQueue(queueName);
-  return q.deadLetter.slice(-limit).map((j) => ({
+  return q.deadLetter.slice(-limit).map((j: any) => ({
     id: j.id,
     data: j.data,
     error: j.error,
@@ -292,7 +292,7 @@ export const QueueFunctions: Record<string, BuiltinHandler> = {
   create, push, pop, complete, fail, retry, remove, size, status, pause, resume, clear, deadLetter, getJob, destroy,
 };
 
-export const QueueFunctionMetadata: Record<string, FunctionMetadata> = {
+export const QueueFunctionMetadata = {
   create: {
     description: "Create a named job queue",
     parameters: [
@@ -403,7 +403,7 @@ export const QueueFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const QueueModuleMetadata: ModuleMetadata = {
+export const QueueModuleMetadata = {
   description: "In-memory job queue with priorities, delayed execution, retry, dead-letter, pause/resume",
   methods: ["create", "push", "pop", "complete", "fail", "retry", "remove", "size", "status", "pause", "resume", "clear", "deadLetter", "getJob", "destroy"],
 };

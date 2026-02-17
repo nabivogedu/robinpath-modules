@@ -1,10 +1,10 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import os from "node:os";
 
 const hostname: BuiltinHandler = () => os.hostname();
 const platform: BuiltinHandler = () => os.platform();
 const arch: BuiltinHandler = () => os.arch();
-const cpus: BuiltinHandler = () => os.cpus().map((c) => ({ model: c.model, speed: c.speed }));
+const cpus: BuiltinHandler = () => os.cpus().map((c: any) => ({ model: c.model, speed: c.speed }));
 const cpuCount: BuiltinHandler = () => os.cpus().length;
 const totalMemory: BuiltinHandler = () => os.totalmem();
 const freeMemory: BuiltinHandler = () => os.freemem();
@@ -19,7 +19,7 @@ const networkInterfaces: BuiltinHandler = () => {
   const ifaces = os.networkInterfaces();
   const result: Record<string, unknown[]> = {};
   for (const [name, addrs] of Object.entries(ifaces)) {
-    if (addrs) result[name] = addrs.map((a) => ({ address: a.address, family: a.family, internal: a.internal }));
+    if (addrs) result[name] = addrs.map((a: any) => ({ address: a.address, family: a.family, internal: a.internal }));
   }
   return result;
 };
@@ -31,7 +31,7 @@ export const OsFunctions: Record<string, BuiltinHandler> = {
   hostname, platform, arch, cpus, cpuCount, totalMemory, freeMemory, uptime, homeDir, tempDir, userInfo, networkInterfaces, type, release, eol,
 };
 
-export const OsFunctionMetadata: Record<string, FunctionMetadata> = {
+export const OsFunctionMetadata = {
   hostname: { description: "Get the system hostname", parameters: [], returnType: "string", returnDescription: "Hostname", example: "os.hostname" },
   platform: { description: "Get the OS platform (linux, darwin, win32)", parameters: [], returnType: "string", returnDescription: "Platform string", example: "os.platform" },
   arch: { description: "Get the CPU architecture", parameters: [], returnType: "string", returnDescription: "Architecture (x64, arm64, etc.)", example: "os.arch" },
@@ -49,7 +49,7 @@ export const OsFunctionMetadata: Record<string, FunctionMetadata> = {
   eol: { description: "Get the OS end-of-line marker", parameters: [], returnType: "string", returnDescription: "EOL string (\\n or \\r\\n)", example: "os.eol" },
 };
 
-export const OsModuleMetadata: ModuleMetadata = {
+export const OsModuleMetadata = {
   description: "System information: hostname, platform, architecture, CPU, memory, network, and more",
   methods: ["hostname", "platform", "arch", "cpus", "cpuCount", "totalMemory", "freeMemory", "uptime", "homeDir", "tempDir", "userInfo", "networkInterfaces", "type", "release", "eol"],
 };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createHash, createHmac } from "node:crypto";
 
 // -- RobinPath Function Handlers ----------------------------------------
@@ -76,7 +76,7 @@ export const CryptoFunctions: Record<string, BuiltinHandler> = {
   urlDecode,
 };
 
-export const CryptoFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CryptoFunctionMetadata = {
   md5: {
     description: "Compute the MD5 hash of a string",
     parameters: [
@@ -258,7 +258,7 @@ export const CryptoFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const CryptoModuleMetadata: ModuleMetadata = {
+export const CryptoModuleMetadata = {
   description: "Hashing, HMAC, and encoding/decoding utilities (MD5, SHA, Base64, Hex, URL)",
   methods: [
     "md5",

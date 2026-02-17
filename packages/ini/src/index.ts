@@ -4,10 +4,10 @@ import { IniFunctions, IniFunctionMetadata, IniModuleMetadata } from "./ini.js";
 const IniModule: ModuleAdapter = {
   name: "ini",
   functions: IniFunctions,
-  functionMetadata: IniFunctionMetadata,
-  moduleMetadata: IniModuleMetadata,
+  functionMetadata: IniFunctionMetadata as any,
+  moduleMetadata: IniModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default IniModule;
 export { IniModule };

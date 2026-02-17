@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { Buffer } from "node:buffer";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -36,37 +36,37 @@ const HTML_DECODE_MAP: Record<string, string> = {
 
 // ── Functions ────────────────────────────────────────────────────────────────
 
-function base64Encode(args: unknown[]): unknown {
+function base64Encode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   return buf.toString("base64");
 }
 
-function base64Decode(args: unknown[]): unknown {
+function base64Decode(args: Value[]): any {
   const input = toString(args[0]);
   return Buffer.from(input, "base64").toString("utf8");
 }
 
-function base64UrlEncode(args: unknown[]): unknown {
+function base64UrlEncode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   return buf.toString("base64url");
 }
 
-function base64UrlDecode(args: unknown[]): unknown {
+function base64UrlDecode(args: Value[]): any {
   const input = toString(args[0]);
   return Buffer.from(input, "base64url").toString("utf8");
 }
 
-function hexEncode(args: unknown[]): unknown {
+function hexEncode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   return buf.toString("hex");
 }
 
-function hexDecode(args: unknown[]): unknown {
+function hexDecode(args: Value[]): any {
   const input = toString(args[0]);
   return Buffer.from(input, "hex").toString("utf8");
 }
 
-function base32Encode(args: unknown[]): unknown {
+function base32Encode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   let bits = "";
   for (let i = 0; i < buf.length; i++) {
@@ -82,7 +82,7 @@ function base32Encode(args: unknown[]): unknown {
   return result;
 }
 
-function base32Decode(args: unknown[]): unknown {
+function base32Decode(args: Value[]): any {
   const input = toString(args[0]).replace(/=+$/, "").toUpperCase();
   let bits = "";
   for (const ch of input) {
@@ -97,25 +97,25 @@ function base32Decode(args: unknown[]): unknown {
   return Buffer.from(bytes).toString("utf8");
 }
 
-function urlEncode(args: unknown[]): unknown {
+function urlEncode(args: Value[]): any {
   return encodeURIComponent(toString(args[0]));
 }
 
-function urlDecode(args: unknown[]): unknown {
+function urlDecode(args: Value[]): any {
   return decodeURIComponent(toString(args[0]));
 }
 
-function htmlEncode(args: unknown[]): unknown {
+function htmlEncode(args: Value[]): any {
   const input = toString(args[0]);
-  return input.replace(/[&<>"']/g, (ch) => HTML_ENTITY_MAP[ch] ?? ch);
+  return input.replace(/[&<>"']/g, (ch: any) => HTML_ENTITY_MAP[ch] ?? ch);
 }
 
-function htmlDecode(args: unknown[]): unknown {
+function htmlDecode(args: Value[]): any {
   const input = toString(args[0]);
-  return input.replace(/&amp;|&lt;|&gt;|&quot;|&#39;|&#x27;/g, (entity) => HTML_DECODE_MAP[entity] ?? entity);
+  return input.replace(/&amp;|&lt;|&gt;|&quot;|&#39;|&#x27;/g, (entity: any) => HTML_DECODE_MAP[entity] ?? entity);
 }
 
-function utf8Encode(args: unknown[]): unknown {
+function utf8Encode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   const result: number[] = [];
   for (let i = 0; i < buf.length; i++) {
@@ -124,7 +124,7 @@ function utf8Encode(args: unknown[]): unknown {
   return result;
 }
 
-function utf8Decode(args: unknown[]): unknown {
+function utf8Decode(args: Value[]): any {
   const input = args[0];
   if (Array.isArray(input)) {
     return Buffer.from(input as number[]).toString("utf8");
@@ -132,7 +132,7 @@ function utf8Decode(args: unknown[]): unknown {
   return toString(input);
 }
 
-function binaryEncode(args: unknown[]): unknown {
+function binaryEncode(args: Value[]): any {
   const buf = toBuffer(args[0]);
   const separator = toString(args[1]) || " ";
   const result: string[] = [];
@@ -142,7 +142,7 @@ function binaryEncode(args: unknown[]): unknown {
   return result.join(separator);
 }
 
-function binaryDecode(args: unknown[]): unknown {
+function binaryDecode(args: Value[]): any {
   const input = toString(args[0]).replace(/[^01]/g, "");
   const bytes: number[] = [];
   for (let i = 0; i < input.length; i += 8) {
@@ -154,34 +154,34 @@ function binaryDecode(args: unknown[]): unknown {
   return Buffer.from(bytes).toString("utf8");
 }
 
-function asciiToChar(args: unknown[]): unknown {
+function asciiToChar(args: Value[]): any {
   const code = typeof args[0] === "number" ? args[0] : parseInt(toString(args[0]), 10);
   if (isNaN(code) || code < 0 || code > 127) return "";
   return String.fromCharCode(code);
 }
 
-function charToAscii(args: unknown[]): unknown {
+function charToAscii(args: Value[]): any {
   const input = toString(args[0]);
   if (input.length === 0) return -1;
   return input.charCodeAt(0);
 }
 
-function rot13(args: unknown[]): unknown {
+function rot13(args: Value[]): any {
   const input = toString(args[0]);
-  return input.replace(/[a-zA-Z]/g, (ch) => {
+  return input.replace(/[a-zA-Z]/g, (ch: any) => {
     const base = ch <= "Z" ? 65 : 97;
     return String.fromCharCode(((ch.charCodeAt(0) - base + 13) % 26) + base);
   });
 }
 
-function percentEncode(args: unknown[]): unknown {
+function percentEncode(args: Value[]): any {
   const input = toString(args[0]);
   return Array.from(Buffer.from(input, "utf8"))
-    .map((byte) => "%" + byte.toString(16).toUpperCase().padStart(2, "0"))
+    .map((byte: any) => "%" + byte.toString(16).toUpperCase().padStart(2, "0"))
     .join("");
 }
 
-function percentDecode(args: unknown[]): unknown {
+function percentDecode(args: Value[]): any {
   const input = toString(args[0]);
   const bytes: number[] = [];
   let i = 0;
@@ -203,7 +203,7 @@ function percentDecode(args: unknown[]): unknown {
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export const EncodeFunctions: Record<string, BuiltinHandler> = {
+export const EncodeFunctions = {
   base64Encode,
   base64Decode,
   base64UrlEncode,
@@ -227,159 +227,200 @@ export const EncodeFunctions: Record<string, BuiltinHandler> = {
   percentDecode,
 };
 
-export const EncodeFunctionMetadata: Record<string, FunctionMetadata> = {
+export const EncodeFunctionMetadata = {
   base64Encode: {
     description: "Encode a string or buffer to Base64",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The data to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The data to encode" },
     ],
-    returns: { type: "string", description: "Base64-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   base64Decode: {
     description: "Decode a Base64-encoded string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The Base64 string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The Base64 string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   base64UrlEncode: {
     description: "Encode a string to URL-safe Base64 (no padding, +/ replaced with -_)",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The data to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The data to encode" },
     ],
-    returns: { type: "string", description: "URL-safe Base64 string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   base64UrlDecode: {
     description: "Decode a URL-safe Base64 string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The URL-safe Base64 string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The URL-safe Base64 string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   hexEncode: {
     description: "Encode a string to hexadecimal representation",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The data to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The data to encode" },
     ],
-    returns: { type: "string", description: "Hex-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   hexDecode: {
     description: "Decode a hexadecimal string back to UTF-8",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The hex string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The hex string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   base32Encode: {
     description: "Encode a string to Base32 (RFC 4648)",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The data to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The data to encode" },
     ],
-    returns: { type: "string", description: "Base32-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   base32Decode: {
     description: "Decode a Base32-encoded string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The Base32 string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The Base32 string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   urlEncode: {
     description: "Encode a string using encodeURIComponent",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to URL-encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to URL-encode" },
     ],
-    returns: { type: "string", description: "URL-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   urlDecode: {
     description: "Decode a URL-encoded string using decodeURIComponent",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The URL-encoded string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The URL-encoded string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   htmlEncode: {
     description: "Encode HTML special characters into entities",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to encode" },
     ],
-    returns: { type: "string", description: "HTML-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   htmlDecode: {
     description: "Decode HTML entities back to characters",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The HTML-encoded string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The HTML-encoded string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   utf8Encode: {
     description: "Encode a string to an array of UTF-8 byte values",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to encode" },
     ],
-    returns: { type: "array", description: "Array of byte values" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   utf8Decode: {
     description: "Decode an array of UTF-8 byte values back to a string",
     parameters: [
-      { name: "input", type: "array", required: true, description: "Array of byte values" },
+      { name: "input", dataType: "array", formInputType: "json", required: true, description: "Array of byte values" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   binaryEncode: {
     description: "Encode a string to its binary (0s and 1s) representation",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to encode" },
-      { name: "separator", type: "string", required: false, description: "Separator between bytes (default: ' ')" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to encode" },
+      { name: "separator", dataType: "string", formInputType: "text", required: false, description: "Separator between bytes (default: ' ')" },
     ],
-    returns: { type: "string", description: "Binary string representation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   binaryDecode: {
     description: "Decode a binary (0s and 1s) string back to text",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The binary string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The binary string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   asciiToChar: {
     description: "Convert an ASCII code to its character",
     parameters: [
-      { name: "code", type: "number", required: true, description: "ASCII code (0-127)" },
+      { name: "code", dataType: "number", formInputType: "number", required: true, description: "ASCII code (0-127)" },
     ],
-    returns: { type: "string", description: "The character" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   charToAscii: {
     description: "Convert a character to its ASCII code",
     parameters: [
-      { name: "char", type: "string", required: true, description: "A single character" },
+      { name: "char", dataType: "string", formInputType: "text", required: true, description: "A single character" },
     ],
-    returns: { type: "number", description: "ASCII code" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   rot13: {
     description: "Apply ROT13 substitution cipher to a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to transform" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to transform" },
     ],
-    returns: { type: "string", description: "ROT13-transformed string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   percentEncode: {
     description: "Percent-encode every byte of a string (e.g. 'A' becomes '%41')",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to encode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to encode" },
     ],
-    returns: { type: "string", description: "Percent-encoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   percentDecode: {
     description: "Decode a percent-encoded string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The percent-encoded string to decode" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The percent-encoded string to decode" },
     ],
-    returns: { type: "string", description: "Decoded string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const EncodeModuleMetadata: ModuleMetadata = {
-  name: "encode",
+export const EncodeModuleMetadata = {
   description: "Encoding and decoding conversions: Base64, Base32, hex, URL encoding, HTML entities, binary, ROT13, percent-encoding, and more",
   version: "1.0.0",
   tags: ["encode", "decode", "base64", "hex", "url", "html", "binary", "conversion"],

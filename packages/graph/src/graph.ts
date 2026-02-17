@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 interface Edge { from: string; to: string; weight: number; data?: unknown; }
 interface Graph { directed: boolean; nodes: Map<string, unknown>; edges: Edge[]; }
@@ -55,7 +55,7 @@ const removeNode: BuiltinHandler = (args) => {
   const name = String(args[1] ?? "default");
   const g = getGraph(name);
   g.nodes.delete(id);
-  g.edges = g.edges.filter((e) => e.from !== id && e.to !== id);
+  g.edges = g.edges.filter((e: any) => e.from !== id && e.to !== id);
   return true;
 };
 
@@ -64,7 +64,7 @@ const removeEdge: BuiltinHandler = (args) => {
   const to = String(args[1] ?? "");
   const name = String(args[2] ?? "default");
   const g = getGraph(name);
-  g.edges = g.edges.filter((e) => !(e.from === from && e.to === to));
+  g.edges = g.edges.filter((e: any) => !(e.from === from && e.to === to));
   return true;
 };
 
@@ -75,7 +75,7 @@ const nodes: BuiltinHandler = (args) => {
 
 const edges: BuiltinHandler = (args) => {
   const name = String(args[0] ?? "default");
-  return getGraph(name).edges.map((e) => ({ from: e.from, to: e.to, weight: e.weight }));
+  return getGraph(name).edges.map((e: any) => ({ from: e.from, to: e.to, weight: e.weight }));
 };
 
 const neighbors: BuiltinHandler = (args) => {
@@ -235,7 +235,7 @@ const list: BuiltinHandler = () => Array.from(graphs.keys());
 
 export const GraphFunctions: Record<string, BuiltinHandler> = { create, addNode, addEdge, removeNode, removeEdge, nodes, edges, neighbors, degree, bfs, dfs, shortestPath, topologicalSort, hasCycle, isConnected, hasPath, size, destroy, list };
 
-export const GraphFunctionMetadata: Record<string, FunctionMetadata> = {
+export const GraphFunctionMetadata = {
   create: { description: "Create graph", parameters: [{ name: "options", dataType: "object", description: "{name, directed}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{name, directed}", example: 'graph.create {"name": "deps", "directed": true}' },
   addNode: { description: "Add node", parameters: [{ name: "id", dataType: "string", description: "Node ID", formInputType: "text", required: true }, { name: "data", dataType: "any", description: "Node data", formInputType: "text", required: false }, { name: "graph", dataType: "string", description: "Graph name", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "true", example: 'graph.addNode "A" {"label": "Start"}' },
   addEdge: { description: "Add edge", parameters: [{ name: "from", dataType: "string", description: "From node", formInputType: "text", required: true }, { name: "to", dataType: "string", description: "To node", formInputType: "text", required: true }, { name: "weight", dataType: "number", description: "Edge weight", formInputType: "text", required: false }, { name: "graph", dataType: "string", description: "Graph name", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "true", example: 'graph.addEdge "A" "B" 5' },
@@ -257,7 +257,7 @@ export const GraphFunctionMetadata: Record<string, FunctionMetadata> = {
   list: { description: "List all graphs", parameters: [], returnType: "array", returnDescription: "Graph names", example: 'graph.list' },
 };
 
-export const GraphModuleMetadata: ModuleMetadata = {
+export const GraphModuleMetadata = {
   description: "Graph data structures with BFS, DFS, Dijkstra's shortest path, topological sort, cycle detection, and connectivity",
   methods: ["create", "addNode", "addEdge", "removeNode", "removeEdge", "nodes", "edges", "neighbors", "degree", "bfs", "dfs", "shortestPath", "topologicalSort", "hasCycle", "isConnected", "hasPath", "size", "destroy", "list"],
 };

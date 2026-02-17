@@ -4,10 +4,10 @@ import { EventFunctions, EventFunctionMetadata, EventModuleMetadata } from "./ev
 const EventModule: ModuleAdapter = {
   name: "event",
   functions: EventFunctions,
-  functionMetadata: EventFunctionMetadata,
-  moduleMetadata: EventModuleMetadata,
+  functionMetadata: EventFunctionMetadata as any,
+  moduleMetadata: EventModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default EventModule;
 export { EventModule };

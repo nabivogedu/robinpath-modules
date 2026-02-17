@@ -4,10 +4,10 @@ import { TemplateFunctions, TemplateFunctionMetadata, TemplateModuleMetadata } f
 const TemplateModule: ModuleAdapter = {
   name: "template",
   functions: TemplateFunctions,
-  functionMetadata: TemplateFunctionMetadata,
-  moduleMetadata: TemplateModuleMetadata,
+  functionMetadata: TemplateFunctionMetadata as any,
+  moduleMetadata: TemplateModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TemplateModule;
 export { TemplateModule };

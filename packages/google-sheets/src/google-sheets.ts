@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getConfig(key: string): string {
   return val;
 }
 
-async function sheetsApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function sheetsApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getConfig("accessToken");
   const base = "https://sheets.googleapis.com/v4/spreadsheets";
   const res = await fetch(`${base}${path}`, {
@@ -110,7 +110,7 @@ const findRows: BuiltinHandler = async (args) => {
   if (!spreadsheetId || !range || searchValue === undefined) throw new Error("googleSheets.findRows requires spreadsheetId, range, and searchValue.");
   const result = (await sheetsApi(`/${spreadsheetId}/values/${encodeURIComponent(range)}`)) as { values?: unknown[][] };
   const rows = result.values ?? [];
-  return rows.filter((row) => row[column] !== undefined && String(row[column]) === String(searchValue));
+  return rows.filter((row: any) => row[column] !== undefined && String(row[column]) === String(searchValue));
 };
 
 export const GoogleSheetsFunctions: Record<string, BuiltinHandler> = {
@@ -126,11 +126,11 @@ export const GoogleSheetsFunctions: Record<string, BuiltinHandler> = {
   findRows,
 };
 
-export const GoogleSheetsFunctionMetadata: Record<string, object> = {
+export const GoogleSheetsFunctionMetadata = {
   setCredentials: {
     description: "Set the OAuth2 access token for Google Sheets API.",
     parameters: [
-      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "password", required: true },
+      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -231,8 +231,7 @@ export const GoogleSheetsFunctionMetadata: Record<string, object> = {
 };
 
 export const GoogleSheetsModuleMetadata = {
-  name: "googleSheets",
   description: "Read, write, and manage Google Sheets spreadsheets via the Google Sheets API v4.",
-  icon: "table",
   category: "productivity",
+  methods: Object.keys(GoogleSheetsFunctions),
 };

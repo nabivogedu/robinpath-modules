@@ -7,7 +7,7 @@ function toNumber(v: unknown): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
-function getProperty(obj: unknown, key: string): unknown {
+function getProperty(obj: unknown, key: string): any {
   if (obj != null && typeof obj === "object") {
     return (obj as Record<string, unknown>)[key];
   }
@@ -16,9 +16,9 @@ function getProperty(obj: unknown, key: string): unknown {
 
 function extractNumbers(arr: unknown[], key?: string): number[] {
   if (key) {
-    return arr.map((item) => toNumber(getProperty(item, key)));
+    return arr.map((item: any) => toNumber(getProperty(item, key)));
   }
-  return arr.map((item) => toNumber(item));
+  return arr.map((item: any) => toNumber(item));
 }
 
 function looseEquals(a: unknown, b: unknown): boolean {
@@ -36,7 +36,7 @@ const pluck: BuiltinHandler = (args) => {
   const arr = args[0];
   const key = String(args[1] ?? "");
   if (!Array.isArray(arr)) return [];
-  return arr.map((item) => getProperty(item, key) ?? null);
+  return arr.map((item: any) => getProperty(item, key) ?? null);
 };
 
 const where: BuiltinHandler = (args) => {
@@ -44,7 +44,7 @@ const where: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = args[2];
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => looseEquals(getProperty(item, key), value));
+  return arr.filter((item: any) => looseEquals(getProperty(item, key), value));
 };
 
 const whereGt: BuiltinHandler = (args) => {
@@ -52,7 +52,7 @@ const whereGt: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = toNumber(args[2]);
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => toNumber(getProperty(item, key)) > value);
+  return arr.filter((item: any) => toNumber(getProperty(item, key)) > value);
 };
 
 const whereLt: BuiltinHandler = (args) => {
@@ -60,7 +60,7 @@ const whereLt: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = toNumber(args[2]);
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => toNumber(getProperty(item, key)) < value);
+  return arr.filter((item: any) => toNumber(getProperty(item, key)) < value);
 };
 
 const whereGte: BuiltinHandler = (args) => {
@@ -68,7 +68,7 @@ const whereGte: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = toNumber(args[2]);
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => toNumber(getProperty(item, key)) >= value);
+  return arr.filter((item: any) => toNumber(getProperty(item, key)) >= value);
 };
 
 const whereLte: BuiltinHandler = (args) => {
@@ -76,7 +76,7 @@ const whereLte: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = toNumber(args[2]);
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => toNumber(getProperty(item, key)) <= value);
+  return arr.filter((item: any) => toNumber(getProperty(item, key)) <= value);
 };
 
 const whereNot: BuiltinHandler = (args) => {
@@ -84,14 +84,14 @@ const whereNot: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const value = args[2];
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => !looseEquals(getProperty(item, key), value));
+  return arr.filter((item: any) => !looseEquals(getProperty(item, key), value));
 };
 
 const sortBy: BuiltinHandler = (args) => {
   const arr = args[0];
   const key = String(args[1] ?? "");
   if (!Array.isArray(arr)) return [];
-  return [...arr].sort((a, b) => {
+  return [...arr].sort((a: any, b: any) => {
     const va = getProperty(a, key);
     const vb = getProperty(b, key);
     if (typeof va === "number" && typeof vb === "number") return va - vb;
@@ -103,7 +103,7 @@ const sortByDesc: BuiltinHandler = (args) => {
   const arr = args[0];
   const key = String(args[1] ?? "");
   if (!Array.isArray(arr)) return [];
-  return [...arr].sort((a, b) => {
+  return [...arr].sort((a: any, b: any) => {
     const va = getProperty(a, key);
     const vb = getProperty(b, key);
     if (typeof va === "number" && typeof vb === "number") return vb - va;
@@ -225,7 +225,7 @@ const groupBy: BuiltinHandler = (args) => {
 const compact: BuiltinHandler = (args) => {
   const arr = args[0];
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => item !== null && item !== undefined && item !== false && item !== 0 && item !== "");
+  return arr.filter((item: any) => item !== null && item !== undefined && item !== false && item !== 0 && item !== "");
 };
 
 const zip: BuiltinHandler = (args) => {
@@ -244,16 +244,16 @@ const difference: BuiltinHandler = (args) => {
   const a = args[0];
   const b = args[1];
   if (!Array.isArray(a) || !Array.isArray(b)) return [];
-  const bSet = new Set(b.map((item) => JSON.stringify(item)));
-  return a.filter((item) => !bSet.has(JSON.stringify(item)));
+  const bSet = new Set(b.map((item: any) => JSON.stringify(item)));
+  return a.filter((item: any) => !bSet.has(JSON.stringify(item)));
 };
 
 const intersection: BuiltinHandler = (args) => {
   const a = args[0];
   const b = args[1];
   if (!Array.isArray(a) || !Array.isArray(b)) return [];
-  const bSet = new Set(b.map((item) => JSON.stringify(item)));
-  return a.filter((item) => bSet.has(JSON.stringify(item)));
+  const bSet = new Set(b.map((item: any) => JSON.stringify(item)));
+  return a.filter((item: any) => bSet.has(JSON.stringify(item)));
 };
 
 const union: BuiltinHandler = (args) => {
@@ -291,7 +291,7 @@ const contains: BuiltinHandler = (args) => {
   const value = args[1];
   if (!Array.isArray(arr)) return false;
   const serialized = JSON.stringify(value);
-  return arr.some((item) => JSON.stringify(item) === serialized);
+  return arr.some((item: any) => JSON.stringify(item) === serialized);
 };
 
 const indexOf: BuiltinHandler = (args) => {
@@ -299,7 +299,7 @@ const indexOf: BuiltinHandler = (args) => {
   const value = args[1];
   if (!Array.isArray(arr)) return -1;
   const serialized = JSON.stringify(value);
-  return arr.findIndex((item) => JSON.stringify(item) === serialized);
+  return arr.findIndex((item: any) => JSON.stringify(item) === serialized);
 };
 
 // ── Exports ─────────────────────────────────────────────────────────
@@ -337,7 +337,7 @@ export const CollectionFunctions: Record<string, BuiltinHandler> = {
   indexOf,
 };
 
-export const CollectionFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CollectionFunctionMetadata = {
   pluck: {
     description: "Extract a single property value from each object in an array",
     parameters: [
@@ -993,7 +993,7 @@ export const CollectionFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const CollectionModuleMetadata: ModuleMetadata = {
+export const CollectionModuleMetadata = {
   description: "Array and collection manipulation utilities: filtering, sorting, grouping, aggregation, and set operations",
   methods: [
     "pluck",

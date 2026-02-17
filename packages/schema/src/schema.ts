@@ -6,7 +6,7 @@ function validateValue(value: unknown, schema: Schema, path: string): string[] {
   const errors: string[] = [];
   if (schema.nullable && value === null) return errors;
   if (schema.oneOf) {
-    const anyValid = schema.oneOf.some((s) => validateValue(value, s, path).length === 0);
+    const anyValid = schema.oneOf.some((s: any) => validateValue(value, s, path).length === 0);
     if (!anyValid) errors.push(`${path}: does not match any of the oneOf schemas`);
     return errors;
   }
@@ -97,7 +97,7 @@ export const SchemaFunctions: Record<string, BuiltinHandler> = {
   validate, isValid, string, number, boolean, array, object, nullable, oneOf, getErrors,
 };
 
-export const SchemaFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SchemaFunctionMetadata = {
   validate: { description: "Validate data against a schema", parameters: [{ name: "data", dataType: "any", description: "Data to validate", formInputType: "json", required: true }, { name: "schema", dataType: "object", description: "Schema object", formInputType: "json", required: true }], returnType: "object", returnDescription: "{valid: boolean, errors: string[]}", example: "schema.validate $data $schema" },
   isValid: { description: "Check if data matches schema (boolean)", parameters: [{ name: "data", dataType: "any", description: "Data to validate", formInputType: "json", required: true }, { name: "schema", dataType: "object", description: "Schema object", formInputType: "json", required: true }], returnType: "boolean", returnDescription: "True if valid", example: "schema.isValid $data $schema" },
   string: { description: "Create a string schema", parameters: [{ name: "options", dataType: "object", description: "Options: {minLength, maxLength, pattern, enum}", formInputType: "json", required: false }], returnType: "object", returnDescription: "String schema object", example: 'schema.string {"minLength": 1}' },
@@ -110,7 +110,7 @@ export const SchemaFunctionMetadata: Record<string, FunctionMetadata> = {
   getErrors: { description: "Validate and return only the errors array", parameters: [{ name: "data", dataType: "any", description: "Data to validate", formInputType: "json", required: true }, { name: "schema", dataType: "object", description: "Schema object", formInputType: "json", required: true }], returnType: "array", returnDescription: "Array of error strings", example: "schema.getErrors $data $schema" },
 };
 
-export const SchemaModuleMetadata: ModuleMetadata = {
+export const SchemaModuleMetadata = {
   description: "Lightweight schema validation: validate data against type schemas with constraints",
   methods: ["validate", "isValid", "string", "number", "boolean", "array", "object", "nullable", "oneOf", "getErrors"],
 };

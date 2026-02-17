@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { promises as dns } from "node:dns";
 
 const resolve: BuiltinHandler = async (args) => {
@@ -68,7 +68,7 @@ const isResolvable: BuiltinHandler = async (args) => {
 
 export const DnsFunctions: Record<string, BuiltinHandler> = { resolve, resolve4, resolve6, reverse, lookup, mx, txt, ns, srv, soa, cname, isResolvable };
 
-export const DnsFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DnsFunctionMetadata = {
   resolve: { description: "Resolve hostname to records by type", parameters: [{ name: "hostname", dataType: "string", description: "Hostname to resolve", formInputType: "text", required: true }, { name: "rrtype", dataType: "string", description: "Record type: A|AAAA|MX|TXT|SRV|NS|CNAME|SOA|PTR", formInputType: "text", required: false }], returnType: "array", returnDescription: "Array of DNS records", example: 'dns.resolve "example.com" "A"' },
   resolve4: { description: "Resolve hostname to IPv4 addresses", parameters: [{ name: "hostname", dataType: "string", description: "Hostname", formInputType: "text", required: true }], returnType: "array", returnDescription: "IPv4 addresses", example: 'dns.resolve4 "example.com"' },
   resolve6: { description: "Resolve hostname to IPv6 addresses", parameters: [{ name: "hostname", dataType: "string", description: "Hostname", formInputType: "text", required: true }], returnType: "array", returnDescription: "IPv6 addresses", example: 'dns.resolve6 "example.com"' },
@@ -83,7 +83,7 @@ export const DnsFunctionMetadata: Record<string, FunctionMetadata> = {
   isResolvable: { description: "Check if hostname resolves", parameters: [{ name: "hostname", dataType: "string", description: "Hostname", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "true if resolvable", example: 'dns.isResolvable "example.com"' },
 };
 
-export const DnsModuleMetadata: ModuleMetadata = {
+export const DnsModuleMetadata = {
   description: "DNS lookups: resolve, reverse, MX, TXT, NS, SRV, SOA, CNAME records",
   methods: ["resolve", "resolve4", "resolve6", "reverse", "lookup", "mx", "txt", "ns", "srv", "soa", "cname", "isResolvable"],
 };

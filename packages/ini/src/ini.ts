@@ -87,7 +87,7 @@ export const IniFunctions: Record<string, BuiltinHandler> = {
   parse, stringify, parseFile, writeFile, get, set, getSections, getKeys, removeSection, removeKey,
 };
 
-export const IniFunctionMetadata: Record<string, FunctionMetadata> = {
+export const IniFunctionMetadata = {
   parse: { description: "Parse an INI string to object", parameters: [{ name: "iniString", dataType: "string", description: "INI format string", formInputType: "textarea", required: true }], returnType: "object", returnDescription: "Nested object with sections", example: 'ini.parse "[db]\\nhost=localhost"' },
   stringify: { description: "Convert object to INI string", parameters: [{ name: "obj", dataType: "object", description: "Object with sections", formInputType: "json", required: true }], returnType: "string", returnDescription: "INI format string", example: "ini.stringify $config" },
   parseFile: { description: "Read and parse an INI file", parameters: [{ name: "filePath", dataType: "string", description: "Path to INI file", formInputType: "text", required: true }], returnType: "object", returnDescription: "Parsed INI object", example: 'ini.parseFile "config.ini"' },
@@ -100,7 +100,7 @@ export const IniFunctionMetadata: Record<string, FunctionMetadata> = {
   removeKey: { description: "Remove a key from a section", parameters: [{ name: "iniString", dataType: "string", description: "INI string", formInputType: "textarea", required: true }, { name: "section", dataType: "string", description: "Section name", formInputType: "text", required: true }, { name: "key", dataType: "string", description: "Key to remove", formInputType: "text", required: true }], returnType: "string", returnDescription: "Updated INI string", example: 'ini.removeKey $ini "database" "old_key"' },
 };
 
-export const IniModuleMetadata: ModuleMetadata = {
+export const IniModuleMetadata = {
   description: "Parse, stringify, read, and write INI configuration files",
   methods: ["parse", "stringify", "parseFile", "writeFile", "get", "set", "getSections", "getKeys", "removeSection", "removeKey"],
 };

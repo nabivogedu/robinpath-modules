@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -76,7 +76,7 @@ const magicBytes: { bytes: number[]; offset: number; mime: string }[] = [
 
 const lookup: BuiltinHandler = (args) => {
   const input = String(args[0] ?? "");
-  const ext = input.startsWith(".") ? input.toLowerCase() : extname(input).toLowerCase();
+  const ext = input.startsWith(".") ? String(input).toLowerCase() : extname(input).toLowerCase();
   return mimeTypes[ext] ?? null;
 };
 
@@ -116,14 +116,14 @@ const contentType: BuiltinHandler = (args) => {
   const mime = lookup(args) as string | null;
   if (!mime) return null;
   const cs = charset([mime]);
-  return cs ? `${mime}; charset=${cs.toLowerCase()}` : mime;
+  return cs ? `${mime}; charset=${String(cs).toLowerCase()}` : mime;
 };
 
 const allTypes: BuiltinHandler = () => ({ ...mimeTypes });
 
 export const MimeFunctions: Record<string, BuiltinHandler> = { lookup, extension, detect, charset, isText, isImage, isAudio, isVideo, isFont, isArchive, contentType, allTypes };
 
-export const MimeFunctionMetadata: Record<string, FunctionMetadata> = {
+export const MimeFunctionMetadata = {
   lookup: { description: "Get MIME type from file extension", parameters: [{ name: "pathOrExt", dataType: "string", description: "File path or extension", formInputType: "text", required: true }], returnType: "string", returnDescription: "MIME type or null", example: 'mime.lookup "photo.png"' },
   extension: { description: "Get extension from MIME type", parameters: [{ name: "mimeType", dataType: "string", description: "MIME type", formInputType: "text", required: true }], returnType: "string", returnDescription: "Extension or null", example: 'mime.extension "image/png"' },
   detect: { description: "Detect MIME type from file content (magic bytes)", parameters: [{ name: "filePath", dataType: "string", description: "File path", formInputType: "text", required: true }], returnType: "string", returnDescription: "Detected MIME type", example: 'mime.detect "./unknown_file"' },
@@ -138,7 +138,7 @@ export const MimeFunctionMetadata: Record<string, FunctionMetadata> = {
   allTypes: { description: "Get all known MIME type mappings", parameters: [], returnType: "object", returnDescription: "Extension-to-MIME map", example: "mime.allTypes" },
 };
 
-export const MimeModuleMetadata: ModuleMetadata = {
+export const MimeModuleMetadata = {
   description: "MIME type detection from extensions and file content, type classification, Content-Type building",
   methods: ["lookup", "extension", "detect", "charset", "isText", "isImage", "isAudio", "isVideo", "isFont", "isArchive", "contentType", "allTypes"],
 };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Function Handlers ───────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ const slackRich: BuiltinHandler = async (args) => {
     blocks.push({ type: "section", text: { type: "mrkdwn", text: String(opts.text) } });
   }
   if (opts.fields && Array.isArray(opts.fields)) {
-    blocks.push({ type: "section", fields: (opts.fields as { label: string; value: string }[]).map((f) => ({ type: "mrkdwn", text: `*${f.label}*\n${f.value}` })) });
+    blocks.push({ type: "section", fields: (opts.fields as { label: string; value: string }[]).map((f: any) => ({ type: "mrkdwn", text: `*${f.label}*\n${f.value}` })) });
   }
   if (opts.imageUrl) {
     blocks.push({ type: "image", image_url: String(opts.imageUrl), alt_text: String(opts.imageAlt ?? "Image") });
@@ -92,7 +92,7 @@ const discordEmbed: BuiltinHandler = async (args) => {
   if (opts.footer) embed.footer = { text: String(opts.footer) };
   if (opts.timestamp) embed.timestamp = String(opts.timestamp === true ? new Date().toISOString() : opts.timestamp);
   if (opts.fields && Array.isArray(opts.fields)) {
-    embed.fields = (opts.fields as { name: string; value: string; inline?: boolean }[]).map((f) => ({
+    embed.fields = (opts.fields as { name: string; value: string; inline?: boolean }[]).map((f: any) => ({
       name: f.name, value: f.value, inline: f.inline ?? false,
     }));
   }
@@ -174,7 +174,7 @@ const teamsCard: BuiltinHandler = async (args) => {
     card.sections = opts.sections;
   }
   if (opts.actions && Array.isArray(opts.actions)) {
-    card.potentialAction = (opts.actions as { name: string; url: string }[]).map((a) => ({
+    card.potentialAction = (opts.actions as { name: string; url: string }[]).map((a: any) => ({
       "@type": "OpenUri", name: a.name, targets: [{ os: "default", uri: a.url }],
     }));
   }
@@ -216,7 +216,7 @@ export const NotificationFunctions: Record<string, BuiltinHandler> = {
   slack, slackRich, discord, discordEmbed, telegram, teams, teamsCard, sendAll,
 };
 
-export const NotificationFunctionMetadata: Record<string, FunctionMetadata> = {
+export const NotificationFunctionMetadata = {
   slack: { description: "Send a message to Slack via webhook", parameters: [{ name: "webhookUrl", dataType: "string", description: "Slack incoming webhook URL", formInputType: "text", required: true }, { name: "message", dataType: "any", description: "String or Slack message object", formInputType: "text", required: true }], returnType: "object", returnDescription: "{ok, status}", example: 'notification.slack $webhookUrl "Deploy complete!"' },
   slackRich: { description: "Send a rich Slack message with blocks (title, fields, images)", parameters: [{ name: "webhookUrl", dataType: "string", description: "Slack webhook URL", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{title, text, fields, imageUrl, channel, username, iconEmoji}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{ok, status}", example: 'notification.slackRich $url {"title": "Deploy", "text": "v1.2.3 deployed"}' },
   discord: { description: "Send a message to Discord via webhook", parameters: [{ name: "webhookUrl", dataType: "string", description: "Discord webhook URL", formInputType: "text", required: true }, { name: "message", dataType: "any", description: "String or Discord message object", formInputType: "text", required: true }], returnType: "object", returnDescription: "{ok, status}", example: 'notification.discord $webhookUrl "Build passed!"' },
@@ -227,7 +227,7 @@ export const NotificationFunctionMetadata: Record<string, FunctionMetadata> = {
   sendAll: { description: "Send a message to multiple channels at once", parameters: [{ name: "channels", dataType: "array", description: "Array of {type, url/token, chatId}", formInputType: "text", required: true }, { name: "message", dataType: "string", description: "Message text", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of {channel, ok, error?}", example: 'notification.sendAll $channels "System alert: disk 90%"' },
 };
 
-export const NotificationModuleMetadata: ModuleMetadata = {
+export const NotificationModuleMetadata = {
   description: "Unified notifications to Slack, Discord, Telegram, and Microsoft Teams via webhooks",
   methods: ["slack", "slackRich", "discord", "discordEmbed", "telegram", "teams", "teamsCard", "sendAll"],
 };

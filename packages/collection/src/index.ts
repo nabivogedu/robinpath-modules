@@ -4,10 +4,10 @@ import { CollectionFunctions, CollectionFunctionMetadata, CollectionModuleMetada
 const CollectionModule: ModuleAdapter = {
   name: "collection",
   functions: CollectionFunctions,
-  functionMetadata: CollectionFunctionMetadata,
-  moduleMetadata: CollectionModuleMetadata,
+  functionMetadata: CollectionFunctionMetadata as any,
+  moduleMetadata: CollectionModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default CollectionModule;
 export { CollectionModule };

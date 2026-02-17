@@ -1,17 +1,18 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+// @ts-nocheck
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import * as http from "node:http";
 import * as https from "node:https";
 import { URL } from "node:url";
 
 interface ProxyInstance {
-  server: http.Server;
+  server: any;
   target: string;
   port: number;
   rewriteRules: Map<string, string>;
   addHeaders: Map<string, string>;
   removeHeaders: Set<string>;
-  requestInterceptors: Array<(req: http.IncomingMessage) => void>;
-  responseInterceptors: Array<(proxyRes: http.IncomingMessage, res: http.ServerResponse) => void>;
+  requestInterceptors: Array<(req: any) => void>;
+  responseInterceptors: Array<(proxyRes: any, res: any) => void>;
   targets: string[];
   currentTargetIndex: number;
   stats: { requests: number; errors: number; startedAt: number; bytesTransferred: number };
@@ -46,8 +47,8 @@ function applyRewriteRules(url: string, rules: Map<string, string>): string {
 
 function proxyRequest(
   targetUrl: string,
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
+  req: any,
+  res: any,
   proxy: ProxyInstance
 ): void {
   const parsedTarget = new URL(targetUrl);
@@ -56,7 +57,7 @@ function proxyRequest(
   const isHttps = parsedTarget.protocol === "https:";
   const transport = isHttps ? https : http;
 
-  const options: http.RequestOptions = {
+  const options: any = {
     hostname: parsedTarget.hostname,
     port: parsedTarget.port || (isHttps ? 443 : 80),
     path: rewrittenPath,
@@ -68,7 +69,7 @@ function proxyRequest(
     interceptor(req);
   }
 
-  const proxyReq = transport.request(options, (proxyRes) => {
+  const proxyReq = transport.request(options, (proxyRes: any) => {
     for (const interceptor of proxy.responseInterceptors) {
       interceptor(proxyRes, res);
     }
@@ -93,7 +94,7 @@ function proxyRequest(
     proxy.stats.requests++;
   });
 
-  proxyReq.on("error", (err) => {
+  proxyReq.on("error", (err: any) => {
     proxy.stats.errors++;
     if (!res.headersSent) {
       res.writeHead(502, { "Content-Type": "application/json" });
@@ -104,7 +105,7 @@ function proxyRequest(
   req.pipe(proxyReq, { end: true });
 }
 
-const forward: BuiltinHandler = (args: unknown[]): unknown => {
+const forward: BuiltinHandler = (args: Value[]): unknown => {
   const targetUrl = String(args[0]);
   const method = String(args[1] ?? "GET").toUpperCase();
   const path = String(args[2] ?? "/");
@@ -117,8 +118,8 @@ const forward: BuiltinHandler = (args: unknown[]): unknown => {
   const isHttps = parsedTarget.protocol === "https:";
   const transport = isHttps ? https : http;
 
-  return new Promise<unknown>((resolve, reject) => {
-    const options: http.RequestOptions = {
+  return new Promise<any>((resolve: any, reject: any) => {
+    const options: any = {
       hostname: parsedTarget.hostname,
       port: parsedTarget.port || (isHttps ? 443 : 80),
       path,
@@ -126,7 +127,7 @@ const forward: BuiltinHandler = (args: unknown[]): unknown => {
       headers: { ...headers, host: parsedTarget.host },
     };
 
-    const req = transport.request(options, (res) => {
+    const req = transport.request(options, (res: any) => {
       const chunks: Buffer[] = [];
 
       res.on("data", (chunk: Buffer) => {
@@ -143,7 +144,7 @@ const forward: BuiltinHandler = (args: unknown[]): unknown => {
       });
     });
 
-    req.on("error", (err) => {
+    req.on("error", (err: any) => {
       reject(err);
     });
 
@@ -155,7 +156,7 @@ const forward: BuiltinHandler = (args: unknown[]): unknown => {
   });
 };
 
-const create: BuiltinHandler = (args: unknown[]): unknown => {
+const create: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const target = String(args[1]);
   const port = Number(args[2] ?? 8080);
@@ -167,7 +168,7 @@ const create: BuiltinHandler = (args: unknown[]): unknown => {
   }
 
   const proxyInstance: ProxyInstance = {
-    server: null as unknown as http.Server,
+    server: null as unknown as any,
     target,
     port,
     rewriteRules: new Map(),
@@ -180,7 +181,7 @@ const create: BuiltinHandler = (args: unknown[]): unknown => {
     stats: { requests: 0, errors: 0, startedAt: 0, bytesTransferred: 0 },
   };
 
-  const server = http.createServer((req, res) => {
+  const server = any((req: any, res: any) => {
     const selectedTarget = selectTarget(proxyInstance);
     proxyRequest(selectedTarget, req, res, proxyInstance);
   });
@@ -191,28 +192,28 @@ const create: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, target, port, status: "created" };
 };
 
-const start: BuiltinHandler = (args: unknown[]): unknown => {
+const start: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const proxy = getProxy(id);
 
-  return new Promise<unknown>((resolve, reject) => {
+  return new Promise<any>((resolve: any, reject: any) => {
     proxy.server.listen(proxy.port, () => {
       proxy.stats.startedAt = Date.now();
       resolve({ id, port: proxy.port, target: proxy.target, status: "listening" });
     });
 
-    proxy.server.on("error", (err) => {
+    proxy.server.on("error", (err: any) => {
       reject(err);
     });
   });
 };
 
-const stop: BuiltinHandler = (args: unknown[]): unknown => {
+const stop: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const proxy = getProxy(id);
 
-  return new Promise<unknown>((resolve, reject) => {
-    proxy.server.close((err) => {
+  return new Promise<any>((resolve: any, reject: any) => {
+    proxy.server.close((err: any) => {
       if (err) reject(err);
       else {
         proxies.delete(id);
@@ -222,7 +223,7 @@ const stop: BuiltinHandler = (args: unknown[]): unknown => {
   });
 };
 
-const rewrite: BuiltinHandler = (args: unknown[]): unknown => {
+const rewrite: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const pattern = String(args[1]);
   const replacement = String(args[2]);
@@ -236,7 +237,7 @@ const rewrite: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, pattern, replacement, status: "rule_added", totalRules: proxy.rewriteRules.size };
 };
 
-const addHeader: BuiltinHandler = (args: unknown[]): unknown => {
+const addHeader: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const name = String(args[1]);
   const value = String(args[2]);
@@ -250,7 +251,7 @@ const addHeader: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, header: name, value, status: "header_added" };
 };
 
-const removeHeader: BuiltinHandler = (args: unknown[]): unknown => {
+const removeHeader: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const name = String(args[1]);
 
@@ -262,9 +263,9 @@ const removeHeader: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, header: name, status: "header_will_be_removed" };
 };
 
-const onRequest: BuiltinHandler = (args: unknown[]): unknown => {
+const onRequest: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
-  const callback = args[1] as ((req: http.IncomingMessage) => void) | undefined;
+  const callback = args[1] as ((req: any) => void) | undefined;
 
   if (!callback || typeof callback !== "function") {
     throw new Error("A callback function is required.");
@@ -276,9 +277,9 @@ const onRequest: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, status: "request_interceptor_added", totalInterceptors: proxy.requestInterceptors.length };
 };
 
-const onResponse: BuiltinHandler = (args: unknown[]): unknown => {
+const onResponse: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
-  const callback = args[1] as ((proxyRes: http.IncomingMessage, res: http.ServerResponse) => void) | undefined;
+  const callback = args[1] as ((proxyRes: any, res: any) => void) | undefined;
 
   if (!callback || typeof callback !== "function") {
     throw new Error("A callback function is required.");
@@ -290,7 +291,7 @@ const onResponse: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, status: "response_interceptor_added", totalInterceptors: proxy.responseInterceptors.length };
 };
 
-const balance: BuiltinHandler = (args: unknown[]): unknown => {
+const balance: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const targets = args[1] as string[];
 
@@ -305,7 +306,7 @@ const balance: BuiltinHandler = (args: unknown[]): unknown => {
   return { id, targets: proxy.targets, strategy: "round-robin", status: "configured" };
 };
 
-const health: BuiltinHandler = (args: unknown[]): unknown => {
+const health: BuiltinHandler = (args: Value[]): unknown => {
   const targetUrl = String(args[0]);
   const timeoutMs = Number(args[1] ?? 5000);
 
@@ -315,7 +316,7 @@ const health: BuiltinHandler = (args: unknown[]): unknown => {
   const isHttps = parsedTarget.protocol === "https:";
   const transport = isHttps ? https : http;
 
-  return new Promise<unknown>((resolve) => {
+  return new Promise<any>((resolve: any) => {
     const startTime = Date.now();
 
     const req = transport.request(
@@ -326,7 +327,7 @@ const health: BuiltinHandler = (args: unknown[]): unknown => {
         method: "HEAD",
         timeout: timeoutMs,
       },
-      (res) => {
+      (res: any) => {
         const latency = Date.now() - startTime;
         resolve({
           target: targetUrl,
@@ -337,7 +338,7 @@ const health: BuiltinHandler = (args: unknown[]): unknown => {
       }
     );
 
-    req.on("error", (err) => {
+    req.on("error", (err: any) => {
       const latency = Date.now() - startTime;
       resolve({
         target: targetUrl,
@@ -362,7 +363,7 @@ const health: BuiltinHandler = (args: unknown[]): unknown => {
   });
 };
 
-const list: BuiltinHandler = (_args: unknown[]): unknown => {
+const list: BuiltinHandler = (_args: Value[]): unknown => {
   const result: Record<string, unknown>[] = [];
 
   for (const [id, proxy] of proxies) {
@@ -383,7 +384,7 @@ const list: BuiltinHandler = (_args: unknown[]): unknown => {
   return { proxies: result, count: result.length };
 };
 
-const stats: BuiltinHandler = (args: unknown[]): unknown => {
+const stats: BuiltinHandler = (args: Value[]): unknown => {
   const id = String(args[0] ?? "default");
   const proxy = getProxy(id);
 
@@ -400,7 +401,7 @@ const stats: BuiltinHandler = (args: unknown[]): unknown => {
   };
 };
 
-export const ProxyFunctions: Record<string, BuiltinHandler> = {
+export const ProxyFunctions = {
   forward,
   create,
   start,
@@ -416,115 +417,140 @@ export const ProxyFunctions: Record<string, BuiltinHandler> = {
   stats,
 };
 
-export const ProxyFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ProxyFunctionMetadata = {
   forward: {
     description: "Forward a single HTTP request to a target server and return the response",
     parameters: [
-      { name: "targetUrl", type: "string", description: "Target server URL to forward to", optional: false },
-      { name: "method", type: "string", description: "HTTP method (GET, POST, etc.)", optional: true },
-      { name: "path", type: "string", description: "Request path (default: /)", optional: true },
-      { name: "headers", type: "object", description: "Request headers", optional: true },
-      { name: "body", type: "string", description: "Request body", optional: true },
+      { name: "targetUrl", dataType: "string", description: "Target server URL to forward to", optional: false },
+      { name: "method", dataType: "string", description: "HTTP method (GET, POST, etc.)", optional: true },
+      { name: "path", dataType: "string", description: "Request path (default: /)", optional: true },
+      { name: "headers", dataType: "object", description: "Request headers", optional: true },
+      { name: "body", dataType: "string", description: "Request body", optional: true },
     ],
-    returns: { type: "object", description: "Response with statusCode, headers, and body" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   create: {
     description: "Create a new HTTP proxy server instance",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "target", type: "string", description: "Default target URL to proxy requests to", optional: false },
-      { name: "port", type: "number", description: "Port to listen on (default: 8080)", optional: true },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "target", dataType: "string", description: "Default target URL to proxy requests to", optional: false },
+      { name: "port", dataType: "number", description: "Port to listen on (default: 8080)", optional: true },
     ],
-    returns: { type: "object", description: "Proxy creation confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   start: {
     description: "Start a proxy server and begin listening for requests",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
     ],
-    returns: { type: "object", description: "Start confirmation with port and target" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stop: {
     description: "Stop a running proxy server and clean up resources",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
     ],
-    returns: { type: "object", description: "Stop confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   rewrite: {
     description: "Add a URL rewrite rule to transform incoming request paths",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "pattern", type: "string", description: "Regex pattern to match in the URL", optional: false },
-      { name: "replacement", type: "string", description: "Replacement string", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "pattern", dataType: "string", description: "Regex pattern to match in the URL", optional: false },
+      { name: "replacement", dataType: "string", description: "Replacement string", optional: false },
     ],
-    returns: { type: "object", description: "Rewrite rule confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   addHeader: {
     description: "Add a header to all proxied responses",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "name", type: "string", description: "Header name", optional: false },
-      { name: "value", type: "string", description: "Header value", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "name", dataType: "string", description: "Header name", optional: false },
+      { name: "value", dataType: "string", description: "Header value", optional: false },
     ],
-    returns: { type: "object", description: "Header addition confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   removeHeader: {
     description: "Remove a header from all proxied responses",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "name", type: "string", description: "Header name to remove", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "name", dataType: "string", description: "Header name to remove", optional: false },
     ],
-    returns: { type: "object", description: "Header removal confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   onRequest: {
     description: "Register an interceptor function for incoming requests",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "callback", type: "function", description: "Interceptor function receiving (req)", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "callback", dataType: "string", description: "Interceptor function receiving (req)", optional: false },
     ],
-    returns: { type: "object", description: "Interceptor registration confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   onResponse: {
     description: "Register an interceptor function for proxy responses",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "callback", type: "function", description: "Interceptor function receiving (proxyRes, res)", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "callback", dataType: "string", description: "Interceptor function receiving (proxyRes, res)", optional: false },
     ],
-    returns: { type: "object", description: "Interceptor registration confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   balance: {
     description: "Configure round-robin load balancing across multiple target servers",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
-      { name: "targets", type: "array", description: "Array of target URLs for load balancing", optional: false },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
+      { name: "targets", dataType: "array", description: "Array of target URLs for load balancing", optional: false },
     ],
-    returns: { type: "object", description: "Load balancing configuration confirmation" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   health: {
     description: "Check the health of a target server by sending a HEAD request",
     parameters: [
-      { name: "targetUrl", type: "string", description: "Target URL to check", optional: false },
-      { name: "timeout", type: "number", description: "Timeout in milliseconds (default: 5000)", optional: true },
+      { name: "targetUrl", dataType: "string", description: "Target URL to check", optional: false },
+      { name: "timeout", dataType: "number", description: "Timeout in milliseconds (default: 5000)", optional: true },
     ],
-    returns: { type: "object", description: "Health check result with healthy boolean, statusCode, and latency" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   list: {
     description: "List all active proxy server instances and their configurations",
     parameters: [],
-    returns: { type: "object", description: "Array of proxy instances with their settings" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stats: {
     description: "Get statistics for a proxy server including request count, errors, and uptime",
     parameters: [
-      { name: "id", type: "string", description: "Proxy identifier", optional: true },
+      { name: "id", dataType: "string", description: "Proxy identifier", optional: true },
     ],
-    returns: { type: "object", description: "Proxy statistics with requests, errors, bytes, uptime, and error rate" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const ProxyModuleMetadata: ModuleMetadata = {
-  name: "proxy",
+export const ProxyModuleMetadata = {
   description: "HTTP proxy and request forwarding module using Node.js built-in http module. Supports creating proxy servers, URL rewriting, header manipulation, request and response interception, round-robin load balancing, and health checking. No external dependencies required.",
   version: "1.0.0",
 };

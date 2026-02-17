@@ -4,10 +4,10 @@ import { TelegramFunctions, TelegramFunctionMetadata, TelegramModuleMetadata } f
 const TelegramModule: ModuleAdapter = {
   name: "telegram",
   functions: TelegramFunctions,
-  functionMetadata: TelegramFunctionMetadata,
-  moduleMetadata: TelegramModuleMetadata,
+  functionMetadata: TelegramFunctionMetadata as any,
+  moduleMetadata: TelegramModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TelegramModule;
 export { TelegramModule };

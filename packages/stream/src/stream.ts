@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createReadStream, createWriteStream, readFileSync, writeFileSync, statSync } from "node:fs";
 import { pipeline as pipelineAsync } from "node:stream/promises";
 import { Transform, Readable } from "node:stream";
@@ -187,10 +187,10 @@ const hash: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   const algorithm = String(args[1] ?? "sha256");
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve: any, reject: any) => {
     const h = createHash(algorithm);
     const stream = createReadStream(filePath);
-    stream.on("data", (chunk) => h.update(chunk));
+    stream.on("data", (chunk: any) => h.update(chunk));
     stream.on("end", () => resolve(h.digest("hex")));
     stream.on("error", reject);
   });
@@ -200,7 +200,7 @@ export const StreamFunctions: Record<string, BuiltinHandler> = {
   readFile, writeFile, copyFile, lines, transform, filter, concat, split, count, head, tail, pipe, hash,
 };
 
-export const StreamFunctionMetadata: Record<string, FunctionMetadata> = {
+export const StreamFunctionMetadata = {
   readFile: { description: "Read entire file content", parameters: [{ name: "filePath", dataType: "string", description: "File path", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{encoding}", formInputType: "text", required: false }], returnType: "string", returnDescription: "File content", example: 'stream.readFile "./data.txt"' },
   writeFile: { description: "Write data to file", parameters: [{ name: "filePath", dataType: "string", description: "File path", formInputType: "text", required: true }, { name: "data", dataType: "string", description: "Content to write", formInputType: "text", required: true }], returnType: "object", returnDescription: "{path, size}", example: 'stream.writeFile "./out.txt" "hello"' },
   copyFile: { description: "Stream-copy a file", parameters: [{ name: "src", dataType: "string", description: "Source path", formInputType: "text", required: true }, { name: "dest", dataType: "string", description: "Destination path", formInputType: "text", required: true }], returnType: "object", returnDescription: "{src, dest, size}", example: 'stream.copyFile "./a.txt" "./b.txt"' },
@@ -216,7 +216,7 @@ export const StreamFunctionMetadata: Record<string, FunctionMetadata> = {
   hash: { description: "Stream-hash a file", parameters: [{ name: "filePath", dataType: "string", description: "File path", formInputType: "text", required: true }, { name: "algorithm", dataType: "string", description: "Hash algorithm (default sha256)", formInputType: "text", required: false }], returnType: "string", returnDescription: "Hex hash string", example: 'stream.hash "./data.bin" "sha256"' },
 };
 
-export const StreamModuleMetadata: ModuleMetadata = {
+export const StreamModuleMetadata = {
   description: "Stream processing for large files: read, write, transform, filter, split, concat, hash without loading into memory",
   methods: ["readFile", "writeFile", "copyFile", "lines", "transform", "filter", "concat", "split", "count", "head", "tail", "pipe", "hash"],
 };

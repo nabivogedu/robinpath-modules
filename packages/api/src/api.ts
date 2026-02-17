@@ -424,7 +424,7 @@ export const ApiFunctions: Record<string, BuiltinHandler> = {
   request,
 };
 
-export const ApiFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ApiFunctionMetadata = {
   get: {
     description: "Send a GET request to a URL and return the response body (auto-parses JSON)",
     parameters: [
@@ -556,7 +556,7 @@ export const ApiFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const ApiModuleMetadata: ModuleMetadata = {
+export const ApiModuleMetadata = {
   description: "HTTP client for making requests to external APIs with profiles, auth, download/upload, and auto-JSON parsing",
   methods: [
     "get", "post", "put", "patch", "delete", "head",

@@ -4,10 +4,10 @@ import { TomlFunctions, TomlFunctionMetadata, TomlModuleMetadata } from "./toml.
 const TomlModule: ModuleAdapter = {
   name: "toml",
   functions: TomlFunctions,
-  functionMetadata: TomlFunctionMetadata,
-  moduleMetadata: TomlModuleMetadata,
+  functionMetadata: TomlFunctionMetadata as any,
+  moduleMetadata: TomlModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TomlModule;
 export { TomlModule };

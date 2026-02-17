@@ -4,10 +4,10 @@ import { StringFunctions, StringFunctionMetadata, StringModuleMetadata } from ".
 const StringModule: ModuleAdapter = {
   name: "string",
   functions: StringFunctions,
-  functionMetadata: StringFunctionMetadata,
-  moduleMetadata: StringModuleMetadata,
+  functionMetadata: StringFunctionMetadata as any,
+  moduleMetadata: StringModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default StringModule;
 export { StringModule };

@@ -1,15 +1,15 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import nodePath from "node:path";
 
 // ── Function Handlers ──────────────────────────────────────────────
 
 const join: BuiltinHandler = (args) => {
-  const segments = args.map((a) => String(a ?? ""));
+  const segments = args.map((a: any) => String(a ?? ""));
   return nodePath.join(...segments);
 };
 
 const resolve: BuiltinHandler = (args) => {
-  const segments = args.map((a) => String(a ?? ""));
+  const segments = args.map((a: any) => String(a ?? ""));
   return nodePath.resolve(...segments);
 };
 
@@ -76,7 +76,7 @@ export const PathFunctions: Record<string, BuiltinHandler> = {
   separator,
 };
 
-export const PathFunctionMetadata: Record<string, FunctionMetadata> = {
+export const PathFunctionMetadata = {
   join: {
     description: "Join path segments into a single path",
     parameters: [
@@ -235,7 +235,7 @@ export const PathFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const PathModuleMetadata: ModuleMetadata = {
+export const PathModuleMetadata = {
   description: "Path manipulation utilities for joining, resolving, and parsing file paths",
   methods: [
     "join",

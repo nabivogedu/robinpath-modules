@@ -1,29 +1,29 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import QRCode from "qrcode";
 
 const qrGenerate: BuiltinHandler = async (args) => {
   const text = String(args[0] ?? "");
   const opts = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, unknown>;
-  return await QRCode.toDataURL(text, opts as QRCode.QRCodeToDataURLOptions);
+  return await QRCode.toDataURL(text, opts as any);
 };
 
 const qrToFile: BuiltinHandler = async (args) => {
   const text = String(args[0] ?? "");
   const filePath = String(args[1] ?? "qr.png");
   const opts = (typeof args[2] === "object" && args[2] !== null ? args[2] : {}) as Record<string, unknown>;
-  await QRCode.toFile(filePath, text, opts as QRCode.QRCodeToFileOptions);
+  await QRCode.toFile(filePath, text, opts as any);
   return filePath;
 };
 
 const qrToSvg: BuiltinHandler = async (args) => {
   const text = String(args[0] ?? "");
   const opts = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, unknown>;
-  return await QRCode.toString(text, { ...opts, type: "svg" } as QRCode.QRCodeToStringOptions);
+  return await QRCode.toString(text, { ...opts, type: "svg" } as any);
 };
 
 const qrToTerminal: BuiltinHandler = async (args) => {
   const text = String(args[0] ?? "");
-  return await QRCode.toString(text, { type: "terminal" } as QRCode.QRCodeToStringOptions);
+  return await QRCode.toString(text, { type: "terminal" } as any);
 };
 
 function ean13Check(digits: string): number {
@@ -111,7 +111,7 @@ const luhnGenerate: BuiltinHandler = (args) => {
 
 export const BarcodeFunctions: Record<string, BuiltinHandler> = { qrGenerate, qrToFile, qrToSvg, qrToTerminal, ean13Validate, ean13Checksum, upcValidate, upcChecksum, isbn10Validate, isbn13Validate, isbn10to13, isbn13to10, luhn, luhnGenerate };
 
-export const BarcodeFunctionMetadata: Record<string, FunctionMetadata> = {
+export const BarcodeFunctionMetadata = {
   qrGenerate: { description: "Generate QR code as data URL", parameters: [{ name: "text", dataType: "string", description: "Text to encode", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{width, margin, color, errorCorrectionLevel}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Data URL (base64 PNG)", example: 'barcode.qrGenerate "https://example.com"' },
   qrToFile: { description: "Generate QR code to file", parameters: [{ name: "text", dataType: "string", description: "Text", formInputType: "text", required: true }, { name: "filePath", dataType: "string", description: "Output path", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "QR options", formInputType: "text", required: false }], returnType: "string", returnDescription: "File path", example: 'barcode.qrToFile "https://example.com" "./qr.png"' },
   qrToSvg: { description: "Generate QR code as SVG", parameters: [{ name: "text", dataType: "string", description: "Text", formInputType: "text", required: true }], returnType: "string", returnDescription: "SVG string", example: 'barcode.qrToSvg "hello"' },
@@ -128,7 +128,7 @@ export const BarcodeFunctionMetadata: Record<string, FunctionMetadata> = {
   luhnGenerate: { description: "Generate Luhn check digit", parameters: [{ name: "number", dataType: "string", description: "Number without check digit", formInputType: "text", required: true }], returnType: "string", returnDescription: "Number with check digit", example: 'barcode.luhnGenerate "453957876362148"' },
 };
 
-export const BarcodeModuleMetadata: ModuleMetadata = {
+export const BarcodeModuleMetadata = {
   description: "QR code generation, EAN/UPC barcode validation, ISBN conversion, and Luhn checksum",
   methods: ["qrGenerate", "qrToFile", "qrToSvg", "qrToTerminal", "ean13Validate", "ean13Checksum", "upcValidate", "upcChecksum", "isbn10Validate", "isbn13Validate", "isbn10to13", "isbn13to10", "luhn", "luhnGenerate"],
 };

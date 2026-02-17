@@ -4,10 +4,10 @@ import { ScreenFunctions, ScreenFunctionMetadata, ScreenModuleMetadata } from ".
 const ScreenModule: ModuleAdapter = {
   name: "screen",
   functions: ScreenFunctions,
-  functionMetadata: ScreenFunctionMetadata,
-  moduleMetadata: ScreenModuleMetadata,
+  functionMetadata: ScreenFunctionMetadata as any,
+  moduleMetadata: ScreenModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ScreenModule;
 export { ScreenModule };

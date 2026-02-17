@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 
@@ -72,7 +72,7 @@ const parse: BuiltinHandler = (args) => {
   const ics = String(args[0] ?? "");
   const nameMatch = ics.match(/X-WR-CALNAME:(.*)/i);
   const eventBlocks = ics.split(/BEGIN:VEVENT/i).slice(1);
-  const events = eventBlocks.map((block) => {
+  const events = eventBlocks.map((block: any) => {
     const endIdx = block.indexOf("END:VEVENT");
     const content = endIdx >= 0 ? block.substring(0, endIdx) : block;
     const dtstart = extractProp(content, "DTSTART");
@@ -112,7 +112,7 @@ const findEvents: BuiltinHandler = (args) => {
   const events = (Array.isArray(args[0]) ? args[0] : []) as Record<string, unknown>[];
   const start = new Date(String(args[1] ?? "")).getTime();
   const end = new Date(String(args[2] ?? "")).getTime();
-  return events.filter((e) => { const t = new Date(String(e.start ?? "")).getTime(); return t >= start && t <= end; });
+  return events.filter((e: any) => { const t = new Date(String(e.start ?? "")).getTime(); return t >= start && t <= end; });
 };
 
 const today: BuiltinHandler = (args) => {
@@ -135,7 +135,7 @@ const parseDate: BuiltinHandler = (args) => fromIcalDate(String(args[0] ?? ""));
 
 export const CalendarFunctions: Record<string, BuiltinHandler> = { createEvent, createCalendar, parse, parseFile, writeFile, addEvent, removeEvent, findEvents, today, upcoming, toJson, formatDate, parseDate };
 
-export const CalendarFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CalendarFunctionMetadata = {
   createEvent: { description: "Create an iCal event object", parameters: [{ name: "options", dataType: "object", description: "{summary, description, location, start, end, allDay, organizer, attendees, url, uid}", formInputType: "text", required: true }], returnType: "object", returnDescription: "Event object", example: 'calendar.createEvent {"summary": "Meeting", "start": "2024-01-15T10:00:00Z", "end": "2024-01-15T11:00:00Z"}' },
   createCalendar: { description: "Create iCal string from events", parameters: [{ name: "events", dataType: "array", description: "Event objects", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{name, timezone}", formInputType: "text", required: false }], returnType: "string", returnDescription: "iCal string", example: 'calendar.createCalendar [$event1, $event2] {"name": "My Calendar"}' },
   parse: { description: "Parse iCal string", parameters: [{ name: "icsString", dataType: "string", description: "iCal content", formInputType: "text", required: true }], returnType: "object", returnDescription: "{name, events[]}", example: 'calendar.parse $icsContent' },
@@ -151,7 +151,7 @@ export const CalendarFunctionMetadata: Record<string, FunctionMetadata> = {
   parseDate: { description: "Parse iCal date to ISO", parameters: [{ name: "icalDate", dataType: "string", description: "iCal date", formInputType: "text", required: true }], returnType: "string", returnDescription: "ISO date", example: 'calendar.parseDate "20240115T100000Z"' },
 };
 
-export const CalendarModuleMetadata: ModuleMetadata = {
+export const CalendarModuleMetadata = {
   description: "iCal (.ics) calendar parsing, generation, event management, and date range queries",
   methods: ["createEvent", "createCalendar", "parse", "parseFile", "writeFile", "addEvent", "removeEvent", "findEvents", "today", "upcoming", "toJson", "formatDate", "parseDate"],
 };

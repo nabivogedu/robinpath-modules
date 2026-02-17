@@ -4,10 +4,10 @@ import { QueueFunctions, QueueFunctionMetadata, QueueModuleMetadata } from "./qu
 const QueueModule: ModuleAdapter = {
   name: "queue",
   functions: QueueFunctions,
-  functionMetadata: QueueFunctionMetadata,
-  moduleMetadata: QueueModuleMetadata,
+  functionMetadata: QueueFunctionMetadata as any,
+  moduleMetadata: QueueModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default QueueModule;
 export { QueueModule };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -113,7 +113,7 @@ const createJson: BuiltinHandler = (args) => {
     description: config.description,
     language: config.language,
     authors: config.author ? [{ name: config.author }] : undefined,
-    items: (config.items ?? []).map((item) => ({
+    items: (config.items ?? []).map((item: any) => ({
       id: item.guid ?? item.link,
       url: item.link,
       title: item.title,
@@ -199,20 +199,20 @@ const parseAtom: BuiltinHandler = (args) => {
 
 const parseJson: BuiltinHandler = (args) => {
   const input = typeof args[0] === "string" ? JSON.parse(args[0]) : args[0];
-  const feed = input as Record<string, unknown>;
-  const items = (Array.isArray(feed.items) ? feed.items : []) as Record<string, unknown>[];
+  const feed = input as unknown as Record<string, unknown>;
+  const items = (Array.isArray(feed.items) ? feed.items : []) as unknown as Record<string, unknown>[];
   return {
     type: "json",
     title: feed.title,
     link: feed.home_page_url,
     description: feed.description,
     language: feed.language,
-    items: items.map((item) => ({
+    items: items.map((item: any) => ({
       title: item.title ?? "",
       link: item.url ?? "",
       description: item.summary,
       content: item.content_html ?? item.content_text,
-      author: Array.isArray(item.authors) ? (item.authors[0] as Record<string, unknown>)?.name : undefined,
+      author: Array.isArray(item.authors) ? (item.authors[0] as unknown as Record<string, unknown>)?.name : undefined,
       categories: item.tags,
       pubDate: item.date_published,
       guid: item.id,
@@ -246,13 +246,13 @@ const addItem: BuiltinHandler = (args) => {
 const removeItem: BuiltinHandler = (args) => {
   const config = (typeof args[0] === "object" && args[0] !== null ? args[0] : {}) as FeedConfig;
   const guid = String(args[1] ?? "");
-  return { ...config, items: (config.items ?? []).filter((i) => (i.guid ?? i.link) !== guid) };
+  return { ...config, items: (config.items ?? []).filter((i: any) => (i.guid ?? i.link) !== guid) };
 };
 
 const sortItems: BuiltinHandler = (args) => {
   const items = (Array.isArray(args[0]) ? args[0] : []) as FeedItem[];
   const desc = args[1] !== false;
-  return [...items].sort((a, b) => {
+  return [...items].sort((a: any, b: any) => {
     const da = a.pubDate ? new Date(a.pubDate).getTime() : 0;
     const db = b.pubDate ? new Date(b.pubDate).getTime() : 0;
     return desc ? db - da : da - db;
@@ -264,8 +264,8 @@ const filterItems: BuiltinHandler = (args) => {
   const field = String(args[1] ?? "title");
   const pattern = String(args[2] ?? "");
   const re = new RegExp(pattern, "i");
-  return items.filter((item) => {
-    const val = (item as Record<string, unknown>)[field];
+  return items.filter((item: any) => {
+    const val = (item as unknown as Record<string, unknown>)[field];
     return typeof val === "string" && re.test(val);
   });
 };
@@ -274,7 +274,7 @@ const mergeFeeds: BuiltinHandler = (args) => {
   const feeds = (Array.isArray(args[0]) ? args[0] : []) as FeedConfig[];
   const allItems: FeedItem[] = [];
   for (const feed of feeds) allItems.push(...(feed.items ?? []));
-  allItems.sort((a, b) => {
+  allItems.sort((a: any, b: any) => {
     const da = a.pubDate ? new Date(a.pubDate).getTime() : 0;
     const db = b.pubDate ? new Date(b.pubDate).getTime() : 0;
     return db - da;
@@ -292,7 +292,7 @@ const fetchFeed: BuiltinHandler = async (args) => {
 
 export const FeedFunctions: Record<string, BuiltinHandler> = { createRss, createAtom, createJson, parseRss, parseAtom, parseJson, detect, parse: parseFeed, addItem, removeItem, sortItems, filterItems, mergeFeeds, fetch: fetchFeed };
 
-export const FeedFunctionMetadata: Record<string, FunctionMetadata> = {
+export const FeedFunctionMetadata = {
   createRss: { description: "Create RSS 2.0 feed", parameters: [{ name: "config", dataType: "object", description: "{title, link, description, language, items[]}", formInputType: "text", required: true }], returnType: "string", returnDescription: "RSS XML", example: 'feed.createRss {"title": "My Blog", "link": "https://example.com", "items": [...]}' },
   createAtom: { description: "Create Atom feed", parameters: [{ name: "config", dataType: "object", description: "{title, link, description, items[]}", formInputType: "text", required: true }], returnType: "string", returnDescription: "Atom XML", example: 'feed.createAtom {"title": "My Blog", "link": "https://example.com", "items": [...]}' },
   createJson: { description: "Create JSON Feed", parameters: [{ name: "config", dataType: "object", description: "{title, link, description, items[]}", formInputType: "text", required: true }], returnType: "string", returnDescription: "JSON Feed string", example: 'feed.createJson {"title": "My Blog", "items": [...]}' },
@@ -309,7 +309,7 @@ export const FeedFunctionMetadata: Record<string, FunctionMetadata> = {
   fetch: { description: "Fetch and parse feed from URL", parameters: [{ name: "url", dataType: "string", description: "Feed URL", formInputType: "text", required: true }], returnType: "object", returnDescription: "{ok, status, feed}", example: 'feed.fetch "https://example.com/feed.xml"' },
 };
 
-export const FeedModuleMetadata: ModuleMetadata = {
+export const FeedModuleMetadata = {
   description: "RSS, Atom, and JSON Feed creation, parsing, manipulation, and auto-detection",
   methods: ["createRss", "createAtom", "createJson", "parseRss", "parseAtom", "parseJson", "detect", "parse", "addItem", "removeItem", "sortItems", "filterItems", "mergeFeeds", "fetch"],
 };

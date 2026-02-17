@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getToken(): string {
   return token;
 }
 
-async function graphApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function graphApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getToken();
   const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     method,
@@ -133,11 +133,11 @@ export const TeamsFunctions: Record<string, BuiltinHandler> = {
   sendWebhook,
 };
 
-export const TeamsFunctionMetadata: Record<string, object> = {
+export const TeamsFunctionMetadata = {
   setToken: {
     description: "Set the Microsoft Graph API access token.",
     parameters: [
-      { name: "token", dataType: "string", description: "OAuth2 access token with Teams permissions", formInputType: "password", required: true },
+      { name: "token", dataType: "string", description: "OAuth2 access token with Teams permissions", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -235,8 +235,7 @@ export const TeamsFunctionMetadata: Record<string, object> = {
 };
 
 export const TeamsModuleMetadata = {
-  name: "teams",
   description: "Send messages, manage channels, and interact with Microsoft Teams via Microsoft Graph API.",
-  icon: "message-square",
   category: "messaging",
+  methods: Object.keys(TeamsFunctions),
 };

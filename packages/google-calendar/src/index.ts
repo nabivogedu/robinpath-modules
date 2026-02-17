@@ -4,10 +4,10 @@ import { GoogleCalendarFunctions, GoogleCalendarFunctionMetadata, GoogleCalendar
 const GoogleCalendarModule: ModuleAdapter = {
   name: "googleCalendar",
   functions: GoogleCalendarFunctions,
-  functionMetadata: GoogleCalendarFunctionMetadata,
-  moduleMetadata: GoogleCalendarModuleMetadata,
+  functionMetadata: GoogleCalendarFunctionMetadata as any,
+  moduleMetadata: GoogleCalendarModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default GoogleCalendarModule;
 export { GoogleCalendarModule };

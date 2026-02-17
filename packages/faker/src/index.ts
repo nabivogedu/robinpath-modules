@@ -1,7 +1,7 @@
 import type { ModuleAdapter } from "@wiredwp/robinpath";
 import { FakerFunctions, FakerFunctionMetadata, FakerModuleMetadata } from "./faker.js";
 
-const FakerModule: ModuleAdapter = { name: "faker", functions: FakerFunctions, functionMetadata: FakerFunctionMetadata, moduleMetadata: FakerModuleMetadata, global: false };
+const FakerModule: ModuleAdapter = { name: "faker", functions: FakerFunctions, functionMetadata: FakerFunctionMetadata as any, moduleMetadata: FakerModuleMetadata as any, global: false };
 
 export default FakerModule;
 export { FakerModule };

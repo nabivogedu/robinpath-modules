@@ -4,10 +4,10 @@ import { OfficeFunctions, OfficeFunctionMetadata, OfficeModuleMetadata } from ".
 const OfficeModule: ModuleAdapter = {
   name: "office",
   functions: OfficeFunctions,
-  functionMetadata: OfficeFunctionMetadata,
-  moduleMetadata: OfficeModuleMetadata,
+  functionMetadata: OfficeFunctionMetadata as any,
+  moduleMetadata: OfficeModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default OfficeModule;
 export { OfficeModule };

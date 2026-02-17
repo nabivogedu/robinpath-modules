@@ -19,7 +19,7 @@ async function callSlackApi(
   workspaceId: string,
   method: string,
   body: Record<string, unknown>,
-): Promise<unknown> {
+): Promise<Value> {
   const config = workspaces.get(workspaceId);
   if (!config) {
     throw new Error(
@@ -240,7 +240,7 @@ const listChannels: BuiltinHandler = async (args) => {
   const result = (await callSlackApi(workspaceId, "conversations.list", body)) as Record<string, unknown>;
 
   const channels = (result.channels as Array<Record<string, unknown>>) ?? [];
-  return channels.map((ch) => ({
+  return channels.map((ch: any) => ({
     id: ch.id,
     name: ch.name,
     topic: (ch.topic as Record<string, unknown>)?.value ?? "",
@@ -374,7 +374,7 @@ export const SlackFunctions: Record<string, BuiltinHandler> = {
   updateMessage,
 };
 
-export const SlackFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SlackFunctionMetadata = {
   setToken: {
     description: "Store a Slack Bot User OAuth Token for a workspace",
     parameters: [
@@ -515,7 +515,7 @@ export const SlackFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const SlackModuleMetadata: ModuleMetadata = {
+export const SlackModuleMetadata = {
   description: "Slack Web API and Incoming Webhooks client for messaging, channels, reactions, file uploads, and user management",
   methods: [
     "setToken",

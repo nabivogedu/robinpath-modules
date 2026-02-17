@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const configs = new Map<string, { provider: string; accountSid?: string; authToken?: string; apiKey?: string; apiSecret?: string; from?: string }>();
 
@@ -135,7 +135,7 @@ const segmentCount: BuiltinHandler = (args) => countSegments(String(args[0] ?? "
 
 export const SmsFunctions: Record<string, BuiltinHandler> = { configure, send, sendBulk, validate, format, lookup, status, estimateCost, isGsm, segmentCount };
 
-export const SmsFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SmsFunctionMetadata = {
   configure: { description: "Configure SMS provider (Twilio or Vonage)", parameters: [{ name: "id", dataType: "string", description: "Config name", formInputType: "text", required: false }, { name: "options", dataType: "object", description: "{provider, accountSid, authToken, apiKey, apiSecret, from}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{id, provider}", example: 'sms.configure "main" {"provider": "twilio", "accountSid": "AC...", "authToken": "..."}' },
   send: { description: "Send an SMS message", parameters: [{ name: "configId", dataType: "string", description: "Config name", formInputType: "text", required: true }, { name: "to", dataType: "string", description: "Recipient phone (E.164)", formInputType: "text", required: true }, { name: "body", dataType: "string", description: "Message text", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{from}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{success, messageId, provider}", example: 'sms.send "main" "+15559876543" "Your code is 1234"' },
   sendBulk: { description: "Send SMS to multiple recipients", parameters: [{ name: "configId", dataType: "string", description: "Config name", formInputType: "text", required: true }, { name: "recipients", dataType: "array", description: "Phone numbers", formInputType: "text", required: true }, { name: "body", dataType: "string", description: "Message text", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of results", example: 'sms.sendBulk "main" ["+155511111", "+155522222"] "Hello!"' },
@@ -148,7 +148,7 @@ export const SmsFunctionMetadata: Record<string, FunctionMetadata> = {
   segmentCount: { description: "Count SMS segments", parameters: [{ name: "body", dataType: "string", description: "Message text", formInputType: "text", required: true }], returnType: "number", returnDescription: "Segment count", example: 'sms.segmentCount "Hello world"' },
 };
 
-export const SmsModuleMetadata: ModuleMetadata = {
+export const SmsModuleMetadata = {
   description: "SMS sending via Twilio and Vonage with validation, formatting, lookup, and cost estimation",
   methods: ["configure", "send", "sendBulk", "validate", "format", "lookup", "status", "estimateCost", "isGsm", "segmentCount"],
 };

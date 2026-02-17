@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getConfig(key: string): string {
   return val;
 }
 
-async function trelloApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function trelloApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const apiKey = getConfig("apiKey");
   const token = getConfig("token");
   const sep = path.includes("?") ? "&" : "?";
@@ -125,12 +125,12 @@ export const TrelloFunctions: Record<string, BuiltinHandler> = {
   addComment,
 };
 
-export const TrelloFunctionMetadata: Record<string, object> = {
+export const TrelloFunctionMetadata = {
   setCredentials: {
     description: "Set Trello API key and token.",
     parameters: [
       { name: "apiKey", dataType: "string", description: "Trello API key", formInputType: "text", required: true },
-      { name: "token", dataType: "string", description: "Trello API token", formInputType: "password", required: true },
+      { name: "token", dataType: "string", description: "Trello API token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -242,8 +242,7 @@ export const TrelloFunctionMetadata: Record<string, object> = {
 };
 
 export const TrelloModuleMetadata = {
-  name: "trello",
   description: "Manage Trello boards, lists, and cards via the Trello REST API.",
-  icon: "layout",
   category: "project-management",
+  methods: Object.keys(TrelloFunctions),
 };

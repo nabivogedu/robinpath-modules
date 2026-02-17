@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { randomBytes, createHash } from "node:crypto";
 
 // ── Internal State ──────────────────────────────────────────────────
@@ -265,7 +265,7 @@ export const OauthFunctions: Record<string, BuiltinHandler> = {
   authUrl, exchangeCode, refreshToken, clientCredentials, pkceVerifier, pkceChallenge, getToken, isExpired, generateState, revokeToken, clearTokens,
 };
 
-export const OauthFunctionMetadata: Record<string, FunctionMetadata> = {
+export const OauthFunctionMetadata = {
   authUrl: {
     description: "Build an OAuth 2.0 authorization URL with required parameters",
     parameters: [
@@ -352,7 +352,7 @@ export const OauthFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const OauthModuleMetadata: ModuleMetadata = {
+export const OauthModuleMetadata = {
   description: "OAuth 2.0 authorization flows: auth URL, code exchange, refresh, client credentials, PKCE, token management",
   methods: ["authUrl", "exchangeCode", "refreshToken", "clientCredentials", "pkceVerifier", "pkceChallenge", "getToken", "isExpired", "generateState", "revokeToken", "clearTokens"],
 };

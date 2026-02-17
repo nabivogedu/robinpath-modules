@@ -1,14 +1,14 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { execSync } from "child_process";
 
 function exec(cmd: string, cwd?: string): string {
   const opts: Record<string, unknown> = { encoding: "utf-8", maxBuffer: 50 * 1024 * 1024 };
   if (cwd) opts.cwd = cwd;
-  return (execSync(cmd, opts) as string).trim();
+  return (execSync(cmd, opts).toString().trim()).trim();
 }
 
 export const GitFunctions: Record<string, BuiltinHandler> = {
-  clone: (args: unknown[]) => {
+  clone: (args: Value[]) => {
     const url = args[0] as string;
     const dest = (args[1] as string) ?? undefined;
     const cwd = (args[2] as string) ?? undefined;
@@ -16,28 +16,28 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  init: (args: unknown[]) => {
+  init: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const bare = (args[1] as boolean) ?? false;
     const cmd = bare ? "git init --bare" : "git init";
     return exec(cmd, cwd);
   },
 
-  status: (args: unknown[]) => {
+  status: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const short = (args[1] as boolean) ?? false;
     const cmd = short ? "git status --short" : "git status";
     return exec(cmd, cwd);
   },
 
-  add: (args: unknown[]) => {
+  add: (args: Value[]) => {
     const files = args[0] as string | string[];
     const cwd = (args[1] as string) ?? undefined;
     const fileArg = Array.isArray(files) ? files.join(" ") : files;
     return exec(`git add ${fileArg}`, cwd);
   },
 
-  commit: (args: unknown[]) => {
+  commit: (args: Value[]) => {
     const message = args[0] as string;
     const cwd = (args[1] as string) ?? undefined;
     const amend = (args[2] as boolean) ?? false;
@@ -46,7 +46,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  push: (args: unknown[]) => {
+  push: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const remote = (args[1] as string) ?? "origin";
     const branch = (args[2] as string) ?? undefined;
@@ -57,7 +57,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  pull: (args: unknown[]) => {
+  pull: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const remote = (args[1] as string) ?? "origin";
     const branch = (args[2] as string) ?? undefined;
@@ -68,7 +68,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  branch: (args: unknown[]) => {
+  branch: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const name = (args[1] as string) ?? undefined;
     const deleteBranch = (args[2] as boolean) ?? false;
@@ -77,7 +77,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec("git branch -a", cwd);
   },
 
-  checkout: (args: unknown[]) => {
+  checkout: (args: Value[]) => {
     const target = args[0] as string;
     const cwd = (args[1] as string) ?? undefined;
     const create = (args[2] as boolean) ?? false;
@@ -85,7 +85,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  log: (args: unknown[]) => {
+  log: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const count = (args[1] as number) ?? 10;
     const oneline = (args[2] as boolean) ?? true;
@@ -93,7 +93,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(`git log -${count} ${format}`, cwd);
   },
 
-  diff: (args: unknown[]) => {
+  diff: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const staged = (args[1] as boolean) ?? false;
     const ref = (args[2] as string) ?? undefined;
@@ -103,7 +103,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  tag: (args: unknown[]) => {
+  tag: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const name = (args[1] as string) ?? undefined;
     const message = (args[2] as string) ?? undefined;
@@ -115,13 +115,13 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(`git tag ${name}`, cwd);
   },
 
-  remote: (args: unknown[]) => {
+  remote: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const verbose = (args[1] as boolean) ?? true;
     return exec(verbose ? "git remote -v" : "git remote", cwd);
   },
 
-  merge: (args: unknown[]) => {
+  merge: (args: Value[]) => {
     const branch = args[0] as string;
     const cwd = (args[1] as string) ?? undefined;
     const noFf = (args[2] as boolean) ?? false;
@@ -129,7 +129,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd, cwd);
   },
 
-  stash: (args: unknown[]) => {
+  stash: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const action = (args[1] as string) ?? "push";
     const message = (args[2] as string) ?? undefined;
@@ -144,7 +144,7 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
     return exec("git stash push", cwd);
   },
 
-  reset: (args: unknown[]) => {
+  reset: (args: Value[]) => {
     const cwd = (args[0] as string) ?? undefined;
     const ref = (args[1] as string) ?? "HEAD";
     const mode = (args[2] as string) ?? "mixed";
@@ -152,153 +152,184 @@ export const GitFunctions: Record<string, BuiltinHandler> = {
   },
 };
 
-export const GitFunctionMetadata: Record<string, FunctionMetadata> = {
+export const GitFunctionMetadata = {
   clone: {
     description: "Clone a git repository",
     parameters: [
-      { name: "url", type: "string", required: true, description: "Repository URL to clone" },
-      { name: "dest", type: "string", required: false, description: "Destination directory" },
-      { name: "cwd", type: "string", required: false, description: "Working directory" },
+      { name: "url", dataType: "string", formInputType: "text", required: true, description: "Repository URL to clone" },
+      { name: "dest", dataType: "string", formInputType: "text", required: false, description: "Destination directory" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Working directory" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   init: {
     description: "Initialize a new git repository",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Directory to initialize" },
-      { name: "bare", type: "boolean", required: false, description: "Create a bare repository" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Directory to initialize" },
+      { name: "bare", dataType: "boolean", formInputType: "checkbox", required: false, description: "Create a bare repository" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   status: {
     description: "Get the working tree status",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "short", type: "boolean", required: false, description: "Show short status" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "short", dataType: "boolean", formInputType: "checkbox", required: false, description: "Show short status" },
     ],
-    returns: { type: "string", description: "Status output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   add: {
     description: "Stage files for commit",
     parameters: [
-      { name: "files", type: "string | string[]", required: true, description: "Files to stage (path or array of paths, use '.' for all)" },
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
+      { name: "files", dataType: "string | string[]", required: true, description: "Files to stage (path or array of paths, use '.' for all)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   commit: {
     description: "Create a commit with the staged changes",
     parameters: [
-      { name: "message", type: "string", required: true, description: "Commit message" },
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "amend", type: "boolean", required: false, description: "Amend the previous commit" },
+      { name: "message", dataType: "string", formInputType: "text", required: true, description: "Commit message" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "amend", dataType: "boolean", formInputType: "checkbox", required: false, description: "Amend the previous commit" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   push: {
     description: "Push commits to a remote repository",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "remote", type: "string", required: false, description: "Remote name (default: origin)" },
-      { name: "branch", type: "string", required: false, description: "Branch to push" },
-      { name: "force", type: "boolean", required: false, description: "Force push" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "remote", dataType: "string", formInputType: "text", required: false, description: "Remote name (default: origin)" },
+      { name: "branch", dataType: "string", formInputType: "text", required: false, description: "Branch to push" },
+      { name: "force", dataType: "boolean", formInputType: "checkbox", required: false, description: "Force push" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   pull: {
     description: "Pull changes from a remote repository",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "remote", type: "string", required: false, description: "Remote name (default: origin)" },
-      { name: "branch", type: "string", required: false, description: "Branch to pull" },
-      { name: "rebase", type: "boolean", required: false, description: "Rebase instead of merge" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "remote", dataType: "string", formInputType: "text", required: false, description: "Remote name (default: origin)" },
+      { name: "branch", dataType: "string", formInputType: "text", required: false, description: "Branch to pull" },
+      { name: "rebase", dataType: "boolean", formInputType: "checkbox", required: false, description: "Rebase instead of merge" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   branch: {
     description: "List, create, or delete branches",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "name", type: "string", required: false, description: "Branch name to create (omit to list)" },
-      { name: "deleteBranch", type: "boolean", required: false, description: "Delete the named branch" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "name", dataType: "string", formInputType: "text", required: false, description: "Branch name to create (omit to list)" },
+      { name: "deleteBranch", dataType: "boolean", formInputType: "checkbox", required: false, description: "Delete the named branch" },
     ],
-    returns: { type: "string", description: "Branch list or command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   checkout: {
     description: "Switch branches or restore working tree files",
     parameters: [
-      { name: "target", type: "string", required: true, description: "Branch or commit to checkout" },
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "create", type: "boolean", required: false, description: "Create a new branch" },
+      { name: "target", dataType: "string", formInputType: "text", required: true, description: "Branch or commit to checkout" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "create", dataType: "boolean", formInputType: "checkbox", required: false, description: "Create a new branch" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   log: {
     description: "Show the commit log",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "count", type: "number", required: false, description: "Number of commits to show (default: 10)" },
-      { name: "oneline", type: "boolean", required: false, description: "One line per commit (default: true)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "count", dataType: "number", formInputType: "number", required: false, description: "Number of commits to show (default: 10)" },
+      { name: "oneline", dataType: "boolean", formInputType: "checkbox", required: false, description: "One line per commit (default: true)" },
     ],
-    returns: { type: "string", description: "Log output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   diff: {
     description: "Show changes between commits, working tree, etc.",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "staged", type: "boolean", required: false, description: "Show staged changes" },
-      { name: "ref", type: "string", required: false, description: "Reference to diff against" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "staged", dataType: "boolean", formInputType: "checkbox", required: false, description: "Show staged changes" },
+      { name: "ref", dataType: "string", formInputType: "text", required: false, description: "Reference to diff against" },
     ],
-    returns: { type: "string", description: "Diff output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   tag: {
     description: "Create or list tags",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "name", type: "string", required: false, description: "Tag name (omit to list)" },
-      { name: "message", type: "string", required: false, description: "Tag message (creates annotated tag)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "name", dataType: "string", formInputType: "text", required: false, description: "Tag name (omit to list)" },
+      { name: "message", dataType: "string", formInputType: "text", required: false, description: "Tag message (creates annotated tag)" },
     ],
-    returns: { type: "string", description: "Tag list or command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   remote: {
     description: "List remote repositories",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "verbose", type: "boolean", required: false, description: "Show URLs (default: true)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "verbose", dataType: "boolean", formInputType: "checkbox", required: false, description: "Show URLs (default: true)" },
     ],
-    returns: { type: "string", description: "Remote list" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   merge: {
     description: "Merge a branch into the current branch",
     parameters: [
-      { name: "branch", type: "string", required: true, description: "Branch to merge" },
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "noFf", type: "boolean", required: false, description: "Create a merge commit even for fast-forward" },
+      { name: "branch", dataType: "string", formInputType: "text", required: true, description: "Branch to merge" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "noFf", dataType: "boolean", formInputType: "checkbox", required: false, description: "Create a merge commit even for fast-forward" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stash: {
     description: "Stash or restore uncommitted changes",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "action", type: "string", required: false, description: "Action: push, pop, list, drop, apply (default: push)" },
-      { name: "message", type: "string", required: false, description: "Stash message (for push)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "action", dataType: "string", formInputType: "text", required: false, description: "Action: push, pop, list, drop, apply (default: push)" },
+      { name: "message", dataType: "string", formInputType: "text", required: false, description: "Stash message (for push)" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   reset: {
     description: "Reset the current HEAD to a specified state",
     parameters: [
-      { name: "cwd", type: "string", required: false, description: "Repository path" },
-      { name: "ref", type: "string", required: false, description: "Commit reference (default: HEAD)" },
-      { name: "mode", type: "string", required: false, description: "Reset mode: soft, mixed, hard (default: mixed)" },
+      { name: "cwd", dataType: "string", formInputType: "text", required: false, description: "Repository path" },
+      { name: "ref", dataType: "string", formInputType: "text", required: false, description: "Commit reference (default: HEAD)" },
+      { name: "mode", dataType: "string", formInputType: "text", required: false, description: "Reset mode: soft, mixed, hard (default: mixed)" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const GitModuleMetadata: ModuleMetadata = {
-  name: "git",
+export const GitModuleMetadata = {
   description: "Git version control operations using the system git binary",
   version: "1.0.0",
   dependencies: [],

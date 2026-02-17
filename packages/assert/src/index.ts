@@ -4,10 +4,10 @@ import { AssertFunctions, AssertFunctionMetadata, AssertModuleMetadata } from ".
 const AssertModule: ModuleAdapter = {
   name: "assert",
   functions: AssertFunctions,
-  functionMetadata: AssertFunctionMetadata,
-  moduleMetadata: AssertModuleMetadata,
+  functionMetadata: AssertFunctionMetadata as any,
+  moduleMetadata: AssertModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default AssertModule;
 export { AssertModule };

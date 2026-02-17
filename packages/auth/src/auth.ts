@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createHmac, timingSafeEqual, randomBytes } from "node:crypto";
 
 // ── Function Handlers ───────────────────────────────────────────────
@@ -91,8 +91,8 @@ const hashPassword: BuiltinHandler = async (args) => {
 
   // Use PBKDF2 via crypto
   const { pbkdf2 } = await import("node:crypto");
-  return new Promise<string>((resolve, reject) => {
-    pbkdf2(password, salt, iterations, 64, "sha512", (err, derivedKey) => {
+  return new Promise<string>((resolve: any, reject: any) => {
+    pbkdf2(password, salt, iterations, 64, "sha512", (err: any, derivedKey: any) => {
       if (err) reject(err);
       else resolve(`${salt}:${iterations}:${derivedKey.toString("hex")}`);
     });
@@ -110,8 +110,8 @@ const verifyPassword: BuiltinHandler = async (args) => {
   const iterations = parseInt(iterStr, 10);
 
   const { pbkdf2 } = await import("node:crypto");
-  return new Promise<boolean>((resolve, reject) => {
-    pbkdf2(password, salt, iterations, 64, "sha512", (err, derivedKey) => {
+  return new Promise<boolean>((resolve: any, reject: any) => {
+    pbkdf2(password, salt, iterations, 64, "sha512", (err: any, derivedKey: any) => {
       if (err) reject(err);
       else {
         const derived = derivedKey.toString("hex");
@@ -187,7 +187,7 @@ export const AuthFunctions: Record<string, BuiltinHandler> = {
   parseAuthHeader,
 };
 
-export const AuthFunctionMetadata: Record<string, FunctionMetadata> = {
+export const AuthFunctionMetadata = {
   basic: {
     description: "Create a Basic authentication header from username and password",
     parameters: [
@@ -310,7 +310,7 @@ export const AuthFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const AuthModuleMetadata: ModuleMetadata = {
+export const AuthModuleMetadata = {
   description: "API authentication helpers: Basic, Bearer, API key, HMAC signing, and password hashing",
   methods: ["basic", "parseBasic", "bearer", "parseBearer", "apiKey", "hmacSign", "hmacVerify", "generateApiKey", "hashPassword", "verifyPassword", "buildAuthHeader", "parseAuthHeader"],
 };

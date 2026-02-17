@@ -4,10 +4,10 @@ import { StorageFunctions, StorageFunctionMetadata, StorageModuleMetadata } from
 const StorageModule: ModuleAdapter = {
   name: "storage",
   functions: StorageFunctions,
-  functionMetadata: StorageFunctionMetadata,
-  moduleMetadata: StorageModuleMetadata,
+  functionMetadata: StorageFunctionMetadata as any,
+  moduleMetadata: StorageModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default StorageModule;
 export { StorageModule };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import PDFDocument from "pdfkit";
 import pdfParse from "pdf-parse";
 import { createWriteStream, readFileSync } from "node:fs";
@@ -9,7 +9,7 @@ const generate: BuiltinHandler = async (args) => {
   const outputPath = String(args[0] ?? "output.pdf");
   const opts = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, unknown>;
 
-  return new Promise<{ path: string; pages: number }>((resolve, reject) => {
+  return new Promise<{ path: string; pages: number }>((resolve: any, reject: any) => {
     const doc = new PDFDocument({
       size: String(opts.size ?? "A4") as "A4" | "letter",
       margin: Number(opts.margin ?? 50),
@@ -109,7 +109,7 @@ const generateTable: BuiltinHandler = async (args) => {
   const rows = Array.isArray(args[2]) ? args[2] : [];
   const opts = (typeof args[3] === "object" && args[3] !== null ? args[3] : {}) as Record<string, unknown>;
 
-  return new Promise<{ path: string }>((resolve, reject) => {
+  return new Promise<{ path: string }>((resolve: any, reject: any) => {
     const doc = new PDFDocument({ size: "A4", margin: 40, layout: opts.landscape ? "landscape" : "portrait" });
     const stream = createWriteStream(outputPath);
     doc.pipe(stream);
@@ -125,7 +125,7 @@ const generateTable: BuiltinHandler = async (args) => {
 
     // Headers
     doc.fontSize(10).font("Helvetica-Bold");
-    headers.forEach((h, i) => { doc.text(h, startX + i * colWidth, y, { width: colWidth, align: "left" }); });
+    headers.forEach((h: any, i: any) => { doc.text(h, startX + i * colWidth, y, { width: colWidth, align: "left" }); });
     y += 20;
     doc.moveTo(startX, y).lineTo(doc.page.width - 40, y).stroke();
     y += 5;
@@ -135,7 +135,7 @@ const generateTable: BuiltinHandler = async (args) => {
     for (const row of rows) {
       const cells = Array.isArray(row) ? row.map(String) : Object.values(row as Record<string, unknown>).map(String);
       if (y > doc.page.height - 60) { doc.addPage(); y = 40; }
-      cells.forEach((cell, i) => { doc.text(cell, startX + i * colWidth, y, { width: colWidth, align: "left" }); });
+      cells.forEach((cell: any, i: any) => { doc.text(cell, startX + i * colWidth, y, { width: colWidth, align: "left" }); });
       y += 18;
     }
 
@@ -174,7 +174,7 @@ export const PdfFunctions: Record<string, BuiltinHandler> = {
   generate, parse, extractText, pageCount, metadata, generateTable, generateFromHtml,
 };
 
-export const PdfFunctionMetadata: Record<string, FunctionMetadata> = {
+export const PdfFunctionMetadata = {
   generate: { description: "Generate a PDF document with title, content, and sections", parameters: [{ name: "outputPath", dataType: "string", description: "Output file path", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{title, author, content, sections, footer, size, margin, fontSize}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{path, pages}", example: 'pdf.generate "./report.pdf" {"title": "Monthly Report", "content": "..."}' },
   parse: { description: "Parse a PDF file and extract text, metadata, and page count", parameters: [{ name: "filePath", dataType: "string", description: "Path to PDF file", formInputType: "text", required: true }], returnType: "object", returnDescription: "{text, pages, info, metadata}", example: 'pdf.parse "./document.pdf"' },
   extractText: { description: "Extract all text from a PDF file", parameters: [{ name: "filePath", dataType: "string", description: "Path to PDF file", formInputType: "text", required: true }], returnType: "string", returnDescription: "Extracted text content", example: 'pdf.extractText "./document.pdf"' },
@@ -184,7 +184,7 @@ export const PdfFunctionMetadata: Record<string, FunctionMetadata> = {
   generateFromHtml: { description: "Generate a PDF from basic HTML content", parameters: [{ name: "outputPath", dataType: "string", description: "Output file path", formInputType: "text", required: true }, { name: "html", dataType: "string", description: "HTML content", formInputType: "text", required: true }], returnType: "object", returnDescription: "{path, pages}", example: 'pdf.generateFromHtml "./output.pdf" "<h1>Title</h1><p>Content</p>"' },
 };
 
-export const PdfModuleMetadata: ModuleMetadata = {
+export const PdfModuleMetadata = {
   description: "PDF generation (documents, tables, HTML-to-PDF) and parsing (text extraction, metadata, page count)",
   methods: ["generate", "parse", "extractText", "pageCount", "metadata", "generateTable", "generateFromHtml"],
 };

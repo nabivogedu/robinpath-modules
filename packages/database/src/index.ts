@@ -4,10 +4,10 @@ import { DatabaseFunctions, DatabaseFunctionMetadata, DatabaseModuleMetadata } f
 const DatabaseModule: ModuleAdapter = {
   name: "database",
   functions: DatabaseFunctions,
-  functionMetadata: DatabaseFunctionMetadata,
-  moduleMetadata: DatabaseModuleMetadata,
+  functionMetadata: DatabaseFunctionMetadata as any,
+  moduleMetadata: DatabaseModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default DatabaseModule;
 export { DatabaseModule };

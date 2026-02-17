@@ -2,130 +2,210 @@
 
 Reusable modules for [RobinPath](https://www.npmjs.com/package/@wiredwp/robinpath) — the scripting language for automation workflows.
 
-## Packages (110)
+## Packages (200)
 
 | Package | Description |
 |---------|-------------|
-| [@robinpath/agent](./packages/agent) | AI agent integration for Claude and OpenAI — prompts, parsing, caching, retries, batch processing, classification, extraction, guards, and context management |
-| [@robinpath/ai](./packages/ai) | LLM integration: OpenAI and Anthropic chat, completion, summarize, extract, classify, translate |
-| [@robinpath/api](./packages/api) | HTTP client for making requests to external APIs with profiles, auth, download/upload, and auto-JSON parsing |
-| [@robinpath/archive](./packages/archive) | Create and extract .zip and .tar.gz archives |
-| [@robinpath/assert](./packages/assert) | Assertion utilities for equality, type checking, and value validation |
-| [@robinpath/auth](./packages/auth) | API authentication: Basic, Bearer, API key, HMAC signing, password hashing |
-| [@robinpath/barcode](./packages/barcode) | QR code generation, EAN/UPC barcode validation, ISBN conversion, Luhn checksum |
-| [@robinpath/browser](./packages/browser) | Headless browser automation with Puppeteer: navigate, click, type, screenshot, scrape |
-| [@robinpath/buffer](./packages/buffer) | Buffer encoding/decoding: Base64, Hex, Base64URL, and byte operations |
-| [@robinpath/cache](./packages/cache) | In-memory key-value cache with TTL support |
-| [@robinpath/calendar](./packages/calendar) | iCal (.ics) calendar parsing, generation, event management, and date range queries |
-| [@robinpath/chart](./packages/chart) | Generate chart images (PNG/JPEG) using Chart.js — bar, line, pie, doughnut, scatter, radar, polarArea, and bubble charts |
-| [@robinpath/collection](./packages/collection) | Array and collection manipulation utilities: filtering, sorting, grouping, aggregation, and set operations |
-| [@robinpath/color](./packages/color) | ANSI terminal color and style utilities (red, green, bold, underline, RGB, etc.) |
-| [@robinpath/config](./packages/config) | Multi-source configuration management with deep merge, dot-path access, validation |
-| [@robinpath/cookie](./packages/cookie) | HTTP cookie parsing, serialization, HMAC signing, and cookie jar management |
-| [@robinpath/cron](./packages/cron) | Parse, validate, and evaluate cron expressions |
-| [@robinpath/crypto](./packages/crypto) | Hashing, HMAC, and encoding/decoding utilities (MD5, SHA, Base64, Hex, URL) |
-| [@robinpath/csv](./packages/csv) | Parse and stringify CSV data |
-| [@robinpath/database](./packages/database) | SQLite database: query, insert, update, delete, transactions, table management |
-| [@robinpath/date](./packages/date) | Parse, format, manipulate, and compare dates and times |
-| [@robinpath/debug](./packages/debug) | Debugging utilities: inspect, timers, counters, logging, memory, sizeof, diff |
-| [@robinpath/diff](./packages/diff) | Compute diffs between strings, arrays, and objects (lines, chars, words, unified) |
-| [@robinpath/dns](./packages/dns) | DNS lookups: resolve, reverse, MX, TXT, NS, SRV, SOA, CNAME records |
-| [@robinpath/docker](./packages/docker) | Docker container and image management: run, stop, build, pull, exec, networks, volumes |
-| [@robinpath/dotenv](./packages/dotenv) | Parse, load, and manage .env files and environment variables |
-| [@robinpath/email](./packages/email) | SMTP email sending with transports, attachments, address parsing, and testing |
-| [@robinpath/encode](./packages/encode) | Encoding conversions: Base64, Hex, Base32, URL, HTML, UTF-8, binary, ROT13 |
-| [@robinpath/encrypt](./packages/encrypt) | AES/RSA encryption, decryption, hashing, and key derivation |
-| [@robinpath/env](./packages/env) | Read, write, and manage environment variables |
-| [@robinpath/event](./packages/event) | Pub/sub event system with named buses, listeners, history, and async waitFor |
-| [@robinpath/excel](./packages/excel) | Read, write, and manipulate Excel spreadsheets (.xlsx) |
-| [@robinpath/faker](./packages/faker) | Fake data generation: names, emails, addresses, numbers, UUIDs, lorem ipsum |
-| [@robinpath/feed](./packages/feed) | RSS, Atom, and JSON Feed creation, parsing, merging, and auto-detection |
-| [@robinpath/form](./packages/form) | Multipart form data builder, file uploads, URL encoding/decoding, and form submission |
-| [@robinpath/fs](./packages/fs) | Read, write, copy, move, and manage files and directories |
-| [@robinpath/ftp](./packages/ftp) | FTP and SFTP file transfer: upload, download, list, mkdir, rename |
-| [@robinpath/geo](./packages/geo) | Geolocation: distance, bearing, midpoint, bounding box, geocode, reverse geocode |
-| [@robinpath/git](./packages/git) | Git operations: clone, init, status, add, commit, push, pull, branch, merge, stash |
-| [@robinpath/glob](./packages/glob) | Glob pattern matching and expansion utilities |
-| [@robinpath/google-calendar](./packages/google-calendar) | Create, read, update, and delete Google Calendar events, manage calendars, and check availability |
-| [@robinpath/google-drive](./packages/google-drive) | List, upload, download, move, copy, and share files in Google Drive via the Google Drive API v3 |
-| [@robinpath/google-sheets](./packages/google-sheets) | Read, write, and manage Google Sheets spreadsheets via the Google Sheets API v4 |
-| [@robinpath/graph](./packages/graph) | Graph data structures with BFS, DFS, Dijkstra's shortest path, topological sort, cycle detection |
-| [@robinpath/graphql](./packages/graphql) | GraphQL client: query, mutate, introspect, batch requests |
-| [@robinpath/hash](./packages/hash) | Hashing utilities: MD5, SHA-256, SHA-512, HMAC, CRC32, UUID v5, random bytes |
-| [@robinpath/html](./packages/html) | Extract, escape, and manipulate HTML content |
-| [@robinpath/http](./packages/http) | HTTP client for GET, POST, PUT, PATCH, DELETE, and file downloads |
-| [@robinpath/hubspot](./packages/hubspot) | Manage HubSpot contacts, deals, and companies via the HubSpot CRM API v3 |
-| [@robinpath/i18n](./packages/i18n) | Internationalization: translations, number/currency/date formatting, pluralization |
-| [@robinpath/image](./packages/image) | Image processing: resize, crop, convert, rotate, blur, composite, thumbnail |
-| [@robinpath/ini](./packages/ini) | Parse, stringify, and manipulate INI configuration files |
-| [@robinpath/json](./packages/json) | JSON parse, stringify, query, merge, flatten, and deep clone utilities |
-| [@robinpath/jwt](./packages/jwt) | Sign, verify, and decode JSON Web Tokens (HS256/HS384/HS512) |
-| [@robinpath/ldap](./packages/ldap) | LDAP directory operations: search, bind, add, modify, delete, authenticate |
-| [@robinpath/log](./packages/log) | Leveled logging with file output, JSON format, tables, groups, and timers |
-| [@robinpath/markdown](./packages/markdown) | Extract headings, links, code blocks, frontmatter, and convert Markdown to HTML |
-| [@robinpath/math](./packages/math) | Math utilities: clamp, round, random, statistics, factorial, GCD, LCM, lerp |
-| [@robinpath/mime](./packages/mime) | MIME type detection from extensions and magic bytes, content type utilities |
-| [@robinpath/money](./packages/money) | Currency formatting, parsing, arithmetic, conversion, tax, and discount |
-| [@robinpath/mongo](./packages/mongo) | MongoDB client: find, insert, update, delete, aggregate, indexes, collections |
-| [@robinpath/mqtt](./packages/mqtt) | MQTT messaging: connect, publish, subscribe, QoS, last will, topics |
-| [@robinpath/mysql](./packages/mysql) | MySQL client: query, insert, update, delete, transactions, table management |
-| [@robinpath/notification](./packages/notification) | Send notifications to Slack, Discord, Telegram, and Microsoft Teams |
-| [@robinpath/notion](./packages/notion) | Create, read, update, and query Notion pages and databases via the Notion API |
-| [@robinpath/oauth](./packages/oauth) | OAuth 2.0 flows: auth URL, code exchange, refresh, PKCE, client credentials |
-| [@robinpath/office](./packages/office) | Enterprise Microsoft Office suite — Word (.docx), Excel (.xlsx), PowerPoint (.pptx) with hyperlinks, TOC, footnotes, comments, formatting, and more |
-| [@robinpath/os](./packages/os) | System information: hostname, platform, CPU, memory, network, and more |
-| [@robinpath/pagination](./packages/pagination) | Auto-paginate APIs with offset, cursor, page-number, and Link-header strategies |
-| [@robinpath/path](./packages/path) | Path manipulation utilities for joining, resolving, and parsing file paths |
-| [@robinpath/pdf](./packages/pdf) | Generate and parse PDF documents, extract text, create tables |
-| [@robinpath/phone](./packages/phone) | Phone number parsing, formatting, validation, and country detection |
-| [@robinpath/postgres](./packages/postgres) | PostgreSQL client: query, insert, update, delete, transactions, LISTEN/NOTIFY |
-| [@robinpath/process](./packages/process) | Child process management: run, exec, spawn, kill, memory, CPU usage |
-| [@robinpath/promise](./packages/promise) | Async utilities: all, race, retry, parallel, waterfall, throttle, debounce, deferred |
-| [@robinpath/proxy](./packages/proxy) | HTTP proxy server with URL rewriting, load balancing, header manipulation, health checks |
-| [@robinpath/queue](./packages/queue) | In-memory job queue with priorities, delays, retry, dead-letter, pause/resume |
-| [@robinpath/ratelimit](./packages/ratelimit) | Rate limiting: token bucket, sliding window, and fixed window algorithms |
-| [@robinpath/redis](./packages/redis) | Redis client: strings, hashes, lists, sets, pub/sub, TTL, key management |
-| [@robinpath/regex](./packages/regex) | Regular expression operations for pattern matching, searching, and replacing |
-| [@robinpath/retry](./packages/retry) | Retry with exponential backoff and circuit breaker patterns |
-| [@robinpath/robots](./packages/robots) | robots.txt parsing, generation, URL permission checking, and crawl configuration |
-| [@robinpath/router](./packages/router) | URL routing and pattern matching: params, groups, middleware, path building |
-| [@robinpath/rss](./packages/rss) | Parse RSS and Atom feeds, track new items |
-| [@robinpath/s3](./packages/s3) | S3-compatible object storage: upload, download, copy, presign, buckets, ACLs |
-| [@robinpath/sanitize](./packages/sanitize) | Input sanitization: HTML, XSS, SQL, regex, filenames, URLs, slugs |
-| [@robinpath/scheduler](./packages/scheduler) | Task scheduling with cron expressions, one-time runs, pause/resume, history |
-| [@robinpath/schema](./packages/schema) | Lightweight data validation with type-safe schema definitions |
-| [@robinpath/screen](./packages/screen) | Screen capture and OCR: screenshots (full, region, window), text extraction, image comparison |
-| [@robinpath/semver](./packages/semver) | Parse, compare, and validate semantic version strings and ranges |
-| [@robinpath/server](./packages/server) | HTTP server: create, route, static files, JSON/HTML responses, CORS |
-| [@robinpath/shell](./packages/shell) | Execute shell commands and access process information |
-| [@robinpath/shopify](./packages/shopify) | Manage Shopify products, orders, customers, and inventory via the Shopify Admin REST API |
-| [@robinpath/sitemap](./packages/sitemap) | XML sitemap generation, parsing, validation, and manipulation |
-| [@robinpath/slack](./packages/slack) | Slack Web API and Incoming Webhooks: messaging, channels, reactions, file uploads, user management |
-| [@robinpath/sms](./packages/sms) | SMS sending via Twilio/Vonage, phone validation, GSM encoding, segment counting |
-| [@robinpath/soap](./packages/soap) | SOAP web service client, XML-RPC, WSDL parsing, and envelope building |
-| [@robinpath/socket](./packages/socket) | WebSocket client: connect, send, receive, message handlers |
-| [@robinpath/ssh](./packages/ssh) | Remote SSH command execution and SFTP file transfer |
-| [@robinpath/state](./packages/state) | Finite state machine with transitions, guards, actions, context, and history |
-| [@robinpath/storage](./packages/storage) | Persistent key-value store and file storage (memory or file-backed) |
-| [@robinpath/stream](./packages/stream) | Stream processing for large files: lines, transform, filter, hash, pipe |
-| [@robinpath/string](./packages/string) | String utilities: case conversion, slugify, truncate, pad, reverse, and more |
-| [@robinpath/table](./packages/table) | Tabular data operations: select, where, join, group, aggregate, pivot |
-| [@robinpath/teams](./packages/teams) | Send messages, manage channels, and interact with Microsoft Teams via Microsoft Graph API |
-| [@robinpath/telegram](./packages/telegram) | Telegram Bot API: send messages, photos, documents, locations, polls, stickers, and manage chats |
-| [@robinpath/template](./packages/template) | Mustache-like template rendering with variables, sections, and loops |
-| [@robinpath/toml](./packages/toml) | Parse, stringify, and manipulate TOML configuration files |
-| [@robinpath/transform](./packages/transform) | Data transformation: pick, omit, rename, coerce, flatten, merge, pipeline |
-| [@robinpath/trello](./packages/trello) | Manage Trello boards, lists, and cards via the Trello REST API |
-| [@robinpath/url](./packages/url) | Parse, format, resolve, and manipulate URLs and query parameters |
-| [@robinpath/uuid](./packages/uuid) | Generate and validate UUIDs (v4, v5) |
-| [@robinpath/validate](./packages/validate) | Validate strings, numbers, and data formats (email, URL, IP, UUID, JSON, etc.) |
-| [@robinpath/webhook](./packages/webhook) | Send webhooks with HMAC signatures, verify payloads, prevent replay attacks |
-| [@robinpath/whatsapp](./packages/whatsapp) | Send messages, templates, media, and manage WhatsApp Business profiles via the WhatsApp Cloud API |
-| [@robinpath/wordpress](./packages/wordpress) | Enterprise WordPress management — posts, pages, comments, media, users, plugins, themes, settings, search, and bulk operations via the REST API v2 |
-| [@robinpath/workflow](./packages/workflow) | Workflow orchestration: steps, conditions, loops, parallel execution, branching |
-| [@robinpath/xml](./packages/xml) | Parse, stringify, query, and validate XML documents |
-| [@robinpath/yaml](./packages/yaml) | Parse, stringify, and manipulate YAML documents |
-| [@robinpath/zip](./packages/zip) | Gzip, deflate, and Brotli compression/decompression utilities |
+| [@robinpath/activecampaign](./packages/activecampaign) | Configure activecampaign credentials. |
+| [@robinpath/agent](./packages/agent) | Configure pipeline settings for AI agent execution |
+| [@robinpath/ai](./packages/ai) | Configure an AI provider (OpenAI, Anthropic, or custom) |
+| [@robinpath/airtable](./packages/airtable) | Store an Airtable personal access token for authentication |
+| [@robinpath/anthropic](./packages/anthropic) | Configure anthropic credentials. |
+| [@robinpath/api](./packages/api) | Send a GET request to a URL and return the response body (auto-parses JSON) |
+| [@robinpath/apollo](./packages/apollo) | Configure apollo credentials. |
+| [@robinpath/archive](./packages/archive) | Create a .zip archive from files and directories |
+| [@robinpath/asana](./packages/asana) | Configure asana credentials. |
+| [@robinpath/assert](./packages/assert) | Assert two values are strictly equal (===) |
+| [@robinpath/auth](./packages/auth) | Create a Basic authentication header from username and password |
+| [@robinpath/barcode](./packages/barcode) | Generate QR code as data URL |
+| [@robinpath/basecamp](./packages/basecamp) | Configure basecamp credentials. |
+| [@robinpath/bigcommerce](./packages/bigcommerce) | Configure bigcommerce credentials. |
+| [@robinpath/bitbucket](./packages/bitbucket) | Configure bitbucket credentials. |
+| [@robinpath/box](./packages/box) | Configure box credentials. |
+| [@robinpath/brevo](./packages/brevo) | Configure brevo credentials. |
+| [@robinpath/browser](./packages/browser) | Launch a headless browser instance |
+| [@robinpath/buffer](./packages/buffer) | Create a base64 buffer from a string |
+| [@robinpath/cache](./packages/cache) | Store a value in the cache with an optional TTL |
+| [@robinpath/calendar](./packages/calendar) | Create an iCal event object |
+| [@robinpath/calendly](./packages/calendly) | Configure calendly credentials. |
+| [@robinpath/chart](./packages/chart) | Create a new chart (bar, line, pie, doughnut, scatter, radar, polarArea, bubble) |
+| [@robinpath/clearbit](./packages/clearbit) | Configure clearbit credentials. |
+| [@robinpath/clickup](./packages/clickup) | Configure clickup credentials. |
+| [@robinpath/cloudflare](./packages/cloudflare) | Set Cloudflare API token for authentication |
+| [@robinpath/collection](./packages/collection) | Extract a single property value from each object in an array |
+| [@robinpath/color](./packages/color) | Text to colorize |
+| [@robinpath/config](./packages/config) | Create config with defaults |
+| [@robinpath/confluence](./packages/confluence) | Configure confluence credentials. |
+| [@robinpath/contentful](./packages/contentful) | Configure contentful credentials. |
+| [@robinpath/convertkit](./packages/convertkit) | Configure convertkit credentials. |
+| [@robinpath/cookie](./packages/cookie) | Parse Cookie header string |
+| [@robinpath/cron](./packages/cron) | Validate a cron expression |
+| [@robinpath/crypto](./packages/crypto) | Compute the MD5 hash of a string |
+| [@robinpath/csv](./packages/csv) | Parse a CSV string into an array of objects (first row = headers) |
+| [@robinpath/currency](./packages/currency) | getLatestRates |
+| [@robinpath/database](./packages/database) | Open a SQLite database (file or in-memory) |
+| [@robinpath/date](./packages/date) | Parse a date string and return its ISO representation |
+| [@robinpath/debug](./packages/debug) | Deep inspect a value |
+| [@robinpath/deepl](./packages/deepl) | Configure deepl credentials. |
+| [@robinpath/diff](./packages/diff) | Diff two strings line by line |
+| [@robinpath/digitalocean](./packages/digitalocean) | Configure digitalocean credentials. |
+| [@robinpath/discord](./packages/discord) | Store a Discord bot token for subsequent API calls |
+| [@robinpath/dns](./packages/dns) | Resolve hostname to records by type |
+| [@robinpath/docker](./packages/docker) | List Docker containers |
+| [@robinpath/docusign](./packages/docusign) | Configure docusign credentials. |
+| [@robinpath/dotenv](./packages/dotenv) | Parse a .env format string into an object |
+| [@robinpath/dropbox](./packages/dropbox) | Configure dropbox credentials. |
+| [@robinpath/email](./packages/email) | Create a named SMTP transport for sending emails |
+| [@robinpath/encode](./packages/encode) | Encode a string or buffer to Base64 |
+| [@robinpath/encrypt](./packages/encrypt) | Encrypt text with AES using a password (auto-generates salt/IV) |
+| [@robinpath/env](./packages/env) | Get the value of an environment variable |
+| [@robinpath/event](./packages/event) | Create a named event bus with an optional max listener limit |
+| [@robinpath/excel](./packages/excel) | Read an Excel file into an array of row objects |
+| [@robinpath/facebook](./packages/facebook) | Configure facebook credentials. |
+| [@robinpath/faker](./packages/faker) | Set the random seed for reproducible fake data generation |
+| [@robinpath/feed](./packages/feed) | Create RSS 2.0 feed |
+| [@robinpath/firebase](./packages/firebase) | Set Firebase project ID and API key for client-side REST operations |
+| [@robinpath/form](./packages/form) | Create a FormData object from key-value pairs |
+| [@robinpath/freshbooks](./packages/freshbooks) | Configure freshbooks credentials. |
+| [@robinpath/freshdesk](./packages/freshdesk) | Configure freshdesk credentials. |
+| [@robinpath/fs](./packages/fs) | Read the contents of a file as a string |
+| [@robinpath/ftp](./packages/ftp) | Connect to an FTP or SFTP server |
+| [@robinpath/geo](./packages/geo) | Haversine distance between two points |
+| [@robinpath/git](./packages/git) | Clone a git repository |
+| [@robinpath/github](./packages/github) | Store a GitHub personal access token for authentication |
+| [@robinpath/gitlab](./packages/gitlab) | Configure gitlab credentials. |
+| [@robinpath/glob](./packages/glob) | Find files matching a glob pattern |
+| [@robinpath/gmail](./packages/gmail) | Configure Gmail OAuth2 credentials. |
+| [@robinpath/google-analytics](./packages/google-analytics) | Configure google-analytics credentials. |
+| [@robinpath/google-calendar](./packages/google-calendar) | Set the OAuth2 access token for Google Calendar API. |
+| [@robinpath/google-contacts](./packages/google-contacts) | Configure google-contacts credentials. |
+| [@robinpath/google-drive](./packages/google-drive) | Set the OAuth2 access token for Google Drive API. |
+| [@robinpath/google-forms](./packages/google-forms) | Configure google-forms credentials. |
+| [@robinpath/google-sheets](./packages/google-sheets) | Set the OAuth2 access token for Google Sheets API. |
+| [@robinpath/graph](./packages/graph) | Create graph |
+| [@robinpath/graphql](./packages/graphql) | Create a named GraphQL client |
+| [@robinpath/hash](./packages/hash) | Compute MD5 hash of a string |
+| [@robinpath/hellosign](./packages/hellosign) | Configure hellosign credentials. |
+| [@robinpath/hotjar](./packages/hotjar) | Configure hotjar credentials. |
+| [@robinpath/html](./packages/html) | Remove all HTML tags from a string, returning plain text |
+| [@robinpath/http](./packages/http) | Create a new HTTP server instance (does not start listening yet) |
+| [@robinpath/hubspot](./packages/hubspot) | Set the HubSpot private app access token. |
+| [@robinpath/i18n](./packages/i18n) | Set default locale |
+| [@robinpath/image](./packages/image) | Resize an image |
+| [@robinpath/ini](./packages/ini) | Parse an INI string to object |
+| [@robinpath/instagram](./packages/instagram) | Store a long-lived Instagram access token for API calls |
+| [@robinpath/intercom](./packages/intercom) | Configure intercom credentials. |
+| [@robinpath/invoice](./packages/invoice) | createInvoice |
+| [@robinpath/invoice-parser](./packages/invoice-parser) | parseInvoiceText |
+| [@robinpath/ip](./packages/ip) | getMyIp |
+| [@robinpath/jira](./packages/jira) | Set Jira Cloud credentials for API access. |
+| [@robinpath/jotform](./packages/jotform) | Configure jotform credentials. |
+| [@robinpath/json](./packages/json) | Parse a JSON string into an object |
+| [@robinpath/jwt](./packages/jwt) | Create a signed JWT token from a payload object using HMAC (HS256, HS384, or HS512) |
+| [@robinpath/ldap](./packages/ldap) | Create and connect an LDAP client to a server |
+| [@robinpath/lemlist](./packages/lemlist) | Configure lemlist credentials. |
+| [@robinpath/linear](./packages/linear) | Configure linear credentials. |
+| [@robinpath/linkedin](./packages/linkedin) | Store an OAuth2 access token for LinkedIn API requests |
+| [@robinpath/log](./packages/log) | Log a message at DEBUG level to stdout |
+| [@robinpath/mailchimp](./packages/mailchimp) | Store Mailchimp API key and server prefix for authentication |
+| [@robinpath/markdown](./packages/markdown) | Convert markdown to basic HTML |
+| [@robinpath/math](./packages/math) | Clamp a number between a minimum and maximum value |
+| [@robinpath/mime](./packages/mime) | Get MIME type from file extension |
+| [@robinpath/mixpanel](./packages/mixpanel) | Configure mixpanel credentials. |
+| [@robinpath/monday](./packages/monday) | Configure monday credentials. |
+| [@robinpath/money](./packages/money) | Format number as currency |
+| [@robinpath/mongo](./packages/mongo) | Connect to MongoDB |
+| [@robinpath/mqtt](./packages/mqtt) | Connect to an MQTT broker |
+| [@robinpath/mysql](./packages/mysql) | Connect to MySQL database |
+| [@robinpath/netlify](./packages/netlify) | Configure netlify credentials. |
+| [@robinpath/notification](./packages/notification) | Send a message to Slack via webhook |
+| [@robinpath/notify](./packages/notify) | send |
+| [@robinpath/notion](./packages/notion) | Set the Notion integration token. |
+| [@robinpath/oauth](./packages/oauth) | Build an OAuth 2.0 authorization URL with required parameters |
+| [@robinpath/office](./packages/office) | Create a new Word document |
+| [@robinpath/onedrive](./packages/onedrive) | Configure onedrive credentials. |
+| [@robinpath/openai](./packages/openai) | Set the OpenAI API key for authentication |
+| [@robinpath/os](./packages/os) | Get the system hostname |
+| [@robinpath/outlook](./packages/outlook) | Configure outlook credentials. |
+| [@robinpath/pagination](./packages/pagination) | Auto-paginate an API and collect all items |
+| [@robinpath/pandadoc](./packages/pandadoc) | Configure pandadoc credentials. |
+| [@robinpath/path](./packages/path) | Join path segments into a single path |
+| [@robinpath/pdf](./packages/pdf) | Generate a PDF document with title, content, and sections |
+| [@robinpath/phone](./packages/phone) | Parse phone number |
+| [@robinpath/pinterest](./packages/pinterest) | Configure pinterest credentials. |
+| [@robinpath/pipedrive](./packages/pipedrive) | Configure pipedrive credentials. |
+| [@robinpath/postgres](./packages/postgres) | Connect to PostgreSQL |
+| [@robinpath/process](./packages/process) | Run command and wait for result |
+| [@robinpath/promise](./packages/promise) | Wait for all promises |
+| [@robinpath/proxy](./packages/proxy) | Forward a single HTTP request to a target server and return the response |
+| [@robinpath/qr](./packages/qr) | generateQrUrl |
+| [@robinpath/queue](./packages/queue) | Create a named job queue |
+| [@robinpath/quickbooks](./packages/quickbooks) | Configure quickbooks credentials. |
+| [@robinpath/ratelimit](./packages/ratelimit) | Create a named rate limiter (token-bucket, sliding-window, or fixed-window) |
+| [@robinpath/redis](./packages/redis) | Connect to Redis |
+| [@robinpath/regex](./packages/regex) | Test if a string matches a regular expression pattern |
+| [@robinpath/retry](./packages/retry) | Execute a function with automatic retry and exponential backoff |
+| [@robinpath/robots](./packages/robots) | Parse robots.txt content |
+| [@robinpath/router](./packages/router) | Create a new router instance |
+| [@robinpath/rss](./packages/rss) | Parse an RSS/Atom feed from a URL |
+| [@robinpath/s3](./packages/s3) | Configure S3 client credentials and endpoint |
+| [@robinpath/salesforce](./packages/salesforce) | Configure salesforce credentials. |
+| [@robinpath/sanitize](./packages/sanitize) | Strip or escape HTML tags from input |
+| [@robinpath/sanity](./packages/sanity) | Configure sanity credentials. |
+| [@robinpath/scheduler](./packages/scheduler) | Schedule a recurring task using a cron expression |
+| [@robinpath/schema](./packages/schema) | Validate data against a schema |
+| [@robinpath/screen](./packages/screen) | Take a full screenshot and save to file |
+| [@robinpath/semver](./packages/semver) | Parse a semver version string into its components (major, minor, patch, prerelease, build) |
+| [@robinpath/sendgrid](./packages/sendgrid) | Store the SendGrid API key for authentication |
+| [@robinpath/sentry](./packages/sentry) | Configure sentry credentials. |
+| [@robinpath/server](./packages/server) | Create a new HTTP server instance |
+| [@robinpath/shell](./packages/shell) | Execute a command string in the system shell and return stdout, stderr, and exitCode |
+| [@robinpath/shopify](./packages/shopify) | Set Shopify store credentials. |
+| [@robinpath/sitemap](./packages/sitemap) | Create XML sitemap |
+| [@robinpath/slack](./packages/slack) | Store a Slack Bot User OAuth Token for a workspace |
+| [@robinpath/sms](./packages/sms) | Configure SMS provider (Twilio or Vonage) |
+| [@robinpath/soap](./packages/soap) | Call a SOAP web service |
+| [@robinpath/socket](./packages/socket) | Connect to a WebSocket server |
+| [@robinpath/square](./packages/square) | Configure square credentials. |
+| [@robinpath/ssh](./packages/ssh) | Connect to an SSH server |
+| [@robinpath/state](./packages/state) | Create state machine |
+| [@robinpath/storage](./packages/storage) | Create a named key-value store (memory or file-backed) |
+| [@robinpath/stream](./packages/stream) | Read entire file content |
+| [@robinpath/string](./packages/string) | Capitalize the first letter of a string |
+| [@robinpath/supabase](./packages/supabase) | Store Supabase project URL and anon/service API key |
+| [@robinpath/table](./packages/table) | Create a table from array of objects or columns+rows |
+| [@robinpath/teams](./packages/teams) | Set the Microsoft Graph API access token. |
+| [@robinpath/telegram](./packages/telegram) | Store a Telegram bot token for subsequent API calls |
+| [@robinpath/template](./packages/template) | Render a Mustache-like template string with variable substitution, sections, and loops |
+| [@robinpath/tiktok](./packages/tiktok) | Configure tiktok credentials. |
+| [@robinpath/todoist](./packages/todoist) | Configure todoist credentials. |
+| [@robinpath/toml](./packages/toml) | Parse a TOML string to object |
+| [@robinpath/transform](./packages/transform) | Pick specific keys from an object (supports nested paths with dot notation) |
+| [@robinpath/translate](./packages/translate) | translateText |
+| [@robinpath/trello](./packages/trello) | Set Trello API key and token. |
+| [@robinpath/twilio](./packages/twilio) | Configure twilio credentials. |
+| [@robinpath/twitter](./packages/twitter) | Store a Bearer token for X/Twitter API v2 authentication |
+| [@robinpath/typeform](./packages/typeform) | Configure typeform credentials. |
+| [@robinpath/uptime](./packages/uptime) | checkHttp |
+| [@robinpath/url](./packages/url) | Parse a URL string into its component parts |
+| [@robinpath/uuid](./packages/uuid) | Generate a random UUID v4 |
+| [@robinpath/validate](./packages/validate) | Validate email format |
+| [@robinpath/vercel](./packages/vercel) | Set the Vercel API bearer token for authentication |
+| [@robinpath/weather](./packages/weather) | Configure weather credentials. |
+| [@robinpath/webflow](./packages/webflow) | Configure webflow credentials. |
+| [@robinpath/webhook](./packages/webhook) | Send a webhook POST request with optional HMAC signature |
+| [@robinpath/whatsapp](./packages/whatsapp) | Set WhatsApp Cloud API credentials. |
+| [@robinpath/woocommerce](./packages/woocommerce) | Configure woocommerce credentials. |
+| [@robinpath/wordpress](./packages/wordpress) | Set WordPress site URL and Application Password credentials. |
+| [@robinpath/workflow](./packages/workflow) | Create a new workflow |
+| [@robinpath/xero](./packages/xero) | Configure xero credentials. |
+| [@robinpath/xml](./packages/xml) | Parse an XML string into a JavaScript object |
+| [@robinpath/yaml](./packages/yaml) | Parse a YAML string into a JavaScript object, array, or value |
+| [@robinpath/youtube](./packages/youtube) | Configure youtube credentials. |
+| [@robinpath/zendesk](./packages/zendesk) | Configure zendesk credentials. |
+| [@robinpath/zip](./packages/zip) | Compress a string with gzip, return base64 |
+| [@robinpath/zoho](./packages/zoho) | Configure zoho credentials. |
+| [@robinpath/zoom](./packages/zoom) | Configure zoom credentials. |
 
 ## Usage
 

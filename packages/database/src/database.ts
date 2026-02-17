@@ -1,12 +1,12 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import Database from "better-sqlite3";
-import type { Database as DatabaseType } from "better-sqlite3";
+import type { Database as any } from "better-sqlite3";
 
 // ── Internal State ──────────────────────────────────────────────────
 
-const connections = new Map<string, DatabaseType>();
+const connections = new Map<string, any>();
 
-function getDb(name: string): DatabaseType {
+function getDb(name: string): any {
   const db = connections.get(name);
   if (!db) throw new Error(`Database "${name}" not found. Open it first with database.open.`);
   return db;
@@ -89,8 +89,8 @@ const insert: BuiltinHandler = (args) => {
   const columns = Object.keys(data);
   if (columns.length === 0) throw new Error("No data to insert");
 
-  const placeholders = columns.map((c) => `@${c}`).join(", ");
-  const sql = `INSERT INTO "${table}" (${columns.map((c) => `"${c}"`).join(", ")}) VALUES (${placeholders})`;
+  const placeholders = columns.map((c: any) => `@${c}`).join(", ");
+  const sql = `INSERT INTO "${table}" (${columns.map((c: any) => `"${c}"`).join(", ")}) VALUES (${placeholders})`;
 
   const stmt = db.prepare(sql);
   const info = stmt.run(data);
@@ -106,8 +106,8 @@ const insertMany: BuiltinHandler = (args) => {
   if (rows.length === 0) return { inserted: 0 };
 
   const columns = Object.keys(rows[0] as Record<string, unknown>);
-  const placeholders = columns.map((c) => `@${c}`).join(", ");
-  const sql = `INSERT INTO "${table}" (${columns.map((c) => `"${c}"`).join(", ")}) VALUES (${placeholders})`;
+  const placeholders = columns.map((c: any) => `@${c}`).join(", ");
+  const sql = `INSERT INTO "${table}" (${columns.map((c: any) => `"${c}"`).join(", ")}) VALUES (${placeholders})`;
 
   const stmt = db.prepare(sql);
   const insertAll = db.transaction((items: Record<string, unknown>[]) => {
@@ -130,8 +130,8 @@ const update: BuiltinHandler = (args) => {
   const where = (typeof args[3] === "object" && args[3] !== null ? args[3] : {}) as Record<string, unknown>;
   const db = getDb(name);
 
-  const setClauses = Object.keys(data).map((c) => `"${c}" = @set_${c}`);
-  const whereClauses = Object.keys(where).map((c) => `"${c}" = @where_${c}`);
+  const setClauses = Object.keys(data).map((c: any) => `"${c}" = @set_${c}`);
+  const whereClauses = Object.keys(where).map((c: any) => `"${c}" = @where_${c}`);
 
   if (setClauses.length === 0) throw new Error("No data to update");
   if (whereClauses.length === 0) throw new Error("WHERE clause is required for safety");
@@ -153,7 +153,7 @@ const remove: BuiltinHandler = (args) => {
   const where = (typeof args[2] === "object" && args[2] !== null ? args[2] : {}) as Record<string, unknown>;
   const db = getDb(name);
 
-  const whereClauses = Object.keys(where).map((c) => `"${c}" = @${c}`);
+  const whereClauses = Object.keys(where).map((c: any) => `"${c}" = @${c}`);
   if (whereClauses.length === 0) throw new Error("WHERE clause is required for safety. Use database.execute for raw DELETE.");
 
   const sql = `DELETE FROM "${table}" WHERE ${whereClauses.join(" AND ")}`;
@@ -190,7 +190,7 @@ const listTables: BuiltinHandler = (args) => {
   const name = String(args[0] ?? "default");
   const db = getDb(name);
   const rows = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[];
-  return rows.map((r) => r.name);
+  return rows.map((r: any) => r.name);
 };
 
 const tableInfo: BuiltinHandler = (args) => {
@@ -207,7 +207,7 @@ const count: BuiltinHandler = (args) => {
   const db = getDb(name);
 
   if (where) {
-    const whereClauses = Object.keys(where).map((c) => `"${c}" = @${c}`);
+    const whereClauses = Object.keys(where).map((c: any) => `"${c}" = @${c}`);
     const sql = `SELECT COUNT(*) as count FROM "${table}" WHERE ${whereClauses.join(" AND ")}`;
     const row = db.prepare(sql).get(where) as { count: number };
     return row.count;
@@ -260,7 +260,7 @@ export const DatabaseFunctions: Record<string, BuiltinHandler> = {
   createTable, dropTable, listTables, tableInfo, count, transaction, backup,
 };
 
-export const DatabaseFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DatabaseFunctionMetadata = {
   open: {
     description: "Open a SQLite database (file or in-memory)",
     parameters: [
@@ -397,7 +397,7 @@ export const DatabaseFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const DatabaseModuleMetadata: ModuleMetadata = {
+export const DatabaseModuleMetadata = {
   description: "SQLite database with query builder, transactions, bulk insert, table management, and backup",
   methods: ["open", "close", "query", "queryOne", "execute", "insert", "insertMany", "update", "remove", "createTable", "dropTable", "listTables", "tableInfo", "count", "transaction", "backup"],
 };

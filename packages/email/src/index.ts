@@ -4,10 +4,10 @@ import { EmailFunctions, EmailFunctionMetadata, EmailModuleMetadata } from "./em
 const EmailModule: ModuleAdapter = {
   name: "email",
   functions: EmailFunctions,
-  functionMetadata: EmailFunctionMetadata,
-  moduleMetadata: EmailModuleMetadata,
+  functionMetadata: EmailFunctionMetadata as any,
+  moduleMetadata: EmailModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default EmailModule;
 export { EmailModule };

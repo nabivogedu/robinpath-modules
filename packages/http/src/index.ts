@@ -4,10 +4,10 @@ import { HttpFunctions, HttpFunctionMetadata, HttpModuleMetadata } from "./http.
 const HttpModule: ModuleAdapter = {
   name: "http",
   functions: HttpFunctions,
-  functionMetadata: HttpFunctionMetadata,
-  moduleMetadata: HttpModuleMetadata,
+  functionMetadata: HttpFunctionMetadata as any,
+  moduleMetadata: HttpModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default HttpModule;
 export { HttpModule };

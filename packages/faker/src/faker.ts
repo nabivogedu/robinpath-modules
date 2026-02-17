@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ---------------------------------------------------------------------------
 // Internal PRNG (Mulberry32 - seedable)
@@ -136,7 +136,7 @@ const COLORS = [
 // Functions
 // ---------------------------------------------------------------------------
 
-const seedFn: BuiltinHandler = (args: unknown[]): unknown => {
+const seedFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const s = opts.seed as number ?? opts as unknown as number;
   const seedVal = typeof s === "number" ? s : Number(s);
@@ -146,19 +146,19 @@ const seedFn: BuiltinHandler = (args: unknown[]): unknown => {
   return { seed: currentSeed };
 };
 
-const nameFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const nameFn: BuiltinHandler = (_args: Value[]): unknown => {
   return `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`;
 };
 
-const firstNameFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const firstNameFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(FIRST_NAMES);
 };
 
-const lastNameFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const lastNameFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(LAST_NAMES);
 };
 
-const emailFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const emailFn: BuiltinHandler = (_args: Value[]): unknown => {
   const first = pick(FIRST_NAMES).toLowerCase();
   const last = pick(LAST_NAMES).toLowerCase();
   const domain = pick(DOMAINS);
@@ -167,14 +167,14 @@ const emailFn: BuiltinHandler = (_args: unknown[]): unknown => {
   return `${first}${sep}${last}${num}@${domain}`;
 };
 
-const phoneFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const phoneFn: BuiltinHandler = (_args: Value[]): unknown => {
   const area = randomInt(200, 999);
   const exchange = randomInt(200, 999);
   const subscriber = randomInt(1000, 9999);
   return `(${area}) ${exchange}-${subscriber}`;
 };
 
-const addressFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const addressFn: BuiltinHandler = (_args: Value[]): unknown => {
   const num = randomInt(100, 9999);
   const street = pick(LAST_NAMES);
   const suffix = pick(STREET_SUFFIXES);
@@ -183,25 +183,25 @@ const addressFn: BuiltinHandler = (_args: unknown[]): unknown => {
   return `${num} ${street} ${suffix}, ${city} ${zip}`;
 };
 
-const cityFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const cityFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(CITIES);
 };
 
-const countryFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const countryFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(COUNTRIES);
 };
 
-const zipCodeFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const zipCodeFn: BuiltinHandler = (_args: Value[]): unknown => {
   const opts = ((_args[0] ?? {}) as Record<string, unknown>);
   const format = (opts.format ?? "#####") as string;
   return format.replace(/#/g, () => String(randomInt(0, 9)));
 };
 
-const companyFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const companyFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(COMPANIES);
 };
 
-const loremFn: BuiltinHandler = (args: unknown[]): unknown => {
+const loremFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const type = (opts.type ?? "words") as string;
   const count = (opts.count ?? 5) as number;
@@ -251,14 +251,14 @@ function generateParagraphs(count: number): string {
   return paragraphs.join("\n\n");
 }
 
-const numberFn: BuiltinHandler = (args: unknown[]): unknown => {
+const numberFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const min = (opts.min ?? 0) as number;
   const max = (opts.max ?? 1000) as number;
   return randomInt(min, max);
 };
 
-const floatFn: BuiltinHandler = (args: unknown[]): unknown => {
+const floatFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const min = (opts.min ?? 0) as number;
   const max = (opts.max ?? 1) as number;
@@ -267,11 +267,11 @@ const floatFn: BuiltinHandler = (args: unknown[]): unknown => {
   return Number(val.toFixed(precision));
 };
 
-const booleanFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const booleanFn: BuiltinHandler = (_args: Value[]): unknown => {
   return random() >= 0.5;
 };
 
-const dateFn: BuiltinHandler = (args: unknown[]): unknown => {
+const dateFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const fromTs = opts.from ? new Date(opts.from as string).getTime() : new Date("2000-01-01").getTime();
   const toTs = opts.to ? new Date(opts.to as string).getTime() : Date.now();
@@ -279,7 +279,7 @@ const dateFn: BuiltinHandler = (args: unknown[]): unknown => {
   return new Date(ts).toISOString();
 };
 
-const uuidFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const uuidFn: BuiltinHandler = (_args: Value[]): unknown => {
   // Generate UUID v4 format
   const hex = "0123456789abcdef";
   const segments = [8, 4, 4, 4, 12];
@@ -305,14 +305,14 @@ const uuidFn: BuiltinHandler = (_args: unknown[]): unknown => {
   return parts.join("-");
 };
 
-const pickFn: BuiltinHandler = (args: unknown[]): unknown => {
+const pickFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const arr = opts.array as unknown[];
   if (!Array.isArray(arr) || arr.length === 0) throw new Error("array must be a non-empty array");
   return arr[randomInt(0, arr.length - 1)];
 };
 
-const shuffleFn: BuiltinHandler = (args: unknown[]): unknown => {
+const shuffleFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const arr = opts.array as unknown[];
   if (!Array.isArray(arr)) throw new Error("array must be an array");
@@ -325,19 +325,19 @@ const shuffleFn: BuiltinHandler = (args: unknown[]): unknown => {
   return result;
 };
 
-const paragraphFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const paragraphFn: BuiltinHandler = (_args: Value[]): unknown => {
   return generateParagraph();
 };
 
-const sentenceFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const sentenceFn: BuiltinHandler = (_args: Value[]): unknown => {
   return generateSentence();
 };
 
-const wordFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const wordFn: BuiltinHandler = (_args: Value[]): unknown => {
   return pick(LOREM_WORDS);
 };
 
-const colorFn: BuiltinHandler = (args: unknown[]): unknown => {
+const colorFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const format = (opts.format ?? "hex") as string;
 
@@ -354,7 +354,7 @@ const colorFn: BuiltinHandler = (args: unknown[]): unknown => {
   return `#${r}${g}${b}`;
 };
 
-const ipFn: BuiltinHandler = (args: unknown[]): unknown => {
+const ipFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const version = (opts.version ?? "v4") as string;
 
@@ -370,7 +370,7 @@ const ipFn: BuiltinHandler = (args: unknown[]): unknown => {
   return `${randomInt(1, 255)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`;
 };
 
-const urlFn: BuiltinHandler = (_args: unknown[]): unknown => {
+const urlFn: BuiltinHandler = (_args: Value[]): unknown => {
   const protocol = pick(["https", "http"]);
   const domain = pick(LAST_NAMES).toLowerCase();
   const tld = pick(TLDS);
@@ -382,7 +382,7 @@ const urlFn: BuiltinHandler = (_args: unknown[]): unknown => {
   return `${protocol}://${domain}.${tld}${urlPath}`;
 };
 
-const avatarFn: BuiltinHandler = (args: unknown[]): unknown => {
+const avatarFn: BuiltinHandler = (args: Value[]): unknown => {
   const opts = (args[0] ?? {}) as Record<string, unknown>;
   const size = (opts.size ?? 200) as number;
   const name = (opts.name ?? `${pick(FIRST_NAMES)}+${pick(LAST_NAMES)}`) as string;
@@ -394,7 +394,7 @@ const avatarFn: BuiltinHandler = (args: unknown[]): unknown => {
 // Exports
 // ---------------------------------------------------------------------------
 
-export const FakerFunctions: Record<string, BuiltinHandler> = {
+export const FakerFunctions = {
   seed: seedFn,
   name: nameFn,
   firstName: firstNameFn,
@@ -423,169 +423,220 @@ export const FakerFunctions: Record<string, BuiltinHandler> = {
   avatar: avatarFn,
 };
 
-export const FakerFunctionMetadata: Record<string, FunctionMetadata> = {
+export const FakerFunctionMetadata = {
   seed: {
     description: "Set the random seed for reproducible fake data generation",
     parameters: [
-      { name: "seed", type: "number", description: "Seed value for the PRNG" },
+      { name: "seed", dataType: "number", description: "Seed value for the PRNG" },
     ],
-    returns: { type: "object", description: "Confirmation with seed value" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   name: {
     description: "Generate a random full name",
     parameters: [],
-    returns: { type: "string", description: "Random full name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   firstName: {
     description: "Generate a random first name",
     parameters: [],
-    returns: { type: "string", description: "Random first name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   lastName: {
     description: "Generate a random last name",
     parameters: [],
-    returns: { type: "string", description: "Random last name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   email: {
     description: "Generate a random email address",
     parameters: [],
-    returns: { type: "string", description: "Random email address" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   phone: {
     description: "Generate a random phone number",
     parameters: [],
-    returns: { type: "string", description: "Random phone number in (XXX) XXX-XXXX format" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   address: {
     description: "Generate a random street address",
     parameters: [],
-    returns: { type: "string", description: "Random full address" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   city: {
     description: "Generate a random city name",
     parameters: [],
-    returns: { type: "string", description: "Random city name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   country: {
     description: "Generate a random country name",
     parameters: [],
-    returns: { type: "string", description: "Random country name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   zipCode: {
     description: "Generate a random zip code",
     parameters: [
-      { name: "format", type: "string", description: "Zip code format where # is a digit (default #####)", optional: true },
+      { name: "format", dataType: "string", description: "Zip code format where # is a digit (default #####)", optional: true },
     ],
-    returns: { type: "string", description: "Random zip code" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   company: {
     description: "Generate a random company name",
     parameters: [],
-    returns: { type: "string", description: "Random company name" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   lorem: {
     description: "Generate lorem ipsum text as words, sentences, or paragraphs",
     parameters: [
-      { name: "type", type: "string", description: "Type of lorem text: words, sentences, or paragraphs (default words)", optional: true },
-      { name: "count", type: "number", description: "Number of items to generate (default 5)", optional: true },
+      { name: "type", dataType: "string", description: "Type of lorem text: words, sentences, or paragraphs (default words)", optional: true },
+      { name: "count", dataType: "number", description: "Number of items to generate (default 5)", optional: true },
     ],
-    returns: { type: "string", description: "Generated lorem ipsum text" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   number: {
     description: "Generate a random integer within a range",
     parameters: [
-      { name: "min", type: "number", description: "Minimum value (default 0)", optional: true },
-      { name: "max", type: "number", description: "Maximum value (default 1000)", optional: true },
+      { name: "min", dataType: "number", description: "Minimum value (default 0)", optional: true },
+      { name: "max", dataType: "number", description: "Maximum value (default 1000)", optional: true },
     ],
-    returns: { type: "number", description: "Random integer" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   float: {
     description: "Generate a random floating-point number within a range",
     parameters: [
-      { name: "min", type: "number", description: "Minimum value (default 0)", optional: true },
-      { name: "max", type: "number", description: "Maximum value (default 1)", optional: true },
-      { name: "precision", type: "number", description: "Decimal places (default 2)", optional: true },
+      { name: "min", dataType: "number", description: "Minimum value (default 0)", optional: true },
+      { name: "max", dataType: "number", description: "Maximum value (default 1)", optional: true },
+      { name: "precision", dataType: "number", description: "Decimal places (default 2)", optional: true },
     ],
-    returns: { type: "number", description: "Random float" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   boolean: {
     description: "Generate a random boolean value",
     parameters: [],
-    returns: { type: "boolean", description: "Random true or false" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   date: {
     description: "Generate a random date within a range",
     parameters: [
-      { name: "from", type: "string", description: "Start date ISO string (default 2000-01-01)", optional: true },
-      { name: "to", type: "string", description: "End date ISO string (default now)", optional: true },
+      { name: "from", dataType: "string", description: "Start date ISO string (default 2000-01-01)", optional: true },
+      { name: "to", dataType: "string", description: "End date ISO string (default now)", optional: true },
     ],
-    returns: { type: "string", description: "Random ISO date string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   uuid: {
     description: "Generate a random UUID v4",
     parameters: [],
-    returns: { type: "string", description: "Random UUID in xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx format" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   pick: {
     description: "Pick a random element from an array",
     parameters: [
-      { name: "array", type: "array", description: "Array to pick from" },
+      { name: "array", dataType: "array", description: "Array to pick from" },
     ],
-    returns: { type: "any", description: "Random element from the array" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   shuffle: {
     description: "Randomly shuffle an array using Fisher-Yates algorithm",
     parameters: [
-      { name: "array", type: "array", description: "Array to shuffle" },
+      { name: "array", dataType: "array", description: "Array to shuffle" },
     ],
-    returns: { type: "array", description: "New shuffled array" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   paragraph: {
     description: "Generate a single random paragraph of lorem ipsum",
     parameters: [],
-    returns: { type: "string", description: "Random paragraph" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sentence: {
     description: "Generate a single random sentence of lorem ipsum",
     parameters: [],
-    returns: { type: "string", description: "Random sentence" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   word: {
     description: "Generate a single random lorem ipsum word",
     parameters: [],
-    returns: { type: "string", description: "Random word" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   color: {
     description: "Generate a random color in hex, rgb, or name format",
     parameters: [
-      { name: "format", type: "string", description: "Color format: hex, rgb, or name (default hex)", optional: true },
+      { name: "format", dataType: "string", description: "Color format: hex, rgb, or name (default hex)", optional: true },
     ],
-    returns: { type: "string", description: "Random color value" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   ip: {
     description: "Generate a random IP address",
     parameters: [
-      { name: "version", type: "string", description: "IP version: v4 or v6 (default v4)", optional: true },
+      { name: "version", dataType: "string", description: "IP version: v4 or v6 (default v4)", optional: true },
     ],
-    returns: { type: "string", description: "Random IP address" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   url: {
     description: "Generate a random URL",
     parameters: [],
-    returns: { type: "string", description: "Random URL" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   avatar: {
     description: "Generate a random avatar image URL",
     parameters: [
-      { name: "size", type: "number", description: "Avatar size in pixels (default 200)", optional: true },
-      { name: "name", type: "string", description: "Name for the avatar initials", optional: true },
+      { name: "size", dataType: "number", description: "Avatar size in pixels (default 200)", optional: true },
+      { name: "name", dataType: "string", description: "Name for the avatar initials", optional: true },
     ],
-    returns: { type: "string", description: "Avatar image URL" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const FakerModuleMetadata: ModuleMetadata = {
-  name: "faker",
+export const FakerModuleMetadata = {
   description: "Fake data generation with seedable PRNG. Generates names, emails, addresses, lorem ipsum, numbers, dates, UUIDs, colors, IPs, and more. No external dependencies.",
   version: "1.0.0",
 };

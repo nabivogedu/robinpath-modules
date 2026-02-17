@@ -119,7 +119,7 @@ export const MathFunctions: Record<string, BuiltinHandler> = {
   percentage, factorial, gcd, lcm, isPrime, lerp,
 };
 
-export const MathFunctionMetadata: Record<string, FunctionMetadata> = {
+export const MathFunctionMetadata = {
   clamp: {
     description: "Clamp a number between a minimum and maximum value",
     parameters: [
@@ -267,7 +267,7 @@ export const MathFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const MathModuleMetadata: ModuleMetadata = {
+export const MathModuleMetadata = {
   description: "Math utilities: clamp, round, random, statistics, factorial, GCD, LCM, prime check, and linear interpolation",
   methods: ["clamp", "round", "randomInt", "randomFloat", "sum", "avg", "median", "min", "max", "percentage", "factorial", "gcd", "lcm", "isPrime", "lerp"],
 };

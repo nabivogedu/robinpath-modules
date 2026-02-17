@@ -4,10 +4,10 @@ import { ExcelFunctions, ExcelFunctionMetadata, ExcelModuleMetadata } from "./ex
 const ExcelModule: ModuleAdapter = {
   name: "excel",
   functions: ExcelFunctions,
-  functionMetadata: ExcelFunctionMetadata,
-  moduleMetadata: ExcelModuleMetadata,
+  functionMetadata: ExcelFunctionMetadata as any,
+  moduleMetadata: ExcelModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ExcelModule;
 export { ExcelModule };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getToken(): string {
   return token;
 }
 
-async function hubspotApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function hubspotApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getToken();
   const res = await fetch(`https://api.hubapi.com${path}`, {
     method,
@@ -138,11 +138,11 @@ export const HubspotFunctions: Record<string, BuiltinHandler> = {
   getCompany,
 };
 
-export const HubspotFunctionMetadata: Record<string, object> = {
+export const HubspotFunctionMetadata = {
   setToken: {
     description: "Set the HubSpot private app access token.",
     parameters: [
-      { name: "token", dataType: "string", description: "HubSpot access token", formInputType: "password", required: true },
+      { name: "token", dataType: "string", description: "HubSpot access token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -256,8 +256,7 @@ export const HubspotFunctionMetadata: Record<string, object> = {
 };
 
 export const HubspotModuleMetadata = {
-  name: "hubspot",
   description: "Manage HubSpot contacts, deals, and companies via the HubSpot CRM API v3.",
-  icon: "users",
   category: "crm",
+  methods: Object.keys(HubspotFunctions),
 };

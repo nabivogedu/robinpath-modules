@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Internal State ──────────────────────────────────────────────────
 
@@ -40,7 +40,7 @@ function refillBucket(bucket: TokenBucket): void {
 
 function cleanWindow(window: SlidingWindow): void {
   const cutoff = Date.now() - window.windowMs;
-  window.timestamps = window.timestamps.filter((t) => t > cutoff);
+  window.timestamps = window.timestamps.filter((t: any) => t > cutoff);
 }
 
 function resetFixedWindow(fw: FixedWindow): void {
@@ -193,7 +193,7 @@ const wait: BuiltinHandler = async (args) => {
     if (result.allowed) return result;
     const waitTime = Math.min(result.retryAfterMs ?? 100, maxWait - (Date.now() - start));
     if (waitTime <= 0) break;
-    await new Promise((resolve) => setTimeout(resolve, waitTime));
+    await new Promise((resolve: any) => setTimeout(resolve, waitTime));
   }
 
   throw new Error(`Rate limit wait timeout after ${maxWait}ms for "${name}"`);
@@ -247,7 +247,7 @@ export const RatelimitFunctions: Record<string, BuiltinHandler> = {
   create, acquire, check, remaining, wait, reset, status, destroy,
 };
 
-export const RatelimitFunctionMetadata: Record<string, FunctionMetadata> = {
+export const RatelimitFunctionMetadata = {
   create: {
     description: "Create a named rate limiter (token-bucket, sliding-window, or fixed-window)",
     parameters: [
@@ -326,7 +326,7 @@ export const RatelimitFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const RatelimitModuleMetadata: ModuleMetadata = {
+export const RatelimitModuleMetadata = {
   description: "Rate limiting with token bucket, sliding window, and fixed window algorithms",
   methods: ["create", "acquire", "check", "remaining", "wait", "reset", "status", "destroy"],
 };

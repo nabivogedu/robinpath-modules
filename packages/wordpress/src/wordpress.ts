@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -18,7 +18,7 @@ function getBaseUrl(): string {
   return getConfig("siteUrl").replace(/\/+$/, "");
 }
 
-async function wpApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function wpApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const res = await fetch(`${getBaseUrl()}/wp-json/wp/v2${path}`, {
     method,
     headers: {
@@ -501,7 +501,7 @@ export const WordpressFunctions: Record<string, BuiltinHandler> = {
   bulkUpdatePosts, bulkDeletePosts,
 };
 
-export const WordpressFunctionMetadata: Record<string, FunctionMetadata> = {
+export const WordpressFunctionMetadata = {
   // ── Credentials ─────────────────────────────────────────────────
   setCredentials: {
     description: "Set WordPress site URL and Application Password credentials.",
@@ -1023,7 +1023,7 @@ export const WordpressFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const WordpressModuleMetadata: ModuleMetadata = {
+export const WordpressModuleMetadata = {
   description: "Enterprise WordPress management — posts, pages, comments, media, users, categories, tags, custom fields, revisions, plugins, themes, settings, search, and bulk operations via the WordPress REST API v2.",
   methods: Object.keys(WordpressFunctions),
   category: "cms",

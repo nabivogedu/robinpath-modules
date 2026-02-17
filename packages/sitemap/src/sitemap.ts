@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
@@ -17,9 +17,9 @@ interface SitemapUrl {
 const create: BuiltinHandler = (args) => {
   const urls = (Array.isArray(args[0]) ? args[0] : []) as SitemapUrl[];
   const opts = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, unknown>;
-  const hasImages = urls.some((u) => u.images?.length);
-  const hasVideos = urls.some((u) => u.videos?.length);
-  const hasAlternates = urls.some((u) => u.alternates?.length);
+  const hasImages = urls.some((u: any) => u.images?.length);
+  const hasVideos = urls.some((u: any) => u.videos?.length);
+  const hasAlternates = urls.some((u: any) => u.alternates?.length);
   let nsExtra = "";
   if (hasImages) nsExtra += ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"';
   if (hasVideos) nsExtra += ' xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"';
@@ -128,14 +128,14 @@ const removeUrl: BuiltinHandler = (args) => {
 const filterByChangefreq: BuiltinHandler = (args) => {
   const urls = (Array.isArray(args[0]) ? args[0] : []) as SitemapUrl[];
   const freq = String(args[1] ?? "");
-  return urls.filter((u) => u.changefreq === freq);
+  return urls.filter((u: any) => u.changefreq === freq);
 };
 
 const filterByPriority: BuiltinHandler = (args) => {
   const urls = (Array.isArray(args[0]) ? args[0] : []) as SitemapUrl[];
   const min = Number(args[1] ?? 0);
   const max = Number(args[2] ?? 1);
-  return urls.filter((u) => (u.priority ?? 0.5) >= min && (u.priority ?? 0.5) <= max);
+  return urls.filter((u: any) => (u.priority ?? 0.5) >= min && (u.priority ?? 0.5) <= max);
 };
 
 const sortByPriority: BuiltinHandler = (args) => {
@@ -147,7 +147,7 @@ const sortByPriority: BuiltinHandler = (args) => {
 const sortByLastmod: BuiltinHandler = (args) => {
   const urls = (Array.isArray(args[0]) ? args[0] : []) as SitemapUrl[];
   const desc = args[1] !== false;
-  return [...urls].sort((a, b) => {
+  return [...urls].sort((a: any, b: any) => {
     const da = a.lastmod ? new Date(a.lastmod).getTime() : 0;
     const db = b.lastmod ? new Date(b.lastmod).getTime() : 0;
     return desc ? db - da : da - db;
@@ -161,7 +161,7 @@ const count: BuiltinHandler = (args) => {
 
 const extractLocs: BuiltinHandler = (args) => {
   const urls = (Array.isArray(args[0]) ? args[0] : []) as SitemapUrl[];
-  return urls.map((u) => u.loc);
+  return urls.map((u: any) => u.loc);
 };
 
 const validate: BuiltinHandler = (args) => {
@@ -183,7 +183,7 @@ const validate: BuiltinHandler = (args) => {
 
 export const SitemapFunctions: Record<string, BuiltinHandler> = { create, createIndex, parse, parseIndex, addUrl, removeUrl, filterByChangefreq, filterByPriority, sortByPriority, sortByLastmod, count, extractLocs, validate };
 
-export const SitemapFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SitemapFunctionMetadata = {
   create: { description: "Create XML sitemap", parameters: [{ name: "urls", dataType: "array", description: "Array of {loc, lastmod, changefreq, priority, images, videos, alternates}", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{pretty}", formInputType: "text", required: false }], returnType: "string", returnDescription: "XML sitemap", example: 'sitemap.create [{"loc": "https://example.com/", "priority": 1.0}]' },
   createIndex: { description: "Create sitemap index", parameters: [{ name: "sitemaps", dataType: "array", description: "Array of {loc, lastmod}", formInputType: "text", required: true }], returnType: "string", returnDescription: "XML sitemap index", example: 'sitemap.createIndex [{"loc": "https://example.com/sitemap1.xml"}]' },
   parse: { description: "Parse XML sitemap", parameters: [{ name: "xml", dataType: "string", description: "XML sitemap content", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of URL objects", example: 'sitemap.parse $xml' },
@@ -199,7 +199,7 @@ export const SitemapFunctionMetadata: Record<string, FunctionMetadata> = {
   validate: { description: "Validate sitemap XML", parameters: [{ name: "xml", dataType: "string", description: "Sitemap XML", formInputType: "text", required: true }], returnType: "object", returnDescription: "{valid, errors[], urlCount}", example: 'sitemap.validate $xml' },
 };
 
-export const SitemapModuleMetadata: ModuleMetadata = {
+export const SitemapModuleMetadata = {
   description: "XML sitemap generation, parsing, validation, and manipulation with image/video/alternate support",
   methods: ["create", "createIndex", "parse", "parseIndex", "addUrl", "removeUrl", "filterByChangefreq", "filterByPriority", "sortByPriority", "sortByLastmod", "count", "extractLocs", "validate"],
 };

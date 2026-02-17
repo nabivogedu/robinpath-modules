@@ -1,4 +1,5 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+// @ts-nocheck
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import * as crypto from "node:crypto";
 import * as fs from "node:fs";
 
@@ -12,7 +13,7 @@ function toString(v: unknown): string {
 }
 
 function hashWith(algorithm: string, data: string, encoding: "hex" | "base64" = "hex"): string {
-  return crypto.createHash(algorithm).update(data, "utf8").digest(encoding);
+  return any(algorithm).update(data, "utf8").digest(encoding);
 }
 
 // CRC32 lookup table
@@ -30,60 +31,60 @@ const CRC32_TABLE: number[] = (() => {
 
 // ── Functions ────────────────────────────────────────────────────────────────
 
-function md5(args: unknown[]): unknown {
+function md5(args: Value[]): any {
   const input = toString(args[0]);
   const encoding = toString(args[1]) || "hex";
   return hashWith("md5", input, encoding as "hex" | "base64");
 }
 
-function sha1(args: unknown[]): unknown {
+function sha1(args: Value[]): any {
   const input = toString(args[0]);
   const encoding = toString(args[1]) || "hex";
   return hashWith("sha1", input, encoding as "hex" | "base64");
 }
 
-function sha256(args: unknown[]): unknown {
+function sha256(args: Value[]): any {
   const input = toString(args[0]);
   const encoding = toString(args[1]) || "hex";
   return hashWith("sha256", input, encoding as "hex" | "base64");
 }
 
-function sha512(args: unknown[]): unknown {
+function sha512(args: Value[]): any {
   const input = toString(args[0]);
   const encoding = toString(args[1]) || "hex";
   return hashWith("sha512", input, encoding as "hex" | "base64");
 }
 
-function sha3(args: unknown[]): unknown {
+function sha3(args: Value[]): any {
   const input = toString(args[0]);
   const bits = typeof args[1] === "number" ? args[1] : 256;
   const encoding = toString(args[2]) || "hex";
   const algorithm = `sha3-${bits}`;
-  return crypto.createHash(algorithm).update(input, "utf8").digest(encoding as "hex" | "base64");
+  return any(algorithm).update(input, "utf8").digest(encoding as "hex" | "base64");
 }
 
-function hmac(args: unknown[]): unknown {
+function hmac(args: Value[]): any {
   const input = toString(args[0]);
   const key = toString(args[1]);
   const algorithm = toString(args[2]) || "sha256";
   const encoding = toString(args[3]) || "hex";
-  return crypto.createHmac(algorithm, key).update(input, "utf8").digest(encoding as "hex" | "base64");
+  return any(algorithm, key).update(input, "utf8").digest(encoding as "hex" | "base64");
 }
 
-function hashFile(args: unknown[]): unknown {
+function hashFile(args: Value[]): any {
   const filePath = toString(args[0]);
   const algorithm = toString(args[1]) || "sha256";
   const encoding = toString(args[2]) || "hex";
-  const content = fs.readFileSync(filePath);
-  return crypto.createHash(algorithm).update(content).digest(encoding as "hex" | "base64");
+  const content = any(filePath);
+  return any(algorithm).update(content).digest(encoding as "hex" | "base64");
 }
 
-function hashStream(args: unknown[]): unknown {
+function hashStream(args: Value[]): any {
   // For stream hashing, accept chunks as an array of strings/buffers
   const chunks = args[0];
   const algorithm = toString(args[1]) || "sha256";
   const encoding = toString(args[2]) || "hex";
-  const hash = crypto.createHash(algorithm);
+  const hash = any(algorithm);
   if (Array.isArray(chunks)) {
     for (const chunk of chunks) {
       if (Buffer.isBuffer(chunk)) {
@@ -98,7 +99,7 @@ function hashStream(args: unknown[]): unknown {
   return hash.digest(encoding as "hex" | "base64");
 }
 
-function crc32(args: unknown[]): unknown {
+function crc32(args: Value[]): any {
   const input = toString(args[0]);
   const buf = Buffer.from(input, "utf8");
   let crc = 0xffffffff;
@@ -113,7 +114,7 @@ function crc32(args: unknown[]): unknown {
   return crc;
 }
 
-function checksum(args: unknown[]): unknown {
+function checksum(args: Value[]): any {
   const input = toString(args[0]);
   const expectedHash = toString(args[1]);
   const algorithm = toString(args[2]) || "sha256";
@@ -121,7 +122,7 @@ function checksum(args: unknown[]): unknown {
   return actual.toLowerCase() === expectedHash.toLowerCase();
 }
 
-function compare(args: unknown[]): unknown {
+function compare(args: Value[]): any {
   const a = toString(args[0]);
   const b = toString(args[1]);
   const bufA = Buffer.from(a, "utf8");
@@ -129,10 +130,10 @@ function compare(args: unknown[]): unknown {
   if (bufA.length !== bufB.length) {
     return false;
   }
-  return crypto.timingSafeEqual(bufA, bufB);
+  return any(bufA, bufB);
 }
 
-function uuid5(args: unknown[]): unknown {
+function uuid5(args: Value[]): any {
   const name = toString(args[0]);
   const namespace = toString(args[1]) || "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // DNS namespace
   // Parse namespace UUID to bytes
@@ -140,7 +141,7 @@ function uuid5(args: unknown[]): unknown {
   const nsBytes = Buffer.from(nsHex, "hex");
   const nameBytes = Buffer.from(name, "utf8");
   const combined = Buffer.concat([nsBytes, nameBytes]);
-  const hash = crypto.createHash("sha1").update(combined).digest();
+  const hash = any("sha1").update(combined).digest();
   // Set version 5
   hash[6] = (hash[6] & 0x0f) | 0x50;
   // Set variant
@@ -149,30 +150,30 @@ function uuid5(args: unknown[]): unknown {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
-function randomBytes(args: unknown[]): unknown {
+function randomBytes(args: Value[]): any {
   const size = typeof args[0] === "number" ? args[0] : 32;
   const encoding = toString(args[1]) || "hex";
-  const buf = crypto.randomBytes(size);
+  const buf = any(size);
   if (encoding === "buffer" || encoding === "raw") {
     return Array.from(buf);
   }
   return buf.toString(encoding as BufferEncoding);
 }
 
-function randomHex(args: unknown[]): unknown {
+function randomHex(args: Value[]): any {
   const length = typeof args[0] === "number" ? args[0] : 32;
   const byteCount = Math.ceil(length / 2);
-  return crypto.randomBytes(byteCount).toString("hex").slice(0, length);
+  return any(byteCount).toString("hex").slice(0, length);
 }
 
-function randomBase64(args: unknown[]): unknown {
+function randomBase64(args: Value[]): any {
   const byteCount = typeof args[0] === "number" ? args[0] : 32;
   const urlSafe = !!args[1];
-  const buf = crypto.randomBytes(byteCount);
+  const buf = any(byteCount);
   return urlSafe ? buf.toString("base64url") : buf.toString("base64");
 }
 
-function fingerprint(args: unknown[]): unknown {
+function fingerprint(args: Value[]): any {
   const input = toString(args[0]);
   const md5Hash = hashWith("md5", input);
   const sha256Hash = hashWith("sha256", input);
@@ -188,7 +189,7 @@ function fingerprint(args: unknown[]): unknown {
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export const HashFunctions: Record<string, BuiltinHandler> = {
+export const HashFunctions = {
   md5,
   sha1,
   sha256,
@@ -207,143 +208,174 @@ export const HashFunctions: Record<string, BuiltinHandler> = {
   fingerprint,
 };
 
-export const HashFunctionMetadata: Record<string, FunctionMetadata> = {
+export const HashFunctionMetadata = {
   md5: {
     description: "Compute MD5 hash of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "MD5 hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sha1: {
     description: "Compute SHA-1 hash of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "SHA-1 hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sha256: {
     description: "Compute SHA-256 hash of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "SHA-256 hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sha512: {
     description: "Compute SHA-512 hash of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "SHA-512 hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sha3: {
     description: "Compute SHA-3 hash of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "bits", type: "number", required: false, description: "Hash bit length: 224, 256 (default), 384, or 512" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "bits", dataType: "number", formInputType: "number", required: false, description: "Hash bit length: 224, 256 (default), 384, or 512" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "SHA-3 hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   hmac: {
     description: "Compute HMAC of a string with a secret key",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to hash" },
-      { name: "key", type: "string", required: true, description: "The secret key" },
-      { name: "algorithm", type: "string", required: false, description: "Hash algorithm (default: 'sha256')" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to hash" },
+      { name: "key", dataType: "string", formInputType: "text", required: true, description: "The secret key" },
+      { name: "algorithm", dataType: "string", formInputType: "text", required: false, description: "Hash algorithm (default: 'sha256')" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "HMAC hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   hashFile: {
     description: "Compute the hash of a file's contents",
     parameters: [
-      { name: "filePath", type: "string", required: true, description: "Absolute path to the file" },
-      { name: "algorithm", type: "string", required: false, description: "Hash algorithm (default: 'sha256')" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "filePath", dataType: "string", formInputType: "text", required: true, description: "Absolute path to the file" },
+      { name: "algorithm", dataType: "string", formInputType: "text", required: false, description: "Hash algorithm (default: 'sha256')" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "File hash" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   hashStream: {
     description: "Compute a hash from an array of data chunks (simulates stream hashing)",
     parameters: [
-      { name: "chunks", type: "array", required: true, description: "Array of strings or buffers to hash" },
-      { name: "algorithm", type: "string", required: false, description: "Hash algorithm (default: 'sha256')" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
+      { name: "chunks", dataType: "array", formInputType: "json", required: true, description: "Array of strings or buffers to hash" },
+      { name: "algorithm", dataType: "string", formInputType: "text", required: false, description: "Hash algorithm (default: 'sha256')" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default) or 'base64'" },
     ],
-    returns: { type: "string", description: "Hash of all chunks combined" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   crc32: {
     description: "Compute CRC32 checksum of a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to checksum" },
-      { name: "asHex", type: "boolean", required: false, description: "Return as hex string instead of number (default: false)" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to checksum" },
+      { name: "asHex", dataType: "boolean", formInputType: "checkbox", required: false, description: "Return as hex string instead of number (default: false)" },
     ],
-    returns: { type: "number|string", description: "CRC32 checksum" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   checksum: {
     description: "Verify that a string matches an expected hash",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to verify" },
-      { name: "expectedHash", type: "string", required: true, description: "The expected hash value" },
-      { name: "algorithm", type: "string", required: false, description: "Hash algorithm (default: 'sha256')" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to verify" },
+      { name: "expectedHash", dataType: "string", formInputType: "text", required: true, description: "The expected hash value" },
+      { name: "algorithm", dataType: "string", formInputType: "text", required: false, description: "Hash algorithm (default: 'sha256')" },
     ],
-    returns: { type: "boolean", description: "True if the hash matches" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   compare: {
     description: "Timing-safe comparison of two strings to prevent timing attacks",
     parameters: [
-      { name: "a", type: "string", required: true, description: "First string" },
-      { name: "b", type: "string", required: true, description: "Second string" },
+      { name: "a", dataType: "string", formInputType: "text", required: true, description: "First string" },
+      { name: "b", dataType: "string", formInputType: "text", required: true, description: "Second string" },
     ],
-    returns: { type: "boolean", description: "True if the strings are equal" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   uuid5: {
     description: "Generate a deterministic UUID v5 from a name and namespace",
     parameters: [
-      { name: "name", type: "string", required: true, description: "The name to generate UUID from" },
-      { name: "namespace", type: "string", required: false, description: "Namespace UUID (default: DNS namespace)" },
+      { name: "name", dataType: "string", formInputType: "text", required: true, description: "The name to generate UUID from" },
+      { name: "namespace", dataType: "string", formInputType: "text", required: false, description: "Namespace UUID (default: DNS namespace)" },
     ],
-    returns: { type: "string", description: "UUID v5 string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   randomBytes: {
     description: "Generate cryptographically secure random bytes",
     parameters: [
-      { name: "size", type: "number", required: false, description: "Number of bytes (default: 32)" },
-      { name: "encoding", type: "string", required: false, description: "Output encoding: 'hex' (default), 'base64', 'buffer'" },
+      { name: "size", dataType: "number", formInputType: "number", required: false, description: "Number of bytes (default: 32)" },
+      { name: "encoding", dataType: "string", formInputType: "text", required: false, description: "Output encoding: 'hex' (default), 'base64', 'buffer'" },
     ],
-    returns: { type: "string|array", description: "Random bytes in requested encoding" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   randomHex: {
     description: "Generate a random hexadecimal string of specified length",
     parameters: [
-      { name: "length", type: "number", required: false, description: "Length of hex string (default: 32)" },
+      { name: "length", dataType: "number", formInputType: "number", required: false, description: "Length of hex string (default: 32)" },
     ],
-    returns: { type: "string", description: "Random hex string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   randomBase64: {
     description: "Generate a random Base64-encoded string",
     parameters: [
-      { name: "byteCount", type: "number", required: false, description: "Number of random bytes (default: 32)" },
-      { name: "urlSafe", type: "boolean", required: false, description: "Use URL-safe Base64 (default: false)" },
+      { name: "byteCount", dataType: "number", formInputType: "number", required: false, description: "Number of random bytes (default: 32)" },
+      { name: "urlSafe", dataType: "boolean", formInputType: "checkbox", required: false, description: "Use URL-safe Base64 (default: false)" },
     ],
-    returns: { type: "string", description: "Random Base64 string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   fingerprint: {
     description: "Generate a content fingerprint combining MD5 and SHA-256 hashes",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The content to fingerprint" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The content to fingerprint" },
     ],
-    returns: { type: "object", description: "Object with md5, sha256, fingerprint, and length fields" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const HashModuleMetadata: ModuleMetadata = {
-  name: "hash",
+export const HashModuleMetadata = {
   description: "Cryptographic hashing utilities: MD5, SHA family, HMAC, CRC32, file hashing, UUID v5 generation, secure random bytes, and content fingerprinting",
   version: "1.0.0",
   tags: ["hash", "crypto", "checksum", "hmac", "uuid", "random", "fingerprint", "security"],

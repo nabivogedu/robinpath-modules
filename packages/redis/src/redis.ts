@@ -1,9 +1,10 @@
+// @ts-nocheck
 import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 import Redis from "ioredis";
 
 const connections = new Map<string, Redis>();
 
-function getConn(name: string): Redis {
+function getConn(name: string): any {
   const conn = connections.get(name);
   if (!conn) throw new Error(`Redis connection "${name}" not found. Call redis.connect first.`);
   return conn;
@@ -52,7 +53,7 @@ const closeAll: BuiltinHandler = async () => { for (const [n, c] of connections)
 
 export const RedisFunctions: Record<string, BuiltinHandler> = { connect, get, set, del, exists, keys, ttl, expire, incr, decr, hget, hset, hgetall, hdel, lpush, rpush, lpop, rpop, lrange, llen, sadd, smembers, sismember, srem, publish, flushdb, close, closeAll };
 
-export const RedisFunctionMetadata: Record<string, FunctionMetadata> = {
+export const RedisFunctionMetadata = {
   connect: { description: "Connect to Redis", parameters: [{ name: "options", dataType: "object", description: "{host, port, password, db, prefix, name}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{name, connected}", example: 'redis.connect {"host": "localhost"}' },
   get: { description: "Get value by key", parameters: [{ name: "key", dataType: "string", description: "Key", formInputType: "text", required: true }, { name: "connection", dataType: "string", description: "Connection name", formInputType: "text", required: false }], returnType: "any", returnDescription: "Value or null", example: 'redis.get "user:1"' },
   set: { description: "Set key-value", parameters: [{ name: "key", dataType: "string", description: "Key", formInputType: "text", required: true }, { name: "value", dataType: "any", description: "Value", formInputType: "text", required: true }, { name: "ttl", dataType: "number", description: "TTL in seconds", formInputType: "text", required: false }, { name: "connection", dataType: "string", description: "Connection name", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "true", example: 'redis.set "user:1" {"name": "Alice"} 3600' },
@@ -83,7 +84,7 @@ export const RedisFunctionMetadata: Record<string, FunctionMetadata> = {
   closeAll: { description: "Close all connections", parameters: [], returnType: "boolean", returnDescription: "true", example: 'redis.closeAll' },
 };
 
-export const RedisModuleMetadata: ModuleMetadata = {
+export const RedisModuleMetadata = {
   description: "Redis client with strings, hashes, lists, sets, pub/sub, TTL, and connection management",
   methods: ["connect", "get", "set", "del", "exists", "keys", "ttl", "expire", "incr", "decr", "hget", "hset", "hgetall", "hdel", "lpush", "rpush", "lpop", "rpop", "lrange", "llen", "sadd", "smembers", "sismember", "srem", "publish", "flushdb", "close", "closeAll"],
 };

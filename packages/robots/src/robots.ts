@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 interface RobotsRule {
   userAgent: string;
@@ -73,7 +73,7 @@ const isAllowed: BuiltinHandler = (args) => {
   const url = String(args[1] ?? "/");
   const agent = String(args[2] ?? "*").toLowerCase();
   const path = url.startsWith("http") ? new URL(url).pathname : url;
-  const applicableRules = robotsTxt.rules.filter((r) => r.userAgent === "*" || r.userAgent.toLowerCase() === agent);
+  const applicableRules = robotsTxt.rules.filter((r: any) => r.userAgent === "*" || r.userAgent.toLowerCase() === agent);
   if (applicableRules.length === 0) return true;
   let bestMatch = "";
   let allowed = true;
@@ -111,7 +111,7 @@ const getRules: BuiltinHandler = (args) => {
   const robotsTxt = (typeof args[0] === "object" && args[0] !== null ? args[0] : parse([String(args[0] ?? "")])) as RobotsFile;
   const agent = args[1] ? String(args[1]).toLowerCase() : undefined;
   if (!agent) return robotsTxt.rules;
-  return robotsTxt.rules.filter((r) => r.userAgent === "*" || r.userAgent.toLowerCase() === agent);
+  return robotsTxt.rules.filter((r: any) => r.userAgent === "*" || r.userAgent.toLowerCase() === agent);
 };
 
 const addRule: BuiltinHandler = (args) => {
@@ -124,7 +124,7 @@ const addRule: BuiltinHandler = (args) => {
 const removeRule: BuiltinHandler = (args) => {
   const robotsTxt = (typeof args[0] === "object" && args[0] !== null ? args[0] : parse([String(args[0] ?? "")])) as RobotsFile;
   const agent = String(args[1] ?? "*").toLowerCase();
-  return { ...robotsTxt, rules: robotsTxt.rules.filter((r) => r.userAgent.toLowerCase() !== agent) };
+  return { ...robotsTxt, rules: robotsTxt.rules.filter((r: any) => r.userAgent.toLowerCase() !== agent) };
 };
 
 const addSitemap: BuiltinHandler = (args) => {
@@ -155,7 +155,7 @@ const fetchRobots: BuiltinHandler = async (args) => {
 
 export const RobotsFunctions: Record<string, BuiltinHandler> = { parse, create, isAllowed, isDisallowed, getCrawlDelay, getSitemaps, getRules, addRule, removeRule, addSitemap, allowAll, disallowAll, fetch: fetchRobots };
 
-export const RobotsFunctionMetadata: Record<string, FunctionMetadata> = {
+export const RobotsFunctionMetadata = {
   parse: { description: "Parse robots.txt content", parameters: [{ name: "text", dataType: "string", description: "robots.txt content", formInputType: "text", required: true }], returnType: "object", returnDescription: "{rules[], sitemaps[], host}", example: 'robots.parse $text' },
   create: { description: "Generate robots.txt", parameters: [{ name: "config", dataType: "object", description: "{rules[], sitemaps[], host}", formInputType: "text", required: true }], returnType: "string", returnDescription: "robots.txt content", example: 'robots.create {"rules": [{"userAgent": "*", "disallow": ["/admin"]}]}' },
   isAllowed: { description: "Check if URL is allowed", parameters: [{ name: "robots", dataType: "object", description: "Parsed robots or raw text", formInputType: "text", required: true }, { name: "url", dataType: "string", description: "URL or path", formInputType: "text", required: true }, { name: "userAgent", dataType: "string", description: "Bot name (default *)", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "true if allowed", example: 'robots.isAllowed $robots "/page" "Googlebot"' },
@@ -171,7 +171,7 @@ export const RobotsFunctionMetadata: Record<string, FunctionMetadata> = {
   fetch: { description: "Fetch and parse robots.txt from URL", parameters: [{ name: "url", dataType: "string", description: "Site URL", formInputType: "text", required: true }], returnType: "object", returnDescription: "{found, status, parsed, raw}", example: 'robots.fetch "https://example.com"' },
 };
 
-export const RobotsModuleMetadata: ModuleMetadata = {
+export const RobotsModuleMetadata = {
   description: "robots.txt parsing, generation, URL permission checking, and crawl configuration",
   methods: ["parse", "create", "isAllowed", "isDisallowed", "getCrawlDelay", "getSitemaps", "getRules", "addRule", "removeRule", "addSitemap", "allowAll", "disallowAll", "fetch"],
 };

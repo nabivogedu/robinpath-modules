@@ -4,10 +4,10 @@ import { JsonFunctions, JsonFunctionMetadata, JsonModuleMetadata } from "./json.
 const JsonModule: ModuleAdapter = {
   name: "json",
   functions: JsonFunctions,
-  functionMetadata: JsonFunctionMetadata,
-  moduleMetadata: JsonModuleMetadata,
+  functionMetadata: JsonFunctionMetadata as any,
+  moduleMetadata: JsonModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default JsonModule;
 export { JsonModule };

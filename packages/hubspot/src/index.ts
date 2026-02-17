@@ -4,10 +4,10 @@ import { HubspotFunctions, HubspotFunctionMetadata, HubspotModuleMetadata } from
 const HubspotModule: ModuleAdapter = {
   name: "hubspot",
   functions: HubspotFunctions,
-  functionMetadata: HubspotFunctionMetadata,
-  moduleMetadata: HubspotModuleMetadata,
+  functionMetadata: HubspotFunctionMetadata as any,
+  moduleMetadata: HubspotModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default HubspotModule;
 export { HubspotModule };

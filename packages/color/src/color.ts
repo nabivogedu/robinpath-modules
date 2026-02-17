@@ -1,6 +1,6 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
-const wrap = (code: string, reset: string) => (args: unknown[]) => `\x1b[${code}m${String(args[0] ?? "")}\x1b[${reset}m`;
+const wrap = (code: string, reset: string) => (args: Value[]) => `\x1b[${code}m${String(args[0] ?? "")}\x1b[${reset}m`;
 
 const red: BuiltinHandler = (args) => wrap("31", "39")(args);
 const green: BuiltinHandler = (args) => wrap("32", "39")(args);
@@ -41,7 +41,7 @@ const colorParam = (desc: string): FunctionMetadata => ({
   example: `color.${desc.split(" ")[0]!.toLowerCase()} "hello"`,
 });
 
-export const ColorFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ColorFunctionMetadata = {
   red: { ...colorParam("Wrap text in red"), example: 'color.red "error"' },
   green: { ...colorParam("Wrap text in green"), example: 'color.green "success"' },
   blue: { ...colorParam("Wrap text in blue"), example: 'color.blue "info"' },
@@ -62,7 +62,7 @@ export const ColorFunctionMetadata: Record<string, FunctionMetadata> = {
   rgb: { description: "Wrap text with custom RGB foreground color", parameters: [{ name: "text", dataType: "string", description: "Text to color", formInputType: "text", required: true }, { name: "r", dataType: "number", description: "Red (0-255)", formInputType: "number", required: true }, { name: "g", dataType: "number", description: "Green (0-255)", formInputType: "number", required: true }, { name: "b", dataType: "number", description: "Blue (0-255)", formInputType: "number", required: true }], returnType: "string", returnDescription: "RGB-colored string", example: 'color.rgb "text" 255 128 0' },
 };
 
-export const ColorModuleMetadata: ModuleMetadata = {
+export const ColorModuleMetadata = {
   description: "Terminal ANSI color utilities: red, green, blue, bold, underline, RGB, and more",
   methods: ["red", "green", "blue", "yellow", "cyan", "magenta", "white", "gray", "bold", "dim", "italic", "underline", "strikethrough", "bgRed", "bgGreen", "bgBlue", "strip", "rgb"],
 };

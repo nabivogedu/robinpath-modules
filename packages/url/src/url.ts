@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Function Handlers ──────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ const getParams: BuiltinHandler = (args) => {
   const urlString = String(args[0] ?? "");
   const u = new URL(urlString);
   const result: Record<string, string> = {};
-  u.searchParams.forEach((value, key) => {
+  u.searchParams.forEach((value: any, key: any) => {
     result[key] = value;
   });
   return result;
@@ -143,7 +143,7 @@ export const UrlFunctions: Record<string, BuiltinHandler> = {
   decode,
 };
 
-export const UrlFunctionMetadata: Record<string, FunctionMetadata> = {
+export const UrlFunctionMetadata = {
   parse: {
     description: "Parse a URL string into its component parts",
     parameters: [
@@ -398,7 +398,7 @@ export const UrlFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const UrlModuleMetadata: ModuleMetadata = {
+export const UrlModuleMetadata = {
   description: "URL parsing, formatting, and query parameter manipulation utilities using the built-in URL API",
   methods: [
     "parse",

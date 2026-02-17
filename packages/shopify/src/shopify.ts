@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getConfig(key: string): string {
   return val;
 }
 
-async function shopifyApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function shopifyApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const shop = getConfig("shop");
   const token = getConfig("accessToken");
   const res = await fetch(`https://${shop}.myshopify.com/admin/api/2024-01${path}`, {
@@ -143,12 +143,12 @@ export const ShopifyFunctions: Record<string, BuiltinHandler> = {
   countOrders,
 };
 
-export const ShopifyFunctionMetadata: Record<string, object> = {
+export const ShopifyFunctionMetadata = {
   setCredentials: {
     description: "Set Shopify store credentials.",
     parameters: [
       { name: "shop", dataType: "string", description: "Shopify store name (e.g. 'my-store' from my-store.myshopify.com)", formInputType: "text", required: true },
-      { name: "accessToken", dataType: "string", description: "Admin API access token", formInputType: "password", required: true },
+      { name: "accessToken", dataType: "string", description: "Admin API access token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -255,8 +255,7 @@ export const ShopifyFunctionMetadata: Record<string, object> = {
 };
 
 export const ShopifyModuleMetadata = {
-  name: "shopify",
   description: "Manage Shopify products, orders, customers, and inventory via the Shopify Admin REST API.",
-  icon: "shopping-cart",
   category: "ecommerce",
+  methods: Object.keys(ShopifyFunctions),
 };

@@ -119,7 +119,7 @@ const keys: BuiltinHandler = (args) => {
   const allKeys = [...store.data.keys()];
   if (!pattern) return allKeys;
   const regex = new RegExp(pattern.replace(/\*/g, ".*"));
-  return allKeys.filter((k) => regex.test(k));
+  return allKeys.filter((k: any) => regex.test(k));
 };
 
 const values: BuiltinHandler = (args) => {
@@ -224,7 +224,7 @@ const loadFile: BuiltinHandler = (args) => {
 const listFiles: BuiltinHandler = (args) => {
   const dir = String(args[0] ?? "");
   if (!existsSync(dir)) return [];
-  return readdirSync(dir).map((name) => {
+  return readdirSync(dir).map((name: any) => {
     const full = join(dir, name);
     const stat = statSync(full);
     return { name, path: full, size: stat.size, isDirectory: stat.isDirectory(), modified: stat.mtime.toISOString() };
@@ -244,7 +244,7 @@ export const StorageFunctions: Record<string, BuiltinHandler> = {
   create, set, get, has, remove, keys, values, size, clear, increment, decrement, getAll, setMany, destroy, saveFile, loadFile, listFiles, deleteFile,
 };
 
-export const StorageFunctionMetadata: Record<string, FunctionMetadata> = {
+export const StorageFunctionMetadata = {
   create: { description: "Create a named key-value store (memory or file-backed)", parameters: [{ name: "name", dataType: "string", description: "Store name", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{type: 'memory'|'file', path: string}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{name, type, size}", example: 'storage.create "workflow-state" {"type": "file", "path": "./data/state.json"}' },
   set: { description: "Set a key-value pair with optional TTL", parameters: [{ name: "store", dataType: "string", description: "Store name", formInputType: "text", required: true }, { name: "key", dataType: "string", description: "Key", formInputType: "text", required: true }, { name: "value", dataType: "any", description: "Value", formInputType: "text", required: true }, { name: "ttlMs", dataType: "number", description: "TTL in ms (optional)", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "True", example: 'storage.set "state" "lastRun" $timestamp' },
   get: { description: "Get a value by key", parameters: [{ name: "store", dataType: "string", description: "Store name", formInputType: "text", required: true }, { name: "key", dataType: "string", description: "Key", formInputType: "text", required: true }, { name: "default", dataType: "any", description: "Default if not found", formInputType: "text", required: false }], returnType: "any", returnDescription: "Stored value or default", example: 'storage.get "state" "lastRun"' },
@@ -265,7 +265,7 @@ export const StorageFunctionMetadata: Record<string, FunctionMetadata> = {
   deleteFile: { description: "Delete a file from disk", parameters: [{ name: "path", dataType: "string", description: "File path", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if deleted", example: 'storage.deleteFile "./output/old.json"' },
 };
 
-export const StorageModuleMetadata: ModuleMetadata = {
+export const StorageModuleMetadata = {
   description: "Persistent key-value storage (memory or file-backed) with TTL, counters, and file operations",
   methods: ["create", "set", "get", "has", "remove", "keys", "values", "size", "clear", "increment", "decrement", "getAll", "setMany", "destroy", "saveFile", "loadFile", "listFiles", "deleteFile"],
 };

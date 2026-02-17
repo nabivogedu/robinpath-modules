@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -38,16 +38,16 @@ function toString(v: unknown): string {
 
 // ── Functions ────────────────────────────────────────────────────────────────
 
-function html(args: unknown[]): unknown {
+function html(args: Value[]): any {
   const input = toString(args[0]);
   const mode = toString(args[1]) || "escape";
   if (mode === "strip") {
     return input.replace(/<[^>]*>/g, "");
   }
-  return input.replace(/[&<>"']/g, (ch) => HTML_ESCAPE_MAP[ch] ?? ch);
+  return input.replace(/[&<>"']/g, (ch: any) => HTML_ESCAPE_MAP[ch] ?? ch);
 }
 
-function xss(args: unknown[]): unknown {
+function xss(args: Value[]): any {
   let result = toString(args[0]);
   for (const pattern of XSS_PATTERNS) {
     result = result.replace(pattern, "");
@@ -55,7 +55,7 @@ function xss(args: unknown[]): unknown {
   return result;
 }
 
-function sql(args: unknown[]): unknown {
+function sql(args: Value[]): any {
   const input = toString(args[0]);
   return input
     .replace(/\\/g, "\\\\")
@@ -67,12 +67,12 @@ function sql(args: unknown[]): unknown {
     .replace(/\r/g, "\\r");
 }
 
-function regex(args: unknown[]): unknown {
+function regex(args: Value[]): any {
   const input = toString(args[0]);
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function filename(args: unknown[]): unknown {
+function filename(args: Value[]): any {
   const input = toString(args[0]);
   const replacement = toString(args[1]) || "_";
   let result = input
@@ -90,7 +90,7 @@ function filename(args: unknown[]): unknown {
   return result.slice(0, 255);
 }
 
-function path(args: unknown[]): unknown {
+function path(args: Value[]): any {
   const input = toString(args[0]);
   let result = input
     .replace(/\.\.[/\\]/g, "")
@@ -101,7 +101,7 @@ function path(args: unknown[]): unknown {
   return result;
 }
 
-function url(args: unknown[]): unknown {
+function url(args: Value[]): any {
   const input = toString(args[0]).trim();
   const lower = input.toLowerCase().replace(/\s/g, "");
   if (lower.startsWith("javascript:") || lower.startsWith("vbscript:") || lower.startsWith("data:text/html")) {
@@ -121,7 +121,7 @@ function url(args: unknown[]): unknown {
   }
 }
 
-function email(args: unknown[]): unknown {
+function email(args: Value[]): any {
   const input = toString(args[0]).trim().toLowerCase();
   const parts = input.split("@");
   if (parts.length !== 2) return input;
@@ -135,7 +135,7 @@ function email(args: unknown[]): unknown {
   return `${local}@${domain}`;
 }
 
-function stripTags(args: unknown[]): unknown {
+function stripTags(args: Value[]): any {
   const input = toString(args[0]);
   const allowed = toString(args[1]);
   if (!allowed) {
@@ -145,28 +145,28 @@ function stripTags(args: unknown[]): unknown {
     allowed
       .toLowerCase()
       .match(/<\w+>/g)
-      ?.map((t) => t.slice(1, -1)) ?? []
+      ?.map((t: any) => t.slice(1, -1)) ?? []
   );
-  return input.replace(/<\/?(\w+)[^>]*>/g, (match, tag) => {
+  return input.replace(/<\/?(\w+)[^>]*>/g, (match: any, tag: any) => {
     return allowedSet.has(tag.toLowerCase()) ? match : "";
   });
 }
 
-function escapeHtml(args: unknown[]): unknown {
+function escapeHtml(args: Value[]): any {
   const input = toString(args[0]);
-  return input.replace(/[&<>"']/g, (ch) => HTML_ESCAPE_MAP[ch] ?? ch);
+  return input.replace(/[&<>"']/g, (ch: any) => HTML_ESCAPE_MAP[ch] ?? ch);
 }
 
-function unescapeHtml(args: unknown[]): unknown {
+function unescapeHtml(args: Value[]): any {
   const input = toString(args[0]);
-  return input.replace(/&amp;|&lt;|&gt;|&quot;|&#x27;|&#39;/g, (entity) => HTML_UNESCAPE_MAP[entity] ?? entity);
+  return input.replace(/&amp;|&lt;|&gt;|&quot;|&#x27;|&#39;/g, (entity: any) => HTML_UNESCAPE_MAP[entity] ?? entity);
 }
 
-function trim(args: unknown[]): unknown {
+function trim(args: Value[]): any {
   const value = args[0];
   if (typeof value === "string") return value.trim();
   if (Array.isArray(value)) {
-    return value.map((item) => trim([item]));
+    return value.map((item: any) => trim([item]));
   }
   if (value !== null && typeof value === "object") {
     const result: Record<string, unknown> = {};
@@ -178,7 +178,7 @@ function trim(args: unknown[]): unknown {
   return value;
 }
 
-function truncate(args: unknown[]): unknown {
+function truncate(args: Value[]): any {
   const input = toString(args[0]);
   const maxLen = typeof args[1] === "number" ? args[1] : 100;
   const suffix = toString(args[2] ?? "...");
@@ -186,7 +186,7 @@ function truncate(args: unknown[]): unknown {
   return input.slice(0, maxLen - suffix.length) + suffix;
 }
 
-function alphanumeric(args: unknown[]): unknown {
+function alphanumeric(args: Value[]): any {
   const input = toString(args[0]);
   const allowSpaces = !!args[1];
   if (allowSpaces) {
@@ -195,7 +195,7 @@ function alphanumeric(args: unknown[]): unknown {
   return input.replace(/[^a-zA-Z0-9]/g, "");
 }
 
-function slug(args: unknown[]): unknown {
+function slug(args: Value[]): any {
   const input = toString(args[0]);
   const separator = toString(args[1]) || "-";
   return input
@@ -210,7 +210,7 @@ function slug(args: unknown[]): unknown {
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export const SanitizeFunctions: Record<string, BuiltinHandler> = {
+export const SanitizeFunctions = {
   html,
   xss,
   sql,
@@ -228,123 +228,152 @@ export const SanitizeFunctions: Record<string, BuiltinHandler> = {
   slug,
 };
 
-export const SanitizeFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SanitizeFunctionMetadata = {
   html: {
     description: "Strip or escape HTML tags from input",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to sanitize" },
-      { name: "mode", type: "string", required: false, description: "Mode: 'escape' (default) or 'strip'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to sanitize" },
+      { name: "mode", dataType: "string", formInputType: "text", required: false, description: "Mode: 'escape' (default) or 'strip'" },
     ],
-    returns: { type: "string", description: "Sanitized string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   xss: {
     description: "Remove XSS attack vectors from input",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to sanitize" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to sanitize" },
     ],
-    returns: { type: "string", description: "String with XSS vectors removed" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   sql: {
     description: "Escape SQL special characters to prevent injection",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to escape" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to escape" },
     ],
-    returns: { type: "string", description: "SQL-escaped string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   regex: {
     description: "Escape special regex characters in a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to escape" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to escape" },
     ],
-    returns: { type: "string", description: "Regex-escaped string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   filename: {
     description: "Sanitize a string for safe use as a filename",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The filename to sanitize" },
-      { name: "replacement", type: "string", required: false, description: "Replacement character for invalid chars (default: '_')" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The filename to sanitize" },
+      { name: "replacement", dataType: "string", formInputType: "text", required: false, description: "Replacement character for invalid chars (default: '_')" },
     ],
-    returns: { type: "string", description: "Sanitized filename" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   path: {
     description: "Prevent path traversal attacks by sanitizing a file path",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The path to sanitize" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The path to sanitize" },
     ],
-    returns: { type: "string", description: "Sanitized path with traversal sequences removed" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   url: {
     description: "Sanitize a URL, stripping dangerous protocols like javascript:",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The URL to sanitize" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The URL to sanitize" },
     ],
-    returns: { type: "string", description: "Sanitized URL or empty string if dangerous" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   email: {
     description: "Normalize an email address (lowercase, remove dots/plus aliases for Gmail)",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The email to normalize" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The email to normalize" },
     ],
-    returns: { type: "string", description: "Normalized email address" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stripTags: {
     description: "Remove all HTML tags from a string, optionally allowing specific tags",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to strip tags from" },
-      { name: "allowed", type: "string", required: false, description: "Allowed tags, e.g. '<b><i><a>'" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to strip tags from" },
+      { name: "allowed", dataType: "string", formInputType: "text", required: false, description: "Allowed tags, e.g. '<b><i><a>'" },
     ],
-    returns: { type: "string", description: "String with HTML tags removed" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   escapeHtml: {
     description: "Escape HTML special characters: & < > \" '",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to escape" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to escape" },
     ],
-    returns: { type: "string", description: "HTML-escaped string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   unescapeHtml: {
     description: "Unescape HTML entities back to their original characters",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to unescape" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to unescape" },
     ],
-    returns: { type: "string", description: "Unescaped string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   trim: {
     description: "Deep trim all string values within an object, array, or string",
     parameters: [
-      { name: "value", type: "any", required: true, description: "The value to deep-trim" },
+      { name: "value", dataType: "any", formInputType: "text", required: true, description: "The value to deep-trim" },
     ],
-    returns: { type: "any", description: "The trimmed value" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   truncate: {
     description: "Truncate a string to a maximum length with a suffix",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to truncate" },
-      { name: "maxLength", type: "number", required: false, description: "Maximum length (default: 100)" },
-      { name: "suffix", type: "string", required: false, description: "Suffix to append when truncated (default: '...')" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to truncate" },
+      { name: "maxLength", dataType: "number", formInputType: "number", required: false, description: "Maximum length (default: 100)" },
+      { name: "suffix", dataType: "string", formInputType: "text", required: false, description: "Suffix to append when truncated (default: '...')" },
     ],
-    returns: { type: "string", description: "Truncated string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   alphanumeric: {
     description: "Strip all non-alphanumeric characters from a string",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to sanitize" },
-      { name: "allowSpaces", type: "boolean", required: false, description: "Whether to allow spaces (default: false)" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to sanitize" },
+      { name: "allowSpaces", dataType: "boolean", formInputType: "checkbox", required: false, description: "Whether to allow spaces (default: false)" },
     ],
-    returns: { type: "string", description: "Alphanumeric-only string" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   slug: {
     description: "Sanitize a string into a URL-safe slug",
     parameters: [
-      { name: "input", type: "string", required: true, description: "The string to slugify" },
-      { name: "separator", type: "string", required: false, description: "Separator character (default: '-')" },
+      { name: "input", dataType: "string", formInputType: "text", required: true, description: "The string to slugify" },
+      { name: "separator", dataType: "string", formInputType: "text", required: false, description: "Separator character (default: '-')" },
     ],
-    returns: { type: "string", description: "URL-safe slug" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const SanitizeModuleMetadata: ModuleMetadata = {
-  name: "sanitize",
+export const SanitizeModuleMetadata = {
   description: "Input sanitization utilities for security: HTML escaping, XSS prevention, SQL escaping, filename and path sanitization, URL cleaning, and more",
   version: "1.0.0",
   tags: ["security", "sanitize", "escape", "xss", "sql-injection", "html"],

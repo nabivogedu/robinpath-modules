@@ -12,6 +12,8 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "../../declarations.d.ts"
+  ],
+  "extends": "../../tsconfig.json"
 }

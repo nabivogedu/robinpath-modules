@@ -247,7 +247,7 @@ export const ScreenFunctions: Record<string, BuiltinHandler> = {
   compare,
 };
 
-export const ScreenFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ScreenFunctionMetadata = {
   capture: {
     description: "Take a full screenshot and save to file",
     parameters: [
@@ -333,7 +333,7 @@ export const ScreenFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const ScreenModuleMetadata: ModuleMetadata = {
+export const ScreenModuleMetadata = {
   description: "Screen capture and OCR: take screenshots (full, region, window), extract text from images with tesseract.js, list displays, and compare images",
   methods: ["capture", "captureRegion", "captureWindow", "ocr", "ocrRegion", "setLanguage", "listDisplays", "compare"],
 };

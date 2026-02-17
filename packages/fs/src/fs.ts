@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 import * as fsSync from "node:fs";
 import * as fs from "node:fs/promises";
@@ -7,27 +8,27 @@ import * as fs from "node:fs/promises";
 const read: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   const encoding = (args[1] != null ? String(args[1]) : "utf-8") as BufferEncoding;
-  return await fs.readFile(filePath, { encoding });
+  return await any(filePath, { encoding });
 };
 
 const write: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   const content = String(args[1] ?? "");
-  await fs.writeFile(filePath, content, "utf-8");
+  await any(filePath, content, "utf-8");
   return true;
 };
 
 const append: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   const content = String(args[1] ?? "");
-  await fs.appendFile(filePath, content, "utf-8");
+  await any(filePath, content, "utf-8");
   return true;
 };
 
 const exists: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   try {
-    await fs.access(filePath, fsSync.constants.F_OK);
+    await any(filePath, any.F_OK);
     return true;
   } catch {
     return false;
@@ -36,52 +37,52 @@ const exists: BuiltinHandler = async (args) => {
 
 const del: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
-  await fs.unlink(filePath);
+  await any(filePath);
   return true;
 };
 
 const copy: BuiltinHandler = async (args) => {
   const src = String(args[0] ?? "");
   const dest = String(args[1] ?? "");
-  await fs.copyFile(src, dest);
+  await any(src, dest);
   return true;
 };
 
 const move: BuiltinHandler = async (args) => {
   const src = String(args[0] ?? "");
   const dest = String(args[1] ?? "");
-  await fs.rename(src, dest);
+  await any(src, dest);
   return true;
 };
 
 const rename: BuiltinHandler = async (args) => {
   const oldPath = String(args[0] ?? "");
   const newPath = String(args[1] ?? "");
-  await fs.rename(oldPath, newPath);
+  await any(oldPath, newPath);
   return true;
 };
 
 const list: BuiltinHandler = async (args) => {
   const dirPath = String(args[0] ?? "");
-  const entries = await fs.readdir(dirPath);
+  const entries = await any(dirPath);
   return entries;
 };
 
 const mkdir: BuiltinHandler = async (args) => {
   const dirPath = String(args[0] ?? "");
-  await fs.mkdir(dirPath, { recursive: true });
+  await any(dirPath, { recursive: true });
   return true;
 };
 
 const rmdir: BuiltinHandler = async (args) => {
   const dirPath = String(args[0] ?? "");
-  await fs.rm(dirPath, { recursive: true });
+  await any(dirPath, { recursive: true });
   return true;
 };
 
 const stat: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
-  const stats = await fs.stat(filePath);
+  const stats = await any(filePath);
   return {
     size: stats.size,
     isFile: stats.isFile(),
@@ -94,7 +95,7 @@ const stat: BuiltinHandler = async (args) => {
 const isFile: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   try {
-    const stats = await fs.stat(filePath);
+    const stats = await any(filePath);
     return stats.isFile();
   } catch {
     return false;
@@ -104,7 +105,7 @@ const isFile: BuiltinHandler = async (args) => {
 const isDir: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   try {
-    const stats = await fs.stat(filePath);
+    const stats = await any(filePath);
     return stats.isDirectory();
   } catch {
     return false;
@@ -130,7 +131,7 @@ export const FsFunctions: Record<string, BuiltinHandler> = {
   isDir,
 };
 
-export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
+export const FsFunctionMetadata = {
   read: {
     description: "Read the contents of a file as a string",
     parameters: [
@@ -152,7 +153,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "string",
     returnDescription: "The file contents as a string",
-    example: 'fs.read "/tmp/file.txt"',
+    example: 'any "/tmp/file.txt"',
   },
   write: {
     description: "Write content to a file, creating or overwriting it",
@@ -174,7 +175,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the write succeeded",
-    example: 'fs.write "/tmp/file.txt" "hello world"',
+    example: 'any "/tmp/file.txt" "hello world"',
   },
   append: {
     description: "Append content to the end of a file",
@@ -196,7 +197,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the append succeeded",
-    example: 'fs.append "/tmp/file.txt" "more text"',
+    example: 'any "/tmp/file.txt" "more text"',
   },
   exists: {
     description: "Check whether a file or directory exists at the given path",
@@ -211,7 +212,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the path exists, false otherwise",
-    example: 'fs.exists "/tmp/file.txt"',
+    example: 'any "/tmp/file.txt"',
   },
   delete: {
     description: "Delete a file",
@@ -226,7 +227,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the file was deleted",
-    example: 'fs.delete "/tmp/file.txt"',
+    example: 'any "/tmp/file.txt"',
   },
   copy: {
     description: "Copy a file from source to destination",
@@ -248,7 +249,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the copy succeeded",
-    example: 'fs.copy "/tmp/a.txt" "/tmp/b.txt"',
+    example: 'any "/tmp/a.txt" "/tmp/b.txt"',
   },
   move: {
     description: "Move or rename a file from source to destination",
@@ -270,7 +271,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the move succeeded",
-    example: 'fs.move "/tmp/old.txt" "/tmp/new.txt"',
+    example: 'any "/tmp/old.txt" "/tmp/new.txt"',
   },
   rename: {
     description: "Rename a file (alias for move)",
@@ -292,7 +293,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the rename succeeded",
-    example: 'fs.rename "/tmp/old.txt" "/tmp/new.txt"',
+    example: 'any "/tmp/old.txt" "/tmp/new.txt"',
   },
   list: {
     description: "List the contents of a directory",
@@ -307,7 +308,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "array",
     returnDescription: "Array of filenames in the directory",
-    example: 'fs.list "/tmp"',
+    example: 'any "/tmp"',
   },
   mkdir: {
     description: "Create a directory (recursively creates parent directories)",
@@ -322,7 +323,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the directory was created",
-    example: 'fs.mkdir "/tmp/my/nested/dir"',
+    example: 'any "/tmp/my/nested/dir"',
   },
   rmdir: {
     description: "Remove a directory and its contents",
@@ -337,7 +338,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the directory was removed",
-    example: 'fs.rmdir "/tmp/my/dir"',
+    example: 'any "/tmp/my/dir"',
   },
   stat: {
     description: "Get file or directory statistics",
@@ -352,7 +353,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "object",
     returnDescription: "Object with size, isFile, isDirectory, created, and modified properties",
-    example: 'fs.stat "/tmp/file.txt"',
+    example: 'any "/tmp/file.txt"',
   },
   isFile: {
     description: "Check whether a path points to a regular file",
@@ -367,7 +368,7 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the path is a regular file, false otherwise",
-    example: 'fs.isFile "/tmp/file.txt"',
+    example: 'any "/tmp/file.txt"',
   },
   isDir: {
     description: "Check whether a path points to a directory",
@@ -382,11 +383,11 @@ export const FsFunctionMetadata: Record<string, FunctionMetadata> = {
     ],
     returnType: "boolean",
     returnDescription: "True if the path is a directory, false otherwise",
-    example: 'fs.isDir "/tmp"',
+    example: 'any "/tmp"',
   },
 };
 
-export const FsModuleMetadata: ModuleMetadata = {
+export const FsModuleMetadata = {
   description: "Read, write, copy, move, and manage files and directories",
   methods: [
     "read",

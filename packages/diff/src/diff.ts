@@ -55,18 +55,18 @@ const objects: BuiltinHandler = (args) => {
 const arrays: BuiltinHandler = (args) => {
   const a = (args[0] as unknown[]) ?? [];
   const b = (args[1] as unknown[]) ?? [];
-  const aSet = new Set(a.map((v) => JSON.stringify(v)));
-  const bSet = new Set(b.map((v) => JSON.stringify(v)));
+  const aSet = new Set(a.map((v: any) => JSON.stringify(v)));
+  const bSet = new Set(b.map((v: any) => JSON.stringify(v)));
   return {
-    added: b.filter((v) => !aSet.has(JSON.stringify(v))),
-    removed: a.filter((v) => !bSet.has(JSON.stringify(v))),
-    common: a.filter((v) => bSet.has(JSON.stringify(v))),
+    added: b.filter((v: any) => !aSet.has(JSON.stringify(v))),
+    removed: a.filter((v: any) => !bSet.has(JSON.stringify(v))),
+    common: a.filter((v: any) => bSet.has(JSON.stringify(v))),
   };
 };
 
 const patch: BuiltinHandler = (args) => {
   const diffResult = args[0] as Array<{ type: DiffType; value: string }>;
-  return diffResult.filter((d) => d.type !== "removed").map((d) => d.value).join("\n");
+  return diffResult.filter((d: any) => d.type !== "removed").map((d: any) => d.value).join("\n");
 };
 
 const unified: BuiltinHandler = (args) => {
@@ -88,9 +88,9 @@ const stats: BuiltinHandler = (args) => {
   const d = args[0] as Array<{ type: DiffType }>;
   if (!Array.isArray(d)) return { additions: 0, deletions: 0, unchanged: 0 };
   return {
-    additions: d.filter((e) => e.type === "added").length,
-    deletions: d.filter((e) => e.type === "removed").length,
-    unchanged: d.filter((e) => e.type === "unchanged").length,
+    additions: d.filter((e: any) => e.type === "added").length,
+    deletions: d.filter((e: any) => e.type === "removed").length,
+    unchanged: d.filter((e: any) => e.type === "unchanged").length,
   };
 };
 
@@ -98,7 +98,7 @@ export const DiffFunctions: Record<string, BuiltinHandler> = {
   lines, chars, words, objects, arrays, patch, unified, isEqual, stats,
 };
 
-export const DiffFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DiffFunctionMetadata = {
   lines: { description: "Diff two strings line by line", parameters: [{ name: "a", dataType: "string", description: "Original text", formInputType: "textarea", required: true }, { name: "b", dataType: "string", description: "Modified text", formInputType: "textarea", required: true }], returnType: "array", returnDescription: "Array of {type, value}", example: "diff.lines $old $new" },
   chars: { description: "Diff two strings character by character", parameters: [{ name: "a", dataType: "string", description: "Original", formInputType: "text", required: true }, { name: "b", dataType: "string", description: "Modified", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of {type, value}", example: 'diff.chars "cat" "car"' },
   words: { description: "Diff two strings word by word", parameters: [{ name: "a", dataType: "string", description: "Original", formInputType: "textarea", required: true }, { name: "b", dataType: "string", description: "Modified", formInputType: "textarea", required: true }], returnType: "array", returnDescription: "Array of {type, value}", example: "diff.words $old $new" },
@@ -110,7 +110,7 @@ export const DiffFunctionMetadata: Record<string, FunctionMetadata> = {
   stats: { description: "Get diff statistics from a diff result", parameters: [{ name: "diff", dataType: "array", description: "Diff result", formInputType: "json", required: true }], returnType: "object", returnDescription: "{additions, deletions, unchanged}", example: "diff.stats $lineDiff" },
 };
 
-export const DiffModuleMetadata: ModuleMetadata = {
+export const DiffModuleMetadata = {
   description: "Text and data diffing: line, word, character, object, and array diffs with unified output",
   methods: ["lines", "chars", "words", "objects", "arrays", "patch", "unified", "isEqual", "stats"],
 };

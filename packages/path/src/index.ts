@@ -4,10 +4,10 @@ import { PathFunctions, PathFunctionMetadata, PathModuleMetadata } from "./path.
 const PathModule: ModuleAdapter = {
   name: "path",
   functions: PathFunctions,
-  functionMetadata: PathFunctionMetadata,
-  moduleMetadata: PathModuleMetadata,
+  functionMetadata: PathFunctionMetadata as any,
+  moduleMetadata: PathModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default PathModule;
 export { PathModule };

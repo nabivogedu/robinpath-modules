@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const currencies: Record<string, { symbol: string; name: string; decimals: number }> = {
   USD: { symbol: "$", name: "US Dollar", decimals: 2 }, EUR: { symbol: "€", name: "Euro", decimals: 2 },
@@ -104,7 +104,7 @@ const isValidCode: BuiltinHandler = (args) => String(args[0] ?? "").toUpperCase(
 
 export const MoneyFunctions: Record<string, BuiltinHandler> = { format, parse, add, subtract, multiply, divide, round, convert, fetchRate, split, percentage, discount, tax, currencyInfo, listCurrencies, isValidCode };
 
-export const MoneyFunctionMetadata: Record<string, FunctionMetadata> = {
+export const MoneyFunctionMetadata = {
   format: { description: "Format number as currency", parameters: [{ name: "amount", dataType: "number", description: "Amount", formInputType: "text", required: true }, { name: "currency", dataType: "string", description: "Currency code (default USD)", formInputType: "text", required: false }, { name: "locale", dataType: "string", description: "Locale (default en-US)", formInputType: "text", required: false }], returnType: "string", returnDescription: "Formatted string", example: 'money.format 1234.56 "USD"' },
   parse: { description: "Parse currency string to number", parameters: [{ name: "str", dataType: "string", description: "Currency string", formInputType: "text", required: true }], returnType: "number", returnDescription: "Numeric value", example: 'money.parse "$1,234.56"' },
   add: { description: "Safe addition", parameters: [{ name: "a", dataType: "number", description: "First value", formInputType: "text", required: true }, { name: "b", dataType: "number", description: "Second value", formInputType: "text", required: true }, { name: "decimals", dataType: "number", description: "Decimal places (default 2)", formInputType: "text", required: false }], returnType: "number", returnDescription: "Sum", example: "money.add 0.1 0.2" },
@@ -123,7 +123,7 @@ export const MoneyFunctionMetadata: Record<string, FunctionMetadata> = {
   isValidCode: { description: "Check if currency code is valid", parameters: [{ name: "code", dataType: "string", description: "Currency code", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "true if valid", example: 'money.isValidCode "USD"' },
 };
 
-export const MoneyModuleMetadata: ModuleMetadata = {
+export const MoneyModuleMetadata = {
   description: "Currency formatting, safe arithmetic, conversion, tax, discount, and exchange rates",
   methods: ["format", "parse", "add", "subtract", "multiply", "divide", "round", "convert", "fetchRate", "split", "percentage", "discount", "tax", "currencyInfo", "listCurrencies", "isValidCode"],
 };

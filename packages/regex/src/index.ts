@@ -4,10 +4,10 @@ import { RegexFunctions, RegexFunctionMetadata, RegexModuleMetadata } from "./re
 const RegexModule: ModuleAdapter = {
   name: "regex",
   functions: RegexFunctions,
-  functionMetadata: RegexFunctionMetadata,
-  moduleMetadata: RegexModuleMetadata,
+  functionMetadata: RegexFunctionMetadata as any,
+  moduleMetadata: RegexModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default RegexModule;
 export { RegexModule };

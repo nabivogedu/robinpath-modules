@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const EARTH_RADIUS_KM = 6371;
 const EARTH_RADIUS_MI = 3958.8;
@@ -135,7 +135,7 @@ const area: BuiltinHandler = (args) => {
 
 export const GeoFunctions: Record<string, BuiltinHandler> = { distance, bearing, midpoint, destination, boundingBox, isInBoundingBox, toRadians, toDegrees, toDMS, fromDMS, geocode, reverseGeocode, polygon, area };
 
-export const GeoFunctionMetadata: Record<string, FunctionMetadata> = {
+export const GeoFunctionMetadata = {
   distance: { description: "Haversine distance between two points", parameters: [{ name: "lat1", dataType: "number", description: "Latitude 1", formInputType: "text", required: true }, { name: "lon1", dataType: "number", description: "Longitude 1", formInputType: "text", required: true }, { name: "lat2", dataType: "number", description: "Latitude 2", formInputType: "text", required: true }, { name: "lon2", dataType: "number", description: "Longitude 2", formInputType: "text", required: true }, { name: "unit", dataType: "string", description: "km|mi|m|nm", formInputType: "text", required: false }], returnType: "number", returnDescription: "Distance", example: 'geo.distance 40.7128 -74.0060 51.5074 -0.1278' },
   bearing: { description: "Bearing between two points", parameters: [{ name: "lat1", dataType: "number", description: "Latitude 1", formInputType: "text", required: true }, { name: "lon1", dataType: "number", description: "Longitude 1", formInputType: "text", required: true }, { name: "lat2", dataType: "number", description: "Latitude 2", formInputType: "text", required: true }, { name: "lon2", dataType: "number", description: "Longitude 2", formInputType: "text", required: true }], returnType: "number", returnDescription: "Bearing in degrees (0-360)", example: 'geo.bearing 40.7128 -74.0060 51.5074 -0.1278' },
   midpoint: { description: "Midpoint between two coordinates", parameters: [{ name: "lat1", dataType: "number", description: "Latitude 1", formInputType: "text", required: true }, { name: "lon1", dataType: "number", description: "Longitude 1", formInputType: "text", required: true }, { name: "lat2", dataType: "number", description: "Latitude 2", formInputType: "text", required: true }, { name: "lon2", dataType: "number", description: "Longitude 2", formInputType: "text", required: true }], returnType: "object", returnDescription: "{lat, lon}", example: 'geo.midpoint 40.7128 -74.0060 51.5074 -0.1278' },
@@ -152,7 +152,7 @@ export const GeoFunctionMetadata: Record<string, FunctionMetadata> = {
   area: { description: "Calculate polygon area in sq km", parameters: [{ name: "polygon", dataType: "array", description: "Array of [lat, lon] vertices", formInputType: "text", required: true }], returnType: "number", returnDescription: "Area in square km", example: 'geo.area [[40.6,-74.1],[40.8,-74.1],[40.8,-73.9],[40.6,-73.9]]' },
 };
 
-export const GeoModuleMetadata: ModuleMetadata = {
+export const GeoModuleMetadata = {
   description: "Geolocation utilities: distance, bearing, geocoding, bounding box, polygon containment, DMS conversion",
   methods: ["distance", "bearing", "midpoint", "destination", "boundingBox", "isInBoundingBox", "toRadians", "toDegrees", "toDMS", "fromDMS", "geocode", "reverseGeocode", "polygon", "area"],
 };

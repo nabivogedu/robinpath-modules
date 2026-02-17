@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Internal State ──────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ const DEFAULT_OPTIONS: RetryOptions = {
 // ── Helpers ─────────────────────────────────────────────────────────
 
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 
 function calculateDelay(attempt: number, options: RetryOptions): number {
@@ -47,7 +47,7 @@ function calculateDelay(attempt: number, options: RetryOptions): number {
   return Math.round(delay);
 }
 
-function parseOptions(args: unknown[]): RetryOptions {
+function parseOptions(args: Value[]): RetryOptions {
   const opts = (typeof args[0] === "object" && args[0] !== null ? args[0] : {}) as Partial<RetryOptions>;
   return { ...DEFAULT_OPTIONS, ...opts };
 }
@@ -71,7 +71,7 @@ const execute: BuiltinHandler = async (args) => {
       lastError = err;
       const message = err instanceof Error ? err.message : String(err);
 
-      if (opts.retryOn.length > 0 && !opts.retryOn.some((s) => message.includes(s))) {
+      if (opts.retryOn.length > 0 && !opts.retryOn.some((s: any) => message.includes(s))) {
         throw err;
       }
 
@@ -243,11 +243,11 @@ export const RetryFunctions: Record<string, BuiltinHandler> = {
   breakerReset,
 };
 
-export const RetryFunctionMetadata: Record<string, FunctionMetadata> = {
+export const RetryFunctionMetadata = {
   execute: {
     description: "Execute a function with automatic retry and exponential backoff",
     parameters: [
-      { name: "fn", dataType: "function", description: "The async function to execute", formInputType: "text", required: true },
+      { name: "fn", dataType: "string", description: "The async function to execute", formInputType: "text", required: true },
       { name: "options", dataType: "object", description: "Retry options: maxAttempts, initialDelay, maxDelay, backoffFactor, retryOn, jitter", formInputType: "text", required: false },
     ],
     returnType: "any",
@@ -346,7 +346,7 @@ export const RetryFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const RetryModuleMetadata: ModuleMetadata = {
+export const RetryModuleMetadata = {
   description: "Retry with exponential backoff and circuit breaker patterns for resilient automation workflows",
   methods: ["execute", "withBackoff", "isRetryable", "delay", "attempts", "createBreaker", "breakerState", "breakerRecord", "breakerAllow", "breakerReset"],
 };

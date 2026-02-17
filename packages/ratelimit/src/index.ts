@@ -4,10 +4,10 @@ import { RatelimitFunctions, RatelimitFunctionMetadata, RatelimitModuleMetadata 
 const RatelimitModule: ModuleAdapter = {
   name: "ratelimit",
   functions: RatelimitFunctions,
-  functionMetadata: RatelimitFunctionMetadata,
-  moduleMetadata: RatelimitModuleMetadata,
+  functionMetadata: RatelimitFunctionMetadata as any,
+  moduleMetadata: RatelimitModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default RatelimitModule;
 export { RatelimitModule };

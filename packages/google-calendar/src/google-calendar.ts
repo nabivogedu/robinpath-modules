@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getToken(): string {
   return token;
 }
 
-async function calendarApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function calendarApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getToken();
   const res = await fetch(`https://www.googleapis.com/calendar/v3${path}`, {
     method,
@@ -113,7 +113,7 @@ const freeBusy: BuiltinHandler = async (args) => {
   return calendarApi("/freeBusy", "POST", {
     timeMin,
     timeMax,
-    items: calendars.map((id) => ({ id })),
+    items: calendars.map((id: any) => ({ id })),
   });
 };
 
@@ -130,11 +130,11 @@ export const GoogleCalendarFunctions: Record<string, BuiltinHandler> = {
   freeBusy,
 };
 
-export const GoogleCalendarFunctionMetadata: Record<string, object> = {
+export const GoogleCalendarFunctionMetadata = {
   setCredentials: {
     description: "Set the OAuth2 access token for Google Calendar API.",
     parameters: [
-      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "password", required: true },
+      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
@@ -232,8 +232,7 @@ export const GoogleCalendarFunctionMetadata: Record<string, object> = {
 };
 
 export const GoogleCalendarModuleMetadata = {
-  name: "googleCalendar",
   description: "Create, read, update, and delete Google Calendar events, manage calendars, and check availability.",
-  icon: "calendar",
   category: "productivity",
+  methods: Object.keys(GoogleCalendarFunctions),
 };

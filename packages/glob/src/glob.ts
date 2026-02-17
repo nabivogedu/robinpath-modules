@@ -23,7 +23,7 @@ function globToRegex(pattern: string): RegExp {
     } else if (ch === "{") {
       const close = pattern.indexOf("}", i);
       if (close !== -1) {
-        const alternatives = pattern.slice(i + 1, close).split(",").map((a) => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+        const alternatives = pattern.slice(i + 1, close).split(",").map((a: any) => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
         regex += `(?:${alternatives})`;
         i = close + 1;
       } else {
@@ -71,10 +71,10 @@ const match: BuiltinHandler = (args) => {
   const cwd = String(args[1] ?? ".");
   const regex = globToRegex(pattern);
   const files = walkDir(cwd);
-  return files.filter((f) => {
+  return files.filter((f: any) => {
     const relative = nodePath.relative(cwd, f).replace(/\\/g, "/");
     return regex.test(relative);
-  }).map((f) => nodePath.relative(cwd, f).replace(/\\/g, "/"));
+  }).map((f: any) => nodePath.relative(cwd, f).replace(/\\/g, "/"));
 };
 
 const isMatch: BuiltinHandler = (args) => {
@@ -90,7 +90,7 @@ const expand: BuiltinHandler = (args) => {
   const braceMatch = pattern.match(/^(.*)\{([^}]+)\}(.*)$/);
   if (!braceMatch) return [pattern];
   const [, prefix, alts, suffix] = braceMatch;
-  return alts!.split(",").map((alt) => `${prefix}${alt.trim()}${suffix}`);
+  return alts!.split(",").map((alt: any) => `${prefix}${alt.trim()}${suffix}`);
 };
 
 const base: BuiltinHandler = (args) => {
@@ -110,7 +110,7 @@ export const GlobFunctions: Record<string, BuiltinHandler> = {
   match, isMatch, toRegex, expand, base, hasMagic,
 };
 
-export const GlobFunctionMetadata: Record<string, FunctionMetadata> = {
+export const GlobFunctionMetadata = {
   match: { description: "Find files matching a glob pattern", parameters: [{ name: "pattern", dataType: "string", description: "Glob pattern (e.g. **/*.ts)", formInputType: "text", required: true }, { name: "cwd", dataType: "string", description: "Working directory (default: .)", formInputType: "text", required: false, defaultValue: "." }], returnType: "array", returnDescription: "Array of matching file paths", example: 'glob.match "src/**/*.ts"' },
   isMatch: { description: "Test if a path matches a glob pattern", parameters: [{ name: "filePath", dataType: "string", description: "File path to test", formInputType: "text", required: true }, { name: "pattern", dataType: "string", description: "Glob pattern", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if matches", example: 'glob.isMatch "src/index.ts" "**/*.ts"' },
   toRegex: { description: "Convert a glob pattern to a regex string", parameters: [{ name: "pattern", dataType: "string", description: "Glob pattern", formInputType: "text", required: true }], returnType: "string", returnDescription: "Regex source string", example: 'glob.toRegex "*.ts"' },
@@ -119,7 +119,7 @@ export const GlobFunctionMetadata: Record<string, FunctionMetadata> = {
   hasMagic: { description: "Check if string contains glob characters", parameters: [{ name: "str", dataType: "string", description: "String to check", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if contains glob chars", example: 'glob.hasMagic "*.ts"' },
 };
 
-export const GlobModuleMetadata: ModuleMetadata = {
+export const GlobModuleMetadata = {
   description: "File pattern matching: find files by glob patterns, test matches, expand braces",
   methods: ["match", "isMatch", "toRegex", "expand", "base", "hasMagic"],
 };

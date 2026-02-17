@@ -17,12 +17,12 @@ const read: BuiltinHandler = async (args) => {
   const rows: Record<string, unknown>[] = [];
   const headers: string[] = [];
 
-  sheet.eachRow((row, rowNumber) => {
+  sheet.eachRow((row: any, rowNumber: any) => {
     if (rowNumber === 1 && opts.headers !== false) {
-      row.eachCell((cell, colNumber) => { headers[colNumber - 1] = String(cell.value ?? `col${colNumber}`); });
+      row.eachCell((cell: any, colNumber: any) => { headers[colNumber - 1] = String(cell.value ?? `col${colNumber}`); });
     } else {
       const obj: Record<string, unknown> = {};
-      row.eachCell((cell, colNumber) => {
+      row.eachCell((cell: any, colNumber: any) => {
         const key = headers[colNumber - 1] ?? `col${colNumber}`;
         obj[key] = cell.value;
       });
@@ -48,7 +48,7 @@ const write: BuiltinHandler = async (args) => {
 
   // Auto-detect headers from first row
   const headers = Object.keys(data[0] as Record<string, unknown>);
-  sheet.columns = headers.map((h) => ({ header: h, key: h, width: Number(opts.colWidth ?? 15) }));
+  sheet.columns = headers.map((h: any) => ({ header: h, key: h, width: Number(opts.colWidth ?? 15) }));
 
   // Style headers
   const headerRow = sheet.getRow(1);
@@ -75,7 +75,7 @@ const readSheetNames: BuiltinHandler = async (args) => {
   const filePath = String(args[0] ?? "");
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(filePath);
-  return workbook.worksheets.map((s) => s.name);
+  return workbook.worksheets.map((s: any) => s.name);
 };
 
 const addSheet: BuiltinHandler = async (args) => {
@@ -89,7 +89,7 @@ const addSheet: BuiltinHandler = async (args) => {
   const sheet = workbook.addWorksheet(sheetName);
   if (data.length > 0) {
     const headers = Object.keys(data[0] as Record<string, unknown>);
-    sheet.columns = headers.map((h) => ({ header: h, key: h, width: 15 }));
+    sheet.columns = headers.map((h: any) => ({ header: h, key: h, width: 15 }));
     sheet.getRow(1).font = { bold: true };
     for (const row of data) sheet.addRow(row as Record<string, unknown>);
   }
@@ -116,7 +116,7 @@ const toCsv: BuiltinHandler = async (args) => {
 
   const csvLines = [result.headers.join(",")];
   for (const row of result.rows) {
-    const values = result.headers.map((h) => {
+    const values = result.headers.map((h: any) => {
       const v = String(row[h] ?? "");
       return v.includes(",") || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
     });
@@ -161,7 +161,7 @@ export const ExcelFunctions: Record<string, BuiltinHandler> = {
   read, write, readSheetNames, addSheet, toJson, fromJson, toCsv, getCell, setCell,
 };
 
-export const ExcelFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ExcelFunctionMetadata = {
   read: { description: "Read an Excel file into an array of row objects", parameters: [{ name: "filePath", dataType: "string", description: "Path to .xlsx file", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{sheet, headers}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{rows, headers, sheetName, rowCount}", example: 'excel.read "./data.xlsx"' },
   write: { description: "Write an array of objects to an Excel file", parameters: [{ name: "filePath", dataType: "string", description: "Output path", formInputType: "text", required: true }, { name: "data", dataType: "array", description: "Array of row objects", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{sheetName, colWidth, headerColor, autoFilter}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{path, rows, columns}", example: 'excel.write "./output.xlsx" $data {"sheetName": "Users"}' },
   readSheetNames: { description: "List all sheet names in an Excel file", parameters: [{ name: "filePath", dataType: "string", description: "Path to .xlsx file", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of sheet name strings", example: 'excel.readSheetNames "./data.xlsx"' },
@@ -173,7 +173,7 @@ export const ExcelFunctionMetadata: Record<string, FunctionMetadata> = {
   setCell: { description: "Set a specific cell value", parameters: [{ name: "filePath", dataType: "string", description: "Path to .xlsx file", formInputType: "text", required: true }, { name: "cell", dataType: "string", description: "Cell reference", formInputType: "text", required: true }, { name: "value", dataType: "any", description: "Cell value", formInputType: "text", required: true }, { name: "sheet", dataType: "string", description: "Sheet name (optional)", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "True", example: 'excel.setCell "./data.xlsx" "A1" "Hello"' },
 };
 
-export const ExcelModuleMetadata: ModuleMetadata = {
+export const ExcelModuleMetadata = {
   description: "Read, write, and manipulate Excel spreadsheets (.xlsx) with sheets, cells, JSON/CSV conversion",
   methods: ["read", "write", "readSheetNames", "addSheet", "toJson", "fromJson", "toCsv", "getCell", "setCell"],
 };

@@ -1,11 +1,11 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { execSync } from "child_process";
 
 function exec(cmd: string): string {
   return (execSync(cmd, { encoding: "utf-8", maxBuffer: 50 * 1024 * 1024 }) as string).trim();
 }
 
-function execJson(cmd: string): unknown {
+function execJson(cmd: string): any {
   const raw = exec(cmd);
   if (!raw) return [];
   try {
@@ -16,7 +16,7 @@ function execJson(cmd: string): unknown {
 }
 
 export const DockerFunctions: Record<string, BuiltinHandler> = {
-  ps: (args: unknown[]) => {
+  ps: (args: Value[]) => {
     const all = (args[0] as boolean) ?? true;
     const format = (args[1] as string) ?? "json";
     let cmd = "docker ps";
@@ -25,24 +25,24 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     const raw = exec(cmd);
     if (format === "json" && raw) {
       const lines = raw.split("\n").filter(Boolean);
-      return lines.map((l) => JSON.parse(l));
+      return lines.map((l: any) => JSON.parse(l));
     }
     return raw;
   },
 
-  images: (args: unknown[]) => {
+  images: (args: Value[]) => {
     const format = (args[0] as string) ?? "json";
     let cmd = "docker images";
     if (format === "json") cmd += ' --format "{{json .}}"';
     const raw = exec(cmd);
     if (format === "json" && raw) {
       const lines = raw.split("\n").filter(Boolean);
-      return lines.map((l) => JSON.parse(l));
+      return lines.map((l: any) => JSON.parse(l));
     }
     return raw;
   },
 
-  run: (args: unknown[]) => {
+  run: (args: Value[]) => {
     const image = args[0] as string;
     const options = (args[1] as Record<string, unknown>) ?? {};
     let cmd = "docker run";
@@ -67,7 +67,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  stop: (args: unknown[]) => {
+  stop: (args: Value[]) => {
     const container = args[0] as string;
     const timeout = (args[1] as number) ?? undefined;
     let cmd = `docker stop ${container}`;
@@ -75,12 +75,12 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  start: (args: unknown[]) => {
+  start: (args: Value[]) => {
     const container = args[0] as string;
     return exec(`docker start ${container}`);
   },
 
-  rm: (args: unknown[]) => {
+  rm: (args: Value[]) => {
     const container = args[0] as string;
     const force = (args[1] as boolean) ?? false;
     const volumes = (args[2] as boolean) ?? false;
@@ -91,7 +91,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  rmi: (args: unknown[]) => {
+  rmi: (args: Value[]) => {
     const image = args[0] as string;
     const force = (args[1] as boolean) ?? false;
     let cmd = "docker rmi";
@@ -100,7 +100,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  logs: (args: unknown[]) => {
+  logs: (args: Value[]) => {
     const container = args[0] as string;
     const tail = (args[1] as number) ?? undefined;
     const follow = (args[2] as boolean) ?? false;
@@ -110,7 +110,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  exec: (args: unknown[]) => {
+  exec: (args: Value[]) => {
     const container = args[0] as string;
     const command = args[1] as string;
     const interactive = (args[2] as boolean) ?? false;
@@ -122,7 +122,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  build: (args: unknown[]) => {
+  build: (args: Value[]) => {
     const context = args[0] as string;
     const options = (args[1] as Record<string, unknown>) ?? {};
     let cmd = "docker build";
@@ -137,17 +137,17 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return exec(cmd);
   },
 
-  pull: (args: unknown[]) => {
+  pull: (args: Value[]) => {
     const image = args[0] as string;
     return exec(`docker pull ${image}`);
   },
 
-  push: (args: unknown[]) => {
+  push: (args: Value[]) => {
     const image = args[0] as string;
     return exec(`docker push ${image}`);
   },
 
-  inspect: (args: unknown[]) => {
+  inspect: (args: Value[]) => {
     const target = args[0] as string;
     const format = (args[1] as string) ?? undefined;
     let cmd = `docker inspect ${target}`;
@@ -155,7 +155,7 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     return execJson(cmd);
   },
 
-  stats: (args: unknown[]) => {
+  stats: (args: Value[]) => {
     const container = (args[0] as string) ?? undefined;
     let cmd = "docker stats --no-stream";
     if (container) cmd += ` ${container}`;
@@ -163,12 +163,12 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     const raw = exec(cmd);
     if (raw) {
       const lines = raw.split("\n").filter(Boolean);
-      return lines.map((l) => JSON.parse(l));
+      return lines.map((l: any) => JSON.parse(l));
     }
     return [];
   },
 
-  network: (args: unknown[]) => {
+  network: (args: Value[]) => {
     const action = (args[0] as string) ?? "ls";
     const name = (args[1] as string) ?? undefined;
     const driver = (args[2] as string) ?? undefined;
@@ -179,10 +179,10 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     }
     if (action === "rm" && name) return exec(`docker network rm ${name}`);
     if (action === "inspect" && name) return execJson(`docker network inspect ${name}`);
-    return exec('docker network ls --format "{{json .}}"').split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    return exec('docker network ls --format "{{json .}}"').split("\n").filter(Boolean).map((l: any) => JSON.parse(l));
   },
 
-  volume: (args: unknown[]) => {
+  volume: (args: Value[]) => {
     const action = (args[0] as string) ?? "ls";
     const name = (args[1] as string) ?? undefined;
     const driver = (args[2] as string) ?? undefined;
@@ -193,144 +193,175 @@ export const DockerFunctions: Record<string, BuiltinHandler> = {
     }
     if (action === "rm" && name) return exec(`docker volume rm ${name}`);
     if (action === "inspect" && name) return execJson(`docker volume inspect ${name}`);
-    return exec('docker volume ls --format "{{json .}}"').split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    return exec('docker volume ls --format "{{json .}}"').split("\n").filter(Boolean).map((l: any) => JSON.parse(l));
   },
 };
 
-export const DockerFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DockerFunctionMetadata = {
   ps: {
     description: "List Docker containers",
     parameters: [
-      { name: "all", type: "boolean", required: false, description: "Show all containers including stopped (default: true)" },
-      { name: "format", type: "string", required: false, description: "Output format: json or table (default: json)" },
+      { name: "all", dataType: "boolean", formInputType: "checkbox", required: false, description: "Show all containers including stopped (default: true)" },
+      { name: "format", dataType: "string", formInputType: "text", required: false, description: "Output format: json or table (default: json)" },
     ],
-    returns: { type: "object[]", description: "Array of container objects" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   images: {
     description: "List Docker images",
     parameters: [
-      { name: "format", type: "string", required: false, description: "Output format: json or table (default: json)" },
+      { name: "format", dataType: "string", formInputType: "text", required: false, description: "Output format: json or table (default: json)" },
     ],
-    returns: { type: "object[]", description: "Array of image objects" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   run: {
     description: "Run a new container from an image",
     parameters: [
-      { name: "image", type: "string", required: true, description: "Image name to run" },
-      { name: "options", type: "object", required: false, description: "Run options: detach, rm, name, ports[], env{}, volumes[], network, command" },
+      { name: "image", dataType: "string", formInputType: "text", required: true, description: "Image name to run" },
+      { name: "options", dataType: "object", formInputType: "json", required: false, description: "Run options: detach, rm, name, ports[], env{}, volumes[], network, command" },
     ],
-    returns: { type: "string", description: "Container ID or command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stop: {
     description: "Stop a running container",
     parameters: [
-      { name: "container", type: "string", required: true, description: "Container ID or name" },
-      { name: "timeout", type: "number", required: false, description: "Seconds to wait before killing" },
+      { name: "container", dataType: "string", formInputType: "text", required: true, description: "Container ID or name" },
+      { name: "timeout", dataType: "number", formInputType: "number", required: false, description: "Seconds to wait before killing" },
     ],
-    returns: { type: "string", description: "Container ID" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   start: {
     description: "Start a stopped container",
     parameters: [
-      { name: "container", type: "string", required: true, description: "Container ID or name" },
+      { name: "container", dataType: "string", formInputType: "text", required: true, description: "Container ID or name" },
     ],
-    returns: { type: "string", description: "Container ID" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   rm: {
     description: "Remove a container",
     parameters: [
-      { name: "container", type: "string", required: true, description: "Container ID or name" },
-      { name: "force", type: "boolean", required: false, description: "Force remove running container" },
-      { name: "volumes", type: "boolean", required: false, description: "Remove associated volumes" },
+      { name: "container", dataType: "string", formInputType: "text", required: true, description: "Container ID or name" },
+      { name: "force", dataType: "boolean", formInputType: "checkbox", required: false, description: "Force remove running container" },
+      { name: "volumes", dataType: "boolean", formInputType: "checkbox", required: false, description: "Remove associated volumes" },
     ],
-    returns: { type: "string", description: "Container ID" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   rmi: {
     description: "Remove a Docker image",
     parameters: [
-      { name: "image", type: "string", required: true, description: "Image ID or name" },
-      { name: "force", type: "boolean", required: false, description: "Force remove" },
+      { name: "image", dataType: "string", formInputType: "text", required: true, description: "Image ID or name" },
+      { name: "force", dataType: "boolean", formInputType: "checkbox", required: false, description: "Force remove" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   logs: {
     description: "Fetch logs from a container",
     parameters: [
-      { name: "container", type: "string", required: true, description: "Container ID or name" },
-      { name: "tail", type: "number", required: false, description: "Number of lines from the end" },
-      { name: "follow", type: "boolean", required: false, description: "Follow log output" },
+      { name: "container", dataType: "string", formInputType: "text", required: true, description: "Container ID or name" },
+      { name: "tail", dataType: "number", formInputType: "number", required: false, description: "Number of lines from the end" },
+      { name: "follow", dataType: "boolean", formInputType: "checkbox", required: false, description: "Follow log output" },
     ],
-    returns: { type: "string", description: "Log output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   exec: {
     description: "Execute a command inside a running container",
     parameters: [
-      { name: "container", type: "string", required: true, description: "Container ID or name" },
-      { name: "command", type: "string", required: true, description: "Command to execute" },
-      { name: "interactive", type: "boolean", required: false, description: "Interactive mode with TTY" },
-      { name: "workdir", type: "string", required: false, description: "Working directory inside container" },
+      { name: "container", dataType: "string", formInputType: "text", required: true, description: "Container ID or name" },
+      { name: "command", dataType: "string", formInputType: "text", required: true, description: "Command to execute" },
+      { name: "interactive", dataType: "boolean", formInputType: "checkbox", required: false, description: "Interactive mode with TTY" },
+      { name: "workdir", dataType: "string", formInputType: "text", required: false, description: "Working directory inside container" },
     ],
-    returns: { type: "string", description: "Command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   build: {
     description: "Build a Docker image from a Dockerfile",
     parameters: [
-      { name: "context", type: "string", required: true, description: "Build context path" },
-      { name: "options", type: "object", required: false, description: "Build options: tag, file, noCache, buildArgs{}" },
+      { name: "context", dataType: "string", formInputType: "text", required: true, description: "Build context path" },
+      { name: "options", dataType: "object", formInputType: "json", required: false, description: "Build options: tag, file, noCache, buildArgs{}" },
     ],
-    returns: { type: "string", description: "Build output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   pull: {
     description: "Pull a Docker image from a registry",
     parameters: [
-      { name: "image", type: "string", required: true, description: "Image name with optional tag" },
+      { name: "image", dataType: "string", formInputType: "text", required: true, description: "Image name with optional tag" },
     ],
-    returns: { type: "string", description: "Pull output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   push: {
     description: "Push a Docker image to a registry",
     parameters: [
-      { name: "image", type: "string", required: true, description: "Image name with optional tag" },
+      { name: "image", dataType: "string", formInputType: "text", required: true, description: "Image name with optional tag" },
     ],
-    returns: { type: "string", description: "Push output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   inspect: {
     description: "Return low-level information on a container or image",
     parameters: [
-      { name: "target", type: "string", required: true, description: "Container or image ID/name" },
-      { name: "format", type: "string", required: false, description: "Go template format string" },
+      { name: "target", dataType: "string", formInputType: "text", required: true, description: "Container or image ID/name" },
+      { name: "format", dataType: "string", formInputType: "text", required: false, description: "Go template format string" },
     ],
-    returns: { type: "object", description: "Inspection data" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   stats: {
     description: "Display container resource usage statistics",
     parameters: [
-      { name: "container", type: "string", required: false, description: "Container ID or name (omit for all)" },
+      { name: "container", dataType: "string", formInputType: "text", required: false, description: "Container ID or name (omit for all)" },
     ],
-    returns: { type: "object[]", description: "Array of stats objects" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   network: {
     description: "Manage Docker networks",
     parameters: [
-      { name: "action", type: "string", required: false, description: "Action: ls, create, rm, inspect (default: ls)" },
-      { name: "name", type: "string", required: false, description: "Network name" },
-      { name: "driver", type: "string", required: false, description: "Network driver (for create)" },
+      { name: "action", dataType: "string", formInputType: "text", required: false, description: "Action: ls, create, rm, inspect (default: ls)" },
+      { name: "name", dataType: "string", formInputType: "text", required: false, description: "Network name" },
+      { name: "driver", dataType: "string", formInputType: "text", required: false, description: "Network driver (for create)" },
     ],
-    returns: { type: "object[] | string", description: "Network list or command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
   volume: {
     description: "Manage Docker volumes",
     parameters: [
-      { name: "action", type: "string", required: false, description: "Action: ls, create, rm, inspect (default: ls)" },
-      { name: "name", type: "string", required: false, description: "Volume name" },
-      { name: "driver", type: "string", required: false, description: "Volume driver (for create)" },
+      { name: "action", dataType: "string", formInputType: "text", required: false, description: "Action: ls, create, rm, inspect (default: ls)" },
+      { name: "name", dataType: "string", formInputType: "text", required: false, description: "Volume name" },
+      { name: "driver", dataType: "string", formInputType: "text", required: false, description: "Volume driver (for create)" },
     ],
-    returns: { type: "object[] | string", description: "Volume list or command output" },
+
+    returnType: "object",
+    returnDescription: "API response.",
   },
 };
 
-export const DockerModuleMetadata: ModuleMetadata = {
-  name: "docker",
+export const DockerModuleMetadata = {
   description: "Docker container and image management using the system docker binary",
   version: "1.0.0",
   dependencies: [],

@@ -4,10 +4,10 @@ import { SchedulerFunctions, SchedulerFunctionMetadata, SchedulerModuleMetadata 
 const SchedulerModule: ModuleAdapter = {
   name: "scheduler",
   functions: SchedulerFunctions,
-  functionMetadata: SchedulerFunctionMetadata,
-  moduleMetadata: SchedulerModuleMetadata,
+  functionMetadata: SchedulerFunctionMetadata as any,
+  moduleMetadata: SchedulerModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default SchedulerModule;
 export { SchedulerModule };

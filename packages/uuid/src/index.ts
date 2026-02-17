@@ -4,10 +4,10 @@ import { UuidFunctions, UuidFunctionMetadata, UuidModuleMetadata } from "./uuid.
 const UuidModule: ModuleAdapter = {
   name: "uuid",
   functions: UuidFunctions,
-  functionMetadata: UuidFunctionMetadata,
-  moduleMetadata: UuidModuleMetadata,
+  functionMetadata: UuidFunctionMetadata as any,
+  moduleMetadata: UuidModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default UuidModule;
 export { UuidModule };

@@ -4,10 +4,10 @@ import { WebhookFunctions, WebhookFunctionMetadata, WebhookModuleMetadata } from
 const WebhookModule: ModuleAdapter = {
   name: "webhook",
   functions: WebhookFunctions,
-  functionMetadata: WebhookFunctionMetadata,
-  moduleMetadata: WebhookModuleMetadata,
+  functionMetadata: WebhookFunctionMetadata as any,
+  moduleMetadata: WebhookModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default WebhookModule;
 export { WebhookModule };

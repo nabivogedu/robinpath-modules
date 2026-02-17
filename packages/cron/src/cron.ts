@@ -144,7 +144,7 @@ export const CronFunctions: Record<string, BuiltinHandler> = {
   isValid, parse, next, nextN, prev, matches, describe, between,
 };
 
-export const CronFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CronFunctionMetadata = {
   isValid: { description: "Validate a cron expression", parameters: [{ name: "expression", dataType: "string", description: "Cron expression (5 fields)", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if valid", example: 'cron.isValid "*/5 * * * *"' },
   parse: { description: "Parse cron expression into expanded fields", parameters: [{ name: "expression", dataType: "string", description: "Cron expression", formInputType: "text", required: true }], returnType: "object", returnDescription: "{minute[], hour[], dayOfMonth[], month[], dayOfWeek[]}", example: 'cron.parse "0 9 * * 1-5"' },
   next: { description: "Get next occurrence after a date", parameters: [{ name: "expression", dataType: "string", description: "Cron expression", formInputType: "text", required: true }, { name: "from", dataType: "string", description: "From date (default: now)", formInputType: "text", required: false }], returnType: "string", returnDescription: "ISO date string", example: 'cron.next "*/5 * * * *"' },
@@ -155,7 +155,7 @@ export const CronFunctionMetadata: Record<string, FunctionMetadata> = {
   between: { description: "Get all occurrences between two dates", parameters: [{ name: "expression", dataType: "string", description: "Cron expression", formInputType: "text", required: true }, { name: "start", dataType: "string", description: "Start date", formInputType: "text", required: true }, { name: "end", dataType: "string", description: "End date", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of ISO date strings", example: 'cron.between "0 * * * *" "2024-01-01" "2024-01-02"' },
 };
 
-export const CronModuleMetadata: ModuleMetadata = {
+export const CronModuleMetadata = {
   description: "Cron expression parsing, validation, scheduling, and human-readable descriptions",
   methods: ["isValid", "parse", "next", "nextN", "prev", "matches", "describe", "between"],
 };

@@ -11,5 +11,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "../../declarations.d.ts"
+  ],
+  "extends": "../../tsconfig.json"
 }

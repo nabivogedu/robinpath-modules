@@ -77,7 +77,7 @@ const log: BuiltinHandler = (args) => {
 
 const getLogs: BuiltinHandler = (args) => {
   const level = args[0] ? String(args[0]) : undefined;
-  return level ? logs.filter((l) => l.level === level) : [...logs];
+  return level ? logs.filter((l: any) => l.level === level) : [...logs];
 };
 
 const clearLogs: BuiltinHandler = () => { logs.length = 0; return true; };
@@ -140,10 +140,10 @@ const table: BuiltinHandler = (args) => {
   const data = (Array.isArray(args[0]) ? args[0] : []) as Record<string, unknown>[];
   if (!data.length) return "(empty table)";
   const cols = (Array.isArray(args[1]) ? args[1].map(String) : Object.keys(data[0]!)) as string[];
-  const widths = cols.map((c) => Math.max(c.length, ...data.map((r) => String(r[c] ?? "").length)));
-  const sep = widths.map((w) => "-".repeat(w + 2)).join("+");
+  const widths = cols.map((c: any) => Math.max(c.length, ...data.map((r: any) => String(r[c] ?? "").length)));
+  const sep = widths.map((w: any) => "-".repeat(w + 2)).join("+");
   const header = cols.map((c, i) => ` ${c.padEnd(widths[i]!)} `).join("|");
-  const rows = data.map((r) => cols.map((c, i) => ` ${String(r[c] ?? "").padEnd(widths[i]!)} `).join("|"));
+  const rows = data.map((r: any) => cols.map((c, i) => ` ${String(r[c] ?? "").padEnd(widths[i]!)} `).join("|"));
   return [header, sep, ...rows].join("\n");
 };
 
@@ -156,7 +156,7 @@ const dump: BuiltinHandler = (args) => {
 
 export const DebugFunctions: Record<string, BuiltinHandler> = { inspect, typeOf, timeStart, timeEnd, timeit, count, countReset, countGet, log, getLogs, clearLogs, assert, trace, memory, sizeof, diff, freeze, clone, table, dump };
 
-export const DebugFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DebugFunctionMetadata = {
   inspect: { description: "Deep inspect a value", parameters: [{ name: "value", dataType: "any", description: "Value to inspect", formInputType: "text", required: true }], returnType: "object", returnDescription: "{type, value, keys, length}", example: 'debug.inspect $data' },
   typeOf: { description: "Get detailed type", parameters: [{ name: "value", dataType: "any", description: "Value", formInputType: "text", required: true }], returnType: "string", returnDescription: "Type name", example: 'debug.typeOf $data' },
   timeStart: { description: "Start a timer", parameters: [{ name: "label", dataType: "string", description: "Timer label", formInputType: "text", required: true }], returnType: "string", returnDescription: "Label", example: 'debug.timeStart "fetch"' },
@@ -179,7 +179,7 @@ export const DebugFunctionMetadata: Record<string, FunctionMetadata> = {
   dump: { description: "Pretty-print value", parameters: [{ name: "value", dataType: "any", description: "Value", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{depth}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Formatted string", example: 'debug.dump $data' },
 };
 
-export const DebugModuleMetadata: ModuleMetadata = {
+export const DebugModuleMetadata = {
   description: "Debugging utilities: inspect, timing, counters, logging, memory profiling, value comparison, ASCII tables",
   methods: ["inspect", "typeOf", "timeStart", "timeEnd", "timeit", "count", "countReset", "countGet", "log", "getLogs", "clearLogs", "assert", "trace", "memory", "sizeof", "diff", "freeze", "clone", "table", "dump"],
 };

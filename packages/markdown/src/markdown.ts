@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const toHtml: BuiltinHandler = (args) => {
   let md = String(args[0] ?? "");
@@ -113,15 +113,15 @@ const extractTodos: BuiltinHandler = (args) => {
 
 const tableToArray: BuiltinHandler = (args) => {
   const md = String(args[0] ?? "");
-  const lines = md.split(/\r?\n/).filter((l) => l.trim().startsWith("|"));
+  const lines = md.split(/\r?\n/).filter((l: any) => l.trim().startsWith("|"));
   if (lines.length < 2) return [];
-  const parseRow = (line: string) => line.split("|").map((c) => c.trim()).filter(Boolean);
+  const parseRow = (line: string) => line.split("|").map((c: any) => c.trim()).filter(Boolean);
   const headers = parseRow(lines[0]!);
   const result: Record<string, string>[] = [];
   for (let i = 2; i < lines.length; i++) {
     const cells = parseRow(lines[i]!);
     const row: Record<string, string> = {};
-    headers.forEach((h, j) => { row[h] = cells[j] ?? ""; });
+    headers.forEach((h: any, j: any) => { row[h] = cells[j] ?? ""; });
     result.push(row);
   }
   return result;
@@ -137,7 +137,7 @@ export const MarkdownFunctions: Record<string, BuiltinHandler> = {
   toHtml, extractHeadings, extractLinks, extractImages, extractCodeBlocks, stripMarkdown, extractFrontmatter, extractTodos, tableToArray, wordCount,
 };
 
-export const MarkdownFunctionMetadata: Record<string, FunctionMetadata> = {
+export const MarkdownFunctionMetadata = {
   toHtml: { description: "Convert markdown to basic HTML", parameters: [{ name: "markdown", dataType: "string", description: "Markdown string", formInputType: "textarea", required: true }], returnType: "string", returnDescription: "HTML string", example: 'markdown.toHtml "# Hello"' },
   extractHeadings: { description: "Extract all headings with their levels", parameters: [{ name: "markdown", dataType: "string", description: "Markdown string", formInputType: "textarea", required: true }], returnType: "array", returnDescription: "Array of {level, text}", example: "markdown.extractHeadings $md" },
   extractLinks: { description: "Extract all links", parameters: [{ name: "markdown", dataType: "string", description: "Markdown string", formInputType: "textarea", required: true }], returnType: "array", returnDescription: "Array of {text, url}", example: "markdown.extractLinks $md" },
@@ -150,7 +150,7 @@ export const MarkdownFunctionMetadata: Record<string, FunctionMetadata> = {
   wordCount: { description: "Count words in markdown (stripping formatting)", parameters: [{ name: "markdown", dataType: "string", description: "Markdown string", formInputType: "textarea", required: true }], returnType: "number", returnDescription: "Word count", example: "markdown.wordCount $md" },
 };
 
-export const MarkdownModuleMetadata: ModuleMetadata = {
+export const MarkdownModuleMetadata = {
   description: "Markdown processing: convert to HTML, extract headings, links, images, code blocks, frontmatter, and tables",
   methods: ["toHtml", "extractHeadings", "extractLinks", "extractImages", "extractCodeBlocks", "stripMarkdown", "extractFrontmatter", "extractTodos", "tableToArray", "wordCount"],
 };

@@ -4,10 +4,10 @@ import { CacheFunctions, CacheFunctionMetadata, CacheModuleMetadata } from "./ca
 const CacheModule: ModuleAdapter = {
   name: "cache",
   functions: CacheFunctions,
-  functionMetadata: CacheFunctionMetadata,
-  moduleMetadata: CacheModuleMetadata,
+  functionMetadata: CacheFunctionMetadata as any,
+  moduleMetadata: CacheModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default CacheModule;
 export { CacheModule };

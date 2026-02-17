@@ -4,10 +4,10 @@ import { GraphqlFunctions, GraphqlFunctionMetadata, GraphqlModuleMetadata } from
 const GraphqlModule: ModuleAdapter = {
   name: "graphql",
   functions: GraphqlFunctions,
-  functionMetadata: GraphqlFunctionMetadata,
-  moduleMetadata: GraphqlModuleMetadata,
+  functionMetadata: GraphqlFunctionMetadata as any,
+  moduleMetadata: GraphqlModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default GraphqlModule;
 export { GraphqlModule };

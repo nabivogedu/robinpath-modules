@@ -28,22 +28,22 @@ const camelCase: BuiltinHandler = (args) => {
 };
 
 const snakeCase: BuiltinHandler = (args) => {
-  return splitWords(String(args[0] ?? "")).map((w) => w.toLowerCase()).join("_");
+  return splitWords(String(args[0] ?? "")).map((w: any) => w.toLowerCase()).join("_");
 };
 
 const kebabCase: BuiltinHandler = (args) => {
-  return splitWords(String(args[0] ?? "")).map((w) => w.toLowerCase()).join("-");
+  return splitWords(String(args[0] ?? "")).map((w: any) => w.toLowerCase()).join("-");
 };
 
 const pascalCase: BuiltinHandler = (args) => {
   return splitWords(String(args[0] ?? ""))
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .map((w: any) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join("");
 };
 
 const titleCase: BuiltinHandler = (args) => {
   const str = String(args[0] ?? "");
-  return str.replace(/\b\w/g, (ch) => ch.toUpperCase());
+  return str.replace(/\b\w/g, (ch: any) => ch.toUpperCase());
 };
 
 const slugify: BuiltinHandler = (args) => {
@@ -127,7 +127,7 @@ export const StringFunctions: Record<string, BuiltinHandler> = {
   replaceAll,
 };
 
-export const StringFunctionMetadata: Record<string, FunctionMetadata> = {
+export const StringFunctionMetadata = {
   capitalize: {
     description: "Capitalize the first letter of a string",
     parameters: [
@@ -275,7 +275,7 @@ export const StringFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const StringModuleMetadata: ModuleMetadata = {
+export const StringModuleMetadata = {
   description: "String manipulation utilities: case conversion, slugify, truncate, pad, reverse, and more",
   methods: ["capitalize", "camelCase", "snakeCase", "kebabCase", "pascalCase", "titleCase", "slugify", "truncate", "padStart", "padEnd", "reverse", "wordCount", "contains", "repeat", "replaceAll"],
 };

@@ -4,10 +4,10 @@ import { TeamsFunctions, TeamsFunctionMetadata, TeamsModuleMetadata } from "./te
 const TeamsModule: ModuleAdapter = {
   name: "teams",
   functions: TeamsFunctions,
-  functionMetadata: TeamsFunctionMetadata,
-  moduleMetadata: TeamsModuleMetadata,
+  functionMetadata: TeamsFunctionMetadata as any,
+  moduleMetadata: TeamsModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TeamsModule;
 export { TeamsModule };

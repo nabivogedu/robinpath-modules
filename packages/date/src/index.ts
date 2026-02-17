@@ -4,10 +4,10 @@ import { DateFunctions, DateFunctionMetadata, DateModuleMetadata } from "./date.
 const DateModule: ModuleAdapter = {
   name: "date",
   functions: DateFunctions,
-  functionMetadata: DateFunctionMetadata,
-  moduleMetadata: DateModuleMetadata,
+  functionMetadata: DateFunctionMetadata as any,
+  moduleMetadata: DateModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default DateModule;
 export { DateModule };

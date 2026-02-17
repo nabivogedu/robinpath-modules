@@ -4,10 +4,10 @@ import { EncryptFunctions, EncryptFunctionMetadata, EncryptModuleMetadata } from
 const EncryptModule: ModuleAdapter = {
   name: "encrypt",
   functions: EncryptFunctions,
-  functionMetadata: EncryptFunctionMetadata,
-  moduleMetadata: EncryptModuleMetadata,
+  functionMetadata: EncryptFunctionMetadata as any,
+  moduleMetadata: EncryptModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default EncryptModule;
 export { EncryptModule };

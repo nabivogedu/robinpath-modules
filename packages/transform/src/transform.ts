@@ -2,8 +2,8 @@ import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
-function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-  return path.split(".").reduce<unknown>((acc, key) => {
+function getNestedValue(obj: Record<string, unknown>, path: string): any {
+  return path.split(".").reduce<unknown>((acc: any, key: any) => {
     if (acc != null && typeof acc === "object") return (acc as Record<string, unknown>)[key];
     return undefined;
   }, obj);
@@ -36,7 +36,7 @@ function deepClone<T>(value: T): T {
 
 const pick: BuiltinHandler = (args) => {
   const obj = (typeof args[0] === "object" && args[0] !== null ? args[0] : {}) as Record<string, unknown>;
-  const keys = Array.isArray(args[1]) ? args[1].map(String) : String(args[1] ?? "").split(",").map((k) => k.trim()).filter(Boolean);
+  const keys = Array.isArray(args[1]) ? args[1].map(String) : String(args[1] ?? "").split(",").map((k: any) => k.trim()).filter(Boolean);
 
   const result: Record<string, unknown> = {};
   for (const key of keys) {
@@ -50,7 +50,7 @@ const pick: BuiltinHandler = (args) => {
 
 const omit: BuiltinHandler = (args) => {
   const obj = (typeof args[0] === "object" && args[0] !== null ? args[0] : {}) as Record<string, unknown>;
-  const keys = Array.isArray(args[1]) ? args[1].map(String) : String(args[1] ?? "").split(",").map((k) => k.trim()).filter(Boolean);
+  const keys = Array.isArray(args[1]) ? args[1].map(String) : String(args[1] ?? "").split(",").map((k: any) => k.trim()).filter(Boolean);
 
   const result = deepClone(obj);
   for (const key of keys) {
@@ -191,7 +191,7 @@ const unflatten: BuiltinHandler = (args) => {
 };
 
 const merge: BuiltinHandler = (args) => {
-  const objects = args.filter((a) => typeof a === "object" && a !== null) as Record<string, unknown>[];
+  const objects = args.filter((a: any) => typeof a === "object" && a !== null) as Record<string, unknown>[];
   if (objects.length === 0) return {};
 
   function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
@@ -284,7 +284,7 @@ const mapArray: BuiltinHandler = (args) => {
   const arr = Array.isArray(args[0]) ? args[0] : [];
   const mapping = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, string>;
 
-  return arr.map((item) => {
+  return arr.map((item: any) => {
     if (typeof item !== "object" || item === null) return item;
     const obj = item as Record<string, unknown>;
     const result: Record<string, unknown> = {};
@@ -299,7 +299,7 @@ const filter: BuiltinHandler = (args) => {
   const arr = Array.isArray(args[0]) ? args[0] : [];
   const conditions = (typeof args[1] === "object" && args[1] !== null ? args[1] : {}) as Record<string, unknown>;
 
-  return arr.filter((item) => {
+  return arr.filter((item: any) => {
     if (typeof item !== "object" || item === null) return false;
     const obj = item as Record<string, unknown>;
     for (const [key, expected] of Object.entries(conditions)) {
@@ -315,7 +315,7 @@ const sort: BuiltinHandler = (args) => {
   const key = String(args[1] ?? "");
   const order = String(args[2] ?? "asc");
 
-  return arr.sort((a, b) => {
+  return arr.sort((a: any, b: any) => {
     const aVal = typeof a === "object" && a !== null ? getNestedValue(a as Record<string, unknown>, key) : a;
     const bVal = typeof b === "object" && b !== null ? getNestedValue(b as Record<string, unknown>, key) : b;
 
@@ -335,7 +335,7 @@ export const TransformFunctions: Record<string, BuiltinHandler> = {
   pick, omit, rename, mapValues, coerce, flatten, unflatten, merge, defaults, template, group, pipeline, mapArray, filter, sort,
 };
 
-export const TransformFunctionMetadata: Record<string, FunctionMetadata> = {
+export const TransformFunctionMetadata = {
   pick: {
     description: "Pick specific keys from an object (supports nested paths with dot notation)",
     parameters: [
@@ -488,7 +488,7 @@ export const TransformFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const TransformModuleMetadata: ModuleMetadata = {
+export const TransformModuleMetadata = {
   description: "Data transformation and mapping utilities: pick, omit, rename, coerce, flatten, merge, pipeline, and more",
   methods: ["pick", "omit", "rename", "mapValues", "coerce", "flatten", "unflatten", "merge", "defaults", "template", "group", "pipeline", "mapArray", "filter", "sort"],
 };

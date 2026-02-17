@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { readFileSync } from "node:fs";
 
 // ── HTML Escaping ───────────────────────────────────────────────────
@@ -14,12 +14,12 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
 const HTML_ESCAPE_RE = /[&<>"']/g;
 
 function escapeHtml(str: string): string {
-  return str.replace(HTML_ESCAPE_RE, (ch) => HTML_ESCAPE_MAP[ch]!);
+  return str.replace(HTML_ESCAPE_RE, (ch: any) => HTML_ESCAPE_MAP[ch]!);
 }
 
 // ── Dot-notation property access ────────────────────────────────────
 
-function resolvePath(obj: unknown, path: string): unknown {
+function resolvePath(obj: unknown, path: string): any {
   const parts = path.split(".");
   let current: unknown = obj;
   for (const part of parts) {
@@ -362,7 +362,7 @@ export const TemplateFunctions: Record<string, BuiltinHandler> = {
   renderString,
 };
 
-export const TemplateFunctionMetadata: Record<string, FunctionMetadata> = {
+export const TemplateFunctionMetadata = {
   render: {
     description: "Render a Mustache-like template string with variable substitution, sections, and loops",
     parameters: [
@@ -476,7 +476,7 @@ export const TemplateFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const TemplateModuleMetadata: ModuleMetadata = {
+export const TemplateModuleMetadata = {
   description: "Mustache-like template engine with variable substitution, conditional sections, loops, and simple string interpolation",
   methods: ["render", "renderFile", "escape", "compile", "extractVariables", "renderString"],
 };

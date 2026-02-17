@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── RobinPath Function Handlers ─────────────────────────────────────
 
@@ -185,7 +185,7 @@ export const HtmlFunctions: Record<string, BuiltinHandler> = {
   minify,
 };
 
-export const HtmlFunctionMetadata: Record<string, FunctionMetadata> = {
+export const HtmlFunctionMetadata = {
   stripTags: {
     description: "Remove all HTML tags from a string, returning plain text",
     parameters: [
@@ -403,7 +403,7 @@ export const HtmlFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const HtmlModuleMetadata: ModuleMetadata = {
+export const HtmlModuleMetadata = {
   description: "Parse, extract, escape, and manipulate HTML content using regex-based processing",
   methods: [
     "stripTags",

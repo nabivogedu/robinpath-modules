@@ -18,7 +18,7 @@ const REDACTED = "***";
 
 function isSensitive(key: string): boolean {
   if (sensitiveKeys.has(key)) return true;
-  return SENSITIVE_PATTERNS.some((p) => p.test(key));
+  return SENSITIVE_PATTERNS.some((p: any) => p.test(key));
 }
 
 function validateKey(key: string): void {
@@ -134,7 +134,7 @@ export const EnvFunctions: Record<string, BuiltinHandler> = {
   load,
 };
 
-export const EnvFunctionMetadata: Record<string, FunctionMetadata> = {
+export const EnvFunctionMetadata = {
   get: {
     description: "Get the value of an environment variable",
     parameters: [
@@ -256,7 +256,7 @@ export const EnvFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const EnvModuleMetadata: ModuleMetadata = {
+export const EnvModuleMetadata = {
   description: "Secure environment variable management with sensitive value redaction and protected system vars",
   methods: ["get", "set", "has", "all", "delete", "secret", "load"],
 };

@@ -4,10 +4,10 @@ import { CronFunctions, CronFunctionMetadata, CronModuleMetadata } from "./cron.
 const CronModule: ModuleAdapter = {
   name: "cron",
   functions: CronFunctions,
-  functionMetadata: CronFunctionMetadata,
-  moduleMetadata: CronModuleMetadata,
+  functionMetadata: CronFunctionMetadata as any,
+  moduleMetadata: CronModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default CronModule;
 export { CronModule };

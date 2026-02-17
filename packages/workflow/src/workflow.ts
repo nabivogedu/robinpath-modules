@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { randomBytes } from "node:crypto";
 
 // ── Types ───────────────────────────────────────────────────────────
@@ -201,7 +201,7 @@ const run: BuiltinHandler = async (args) => {
   };
 };
 
-async function executeStep(step: Step, wf: WorkflowDef): Promise<unknown> {
+async function executeStep(step: Step, wf: WorkflowDef): Promise<Value> {
   switch (step.type) {
     case "action": {
       if (step.handler) {
@@ -256,7 +256,7 @@ async function executeStep(step: Step, wf: WorkflowDef): Promise<unknown> {
 
     case "parallel": {
       const subStepIds = (step.config.steps as string[]) ?? [];
-      const promises = subStepIds.map(async (sid) => {
+      const promises = subStepIds.map(async (sid: any) => {
         const subStep = wf.steps.get(sid);
         if (!subStep) return { id: sid, error: "Step not found" };
         try {
@@ -271,7 +271,7 @@ async function executeStep(step: Step, wf: WorkflowDef): Promise<unknown> {
 
     case "delay": {
       const ms = Number(step.config.ms ?? step.config.delay ?? 1000);
-      await new Promise((resolve) => setTimeout(resolve, ms));
+      await new Promise((resolve: any) => setTimeout(resolve, ms));
       return { delayed: ms };
     }
 
@@ -339,7 +339,7 @@ const getHistory: BuiltinHandler = (args) => {
   const wfId = String(args[0] ?? "");
   const wf = workflows.get(wfId);
   if (!wf) throw new Error(`Workflow "${wfId}" not found`);
-  return wf.history.map((h) => ({
+  return wf.history.map((h: any) => ({
     ...h,
     timestamp: new Date(h.timestamp).toISOString(),
   }));
@@ -349,7 +349,7 @@ const listSteps: BuiltinHandler = (args) => {
   const wfId = String(args[0] ?? "");
   const wf = workflows.get(wfId);
   if (!wf) throw new Error(`Workflow "${wfId}" not found`);
-  return [...wf.steps.values()].map((s) => ({
+  return [...wf.steps.values()].map((s: any) => ({
     id: s.id,
     name: s.name,
     type: s.type,
@@ -373,7 +373,7 @@ const destroy: BuiltinHandler = (args) => {
 };
 
 const list: BuiltinHandler = () => {
-  return [...workflows.values()].map((wf) => ({
+  return [...workflows.values()].map((wf: any) => ({
     id: wf.id,
     name: wf.name,
     status: wf.status,
@@ -410,7 +410,7 @@ export const WorkflowFunctions: Record<string, BuiltinHandler> = {
   create, addStep, setEntry, link, run, pause, getStatus, getContext, setContext, getHistory, listSteps, removeStep, destroy, list, clone,
 };
 
-export const WorkflowFunctionMetadata: Record<string, FunctionMetadata> = {
+export const WorkflowFunctionMetadata = {
   create: { description: "Create a new workflow", parameters: [{ name: "name", dataType: "string", description: "Workflow name", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{context: initial context data}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{id, name, status}", example: 'workflow.create "Send Welcome Email"' },
   addStep: { description: "Add a step to a workflow (action, condition, loop, parallel, delay, transform)", parameters: [{ name: "workflowId", dataType: "string", description: "Workflow ID", formInputType: "text", required: true }, { name: "step", dataType: "object", description: "{name, type, handler, config, next, onError}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{id, name, type}", example: 'workflow.addStep $wfId {"name": "Fetch User", "type": "action", "handler": $fn}' },
   setEntry: { description: "Set the entry (first) step of a workflow", parameters: [{ name: "workflowId", dataType: "string", description: "Workflow ID", formInputType: "text", required: true }, { name: "stepId", dataType: "string", description: "Step ID", formInputType: "text", required: true }], returnType: "object", returnDescription: "{entryStep}", example: 'workflow.setEntry $wfId $stepId' },
@@ -428,7 +428,7 @@ export const WorkflowFunctionMetadata: Record<string, FunctionMetadata> = {
   clone: { description: "Clone an existing workflow", parameters: [{ name: "workflowId", dataType: "string", description: "Source workflow ID", formInputType: "text", required: true }, { name: "name", dataType: "string", description: "New workflow name", formInputType: "text", required: false }], returnType: "object", returnDescription: "{id, name}", example: 'workflow.clone $wfId "My Copy"' },
 };
 
-export const WorkflowModuleMetadata: ModuleMetadata = {
+export const WorkflowModuleMetadata = {
   description: "Workflow orchestration engine with steps, conditions, loops, parallel execution, branching, and context management",
   methods: ["create", "addStep", "setEntry", "link", "run", "pause", "getStatus", "getContext", "setContext", "getHistory", "listSteps", "removeStep", "destroy", "list", "clone"],
 };

@@ -4,10 +4,10 @@ import { BufferFunctions, BufferFunctionMetadata, BufferModuleMetadata } from ".
 const BufferModule: ModuleAdapter = {
   name: "buffer",
   functions: BufferFunctions,
-  functionMetadata: BufferFunctionMetadata,
-  moduleMetadata: BufferModuleMetadata,
+  functionMetadata: BufferFunctionMetadata as any,
+  moduleMetadata: BufferModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default BufferModule;
 export { BufferModule };

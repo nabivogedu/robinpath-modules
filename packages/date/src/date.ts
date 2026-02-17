@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -274,7 +274,7 @@ export const DateFunctions: Record<string, BuiltinHandler> = {
   daysInMonth,
 };
 
-export const DateFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DateFunctionMetadata = {
   parse: {
     description: "Parse a date string and return its ISO representation",
     parameters: [
@@ -593,7 +593,7 @@ export const DateFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const DateModuleMetadata: ModuleMetadata = {
+export const DateModuleMetadata = {
   description: "Parse, format, manipulate, and compare dates and times",
   methods: [
     "parse",

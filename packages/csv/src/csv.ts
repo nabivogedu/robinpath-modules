@@ -114,11 +114,11 @@ const stringify: BuiltinHandler = (args) => {
   const first = data[0] as Record<string, unknown>;
   const headers = Object.keys(first);
 
-  const headerLine = headers.map((h) => escapeField(h, delimiter)).join(delimiter);
+  const headerLine = headers.map((h: any) => escapeField(h, delimiter)).join(delimiter);
 
-  const dataLines = (data as Record<string, unknown>[]).map((row) =>
+  const dataLines = (data as Record<string, unknown>[]).map((row: any) =>
     headers
-      .map((h) => escapeField(String(row[h] ?? ""), delimiter))
+      .map((h: any) => escapeField(String(row[h] ?? ""), delimiter))
       .join(delimiter)
   );
 
@@ -166,7 +166,7 @@ export const CsvFunctions: Record<string, BuiltinHandler> = {
   rows,
 };
 
-export const CsvFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CsvFunctionMetadata = {
   parse: {
     description: "Parse a CSV string into an array of objects (first row = headers)",
     parameters: [
@@ -275,7 +275,7 @@ export const CsvFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const CsvModuleMetadata: ModuleMetadata = {
+export const CsvModuleMetadata = {
   description: "Parse and stringify CSV data",
   methods: ["parse", "stringify", "headers", "column", "rows"],
 };

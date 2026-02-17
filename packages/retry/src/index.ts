@@ -4,10 +4,10 @@ import { RetryFunctions, RetryFunctionMetadata, RetryModuleMetadata } from "./re
 const RetryModule: ModuleAdapter = {
   name: "retry",
   functions: RetryFunctions,
-  functionMetadata: RetryFunctionMetadata,
-  moduleMetadata: RetryModuleMetadata,
+  functionMetadata: RetryFunctionMetadata as any,
+  moduleMetadata: RetryModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default RetryModule;
 export { RetryModule };

@@ -4,10 +4,10 @@ import { ShopifyFunctions, ShopifyFunctionMetadata, ShopifyModuleMetadata } from
 const ShopifyModule: ModuleAdapter = {
   name: "shopify",
   functions: ShopifyFunctions,
-  functionMetadata: ShopifyFunctionMetadata,
-  moduleMetadata: ShopifyModuleMetadata,
+  functionMetadata: ShopifyFunctionMetadata as any,
+  moduleMetadata: ShopifyModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ShopifyModule;
 export { ShopifyModule };

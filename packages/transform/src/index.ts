@@ -4,10 +4,10 @@ import { TransformFunctions, TransformFunctionMetadata, TransformModuleMetadata 
 const TransformModule: ModuleAdapter = {
   name: "transform",
   functions: TransformFunctions,
-  functionMetadata: TransformFunctionMetadata,
-  moduleMetadata: TransformModuleMetadata,
+  functionMetadata: TransformFunctionMetadata as any,
+  moduleMetadata: TransformModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TransformModule;
 export { TransformModule };

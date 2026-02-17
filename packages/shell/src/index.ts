@@ -4,10 +4,10 @@ import { ShellFunctions, ShellFunctionMetadata, ShellModuleMetadata } from "./sh
 const ShellModule: ModuleAdapter = {
   name: "shell",
   functions: ShellFunctions,
-  functionMetadata: ShellFunctionMetadata,
-  moduleMetadata: ShellModuleMetadata,
+  functionMetadata: ShellFunctionMetadata as any,
+  moduleMetadata: ShellModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ShellModule;
 export { ShellModule };

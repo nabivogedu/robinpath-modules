@@ -1,9 +1,9 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { MongoClient, Db, ObjectId } from "mongodb";
 
-const clients = new Map<string, { client: MongoClient; db: Db }>();
+const clients = new Map<string, { client: any; db: any }>();
 
-function getDb(name: string): Db {
+function getDb(name: string): any {
   const entry = clients.get(name);
   if (!entry) throw new Error(`MongoDB connection "${name}" not found. Call mongo.connect first.`);
   return entry.db;
@@ -118,7 +118,7 @@ const distinct: BuiltinHandler = async (args) => {
 const collections: BuiltinHandler = async (args) => {
   const name = String(args[0] ?? "default");
   const colls = await getDb(name).listCollections().toArray();
-  return colls.map((c) => c.name);
+  return colls.map((c: any) => c.name);
 };
 
 const createIndex: BuiltinHandler = async (args) => {
@@ -145,7 +145,7 @@ const closeAll: BuiltinHandler = async () => {
 
 export const MongoFunctions: Record<string, BuiltinHandler> = { connect, find, findOne, insertOne, insertMany: insertManyDocs, updateOne, updateMany, deleteOne, deleteMany: deleteManyDocs, aggregate, count: countDocs, distinct, collections, createIndex, objectId, close, closeAll };
 
-export const MongoFunctionMetadata: Record<string, FunctionMetadata> = {
+export const MongoFunctionMetadata = {
   connect: { description: "Connect to MongoDB", parameters: [{ name: "options", dataType: "object", description: "{uri, database, name}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{name, connected, database}", example: 'mongo.connect {"uri": "mongodb://localhost:27017", "database": "mydb"}' },
   find: { description: "Find documents", parameters: [{ name: "collection", dataType: "string", description: "Collection", formInputType: "text", required: true }, { name: "filter", dataType: "object", description: "Query filter", formInputType: "text", required: false }, { name: "options", dataType: "object", description: "{sort, limit, skip, projection}", formInputType: "text", required: false }, { name: "connection", dataType: "string", description: "Connection name", formInputType: "text", required: false }], returnType: "array", returnDescription: "Documents", example: 'mongo.find "users" {"age": {"$gt": 18}} {"limit": 10}' },
   findOne: { description: "Find one document", parameters: [{ name: "collection", dataType: "string", description: "Collection", formInputType: "text", required: true }, { name: "filter", dataType: "object", description: "Query filter", formInputType: "text", required: true }, { name: "connection", dataType: "string", description: "Connection name", formInputType: "text", required: false }], returnType: "object", returnDescription: "Document or null", example: 'mongo.findOne "users" {"email": "alice@example.com"}' },
@@ -165,7 +165,7 @@ export const MongoFunctionMetadata: Record<string, FunctionMetadata> = {
   closeAll: { description: "Close all connections", parameters: [], returnType: "boolean", returnDescription: "true", example: 'mongo.closeAll' },
 };
 
-export const MongoModuleMetadata: ModuleMetadata = {
+export const MongoModuleMetadata = {
   description: "MongoDB client with find, insert, update, delete, aggregation pipeline, indexing, and connection management",
   methods: ["connect", "find", "findOne", "insertOne", "insertMany", "updateOne", "updateMany", "deleteOne", "deleteMany", "aggregate", "count", "distinct", "collections", "createIndex", "objectId", "close", "closeAll"],
 };

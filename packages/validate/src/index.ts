@@ -4,10 +4,10 @@ import { ValidateFunctions, ValidateFunctionMetadata, ValidateModuleMetadata } f
 const ValidateModule: ModuleAdapter = {
   name: "validate",
   functions: ValidateFunctions,
-  functionMetadata: ValidateFunctionMetadata,
-  moduleMetadata: ValidateModuleMetadata,
+  functionMetadata: ValidateFunctionMetadata as any,
+  moduleMetadata: ValidateModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ValidateModule;
 export { ValidateModule };

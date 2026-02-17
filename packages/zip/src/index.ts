@@ -4,10 +4,10 @@ import { ZipFunctions, ZipFunctionMetadata, ZipModuleMetadata } from "./zip.js";
 const ZipModule: ModuleAdapter = {
   name: "zip",
   functions: ZipFunctions,
-  functionMetadata: ZipFunctionMetadata,
-  moduleMetadata: ZipModuleMetadata,
+  functionMetadata: ZipFunctionMetadata as any,
+  moduleMetadata: ZipModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default ZipModule;
 export { ZipModule };

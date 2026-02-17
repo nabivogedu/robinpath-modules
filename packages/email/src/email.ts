@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
 
@@ -66,7 +66,7 @@ const send: BuiltinHandler = async (args) => {
 
   // Attachments
   if (Array.isArray(opts.attachments)) {
-    mailOptions.attachments = (opts.attachments as Record<string, unknown>[]).map((att) => ({
+    mailOptions.attachments = (opts.attachments as Record<string, unknown>[]).map((att: any) => ({
       filename: att.filename ? String(att.filename) : undefined,
       path: att.path ? String(att.path) : undefined,
       content: att.content,
@@ -163,8 +163,8 @@ const parseAddress: BuiltinHandler = (args) => {
 const parseAddressList: BuiltinHandler = (args) => {
   const input = String(args[0] ?? "");
   // Split by comma but not within angle brackets
-  const addresses = input.split(/,(?![^<]*>)/).map((s) => s.trim()).filter(Boolean);
-  return addresses.map((addr) => {
+  const addresses = input.split(/,(?![^<]*>)/).map((s: any) => s.trim()).filter(Boolean);
+  return addresses.map((addr: any) => {
     const result = parseAddress([addr]) as { name: string; address: string; full: string };
     return result;
   });
@@ -222,7 +222,7 @@ export const EmailFunctions: Record<string, BuiltinHandler> = {
   createTransport, send, sendQuick, verify, isValid, parseAddress, parseAddressList, extractDomain, buildAddress, close, createTestAccount, getTestUrl,
 };
 
-export const EmailFunctionMetadata: Record<string, FunctionMetadata> = {
+export const EmailFunctionMetadata = {
   createTransport: {
     description: "Create a named SMTP transport for sending emails",
     parameters: [
@@ -314,7 +314,7 @@ export const EmailFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const EmailModuleMetadata: ModuleMetadata = {
+export const EmailModuleMetadata = {
   description: "SMTP email sending with transports, attachments, address parsing, and Ethereal test accounts",
   methods: ["createTransport", "send", "sendQuick", "verify", "isValid", "parseAddress", "parseAddressList", "extractDomain", "buildAddress", "close", "createTestAccount", "getTestUrl"],
 };

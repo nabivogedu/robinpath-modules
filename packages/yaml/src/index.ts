@@ -4,10 +4,10 @@ import { YamlFunctions, YamlFunctionMetadata, YamlModuleMetadata } from "./yaml.
 const YamlModule: ModuleAdapter = {
   name: "yaml",
   functions: YamlFunctions,
-  functionMetadata: YamlFunctionMetadata,
-  moduleMetadata: YamlModuleMetadata,
+  functionMetadata: YamlFunctionMetadata as any,
+  moduleMetadata: YamlModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default YamlModule;
 export { YamlModule };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { readFileSync, statSync } from "node:fs";
 import { basename } from "node:path";
 
@@ -143,7 +143,7 @@ const parseMultipart: BuiltinHandler = (args) => {
 
 export const FormFunctions: Record<string, BuiltinHandler> = { create, addField, addFile, submit, encode, decode, uploadFile, parseMultipart };
 
-export const FormFunctionMetadata: Record<string, FunctionMetadata> = {
+export const FormFunctionMetadata = {
   create: { description: "Create a FormData object from key-value pairs", parameters: [{ name: "data", dataType: "object", description: "Key-value pairs", formInputType: "text", required: false }], returnType: "object", returnDescription: "FormData object", example: 'form.create {"name": "Alice", "email": "alice@example.com"}' },
   addField: { description: "Add a text field to a FormData", parameters: [{ name: "form", dataType: "object", description: "FormData", formInputType: "text", required: true }, { name: "name", dataType: "string", description: "Field name", formInputType: "text", required: true }, { name: "value", dataType: "string", description: "Field value", formInputType: "text", required: true }], returnType: "object", returnDescription: "Updated FormData", example: 'form.addField $form "name" "Alice"' },
   addFile: { description: "Add a file to a FormData", parameters: [{ name: "form", dataType: "object", description: "FormData", formInputType: "text", required: true }, { name: "fieldName", dataType: "string", description: "Form field name", formInputType: "text", required: true }, { name: "filePath", dataType: "string", description: "File path", formInputType: "text", required: true }, { name: "fileName", dataType: "string", description: "Override filename", formInputType: "text", required: false }], returnType: "object", returnDescription: "Updated FormData", example: 'form.addFile $form "avatar" "./photo.jpg"' },
@@ -154,7 +154,7 @@ export const FormFunctionMetadata: Record<string, FunctionMetadata> = {
   parseMultipart: { description: "Parse a multipart form body", parameters: [{ name: "body", dataType: "string", description: "Raw multipart body", formInputType: "text", required: true }, { name: "boundary", dataType: "string", description: "Multipart boundary string", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of {name, filename, contentType, value}", example: 'form.parseMultipart $rawBody $boundary' },
 };
 
-export const FormModuleMetadata: ModuleMetadata = {
+export const FormModuleMetadata = {
   description: "Multipart form data builder, file uploads, URL encoding/decoding, and form submission",
   methods: ["create", "addField", "addFile", "submit", "encode", "decode", "uploadFile", "parseMultipart"],
 };

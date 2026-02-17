@@ -8,9 +8,9 @@ const create: BuiltinHandler = (args) => {
   if (typeof input === "object" && input !== null) {
     const obj = input as { columns?: string[]; rows?: unknown[][] };
     if (obj.columns && obj.rows) {
-      return obj.rows.map((row) => {
+      return obj.rows.map((row: any) => {
         const r: Row = {};
-        obj.columns!.forEach((col, i) => { r[col] = row[i]; });
+        obj.columns!.forEach((col: any, i: any) => { r[col] = row[i]; });
         return r;
       });
     }
@@ -21,7 +21,7 @@ const create: BuiltinHandler = (args) => {
 const select: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const columns = (args[1] ?? []) as string[];
-  return table.map((row) => {
+  return table.map((row: any) => {
     const r: Row = {};
     for (const col of columns) r[col] = row[col];
     return r;
@@ -34,7 +34,7 @@ const where: BuiltinHandler = (args) => {
   const operator = String(args[2] ?? "eq");
   const value = args[3];
 
-  return table.filter((row) => {
+  return table.filter((row: any) => {
     const v = row[field];
     switch (operator) {
       case "eq": return v === value;
@@ -60,7 +60,7 @@ const orderBy: BuiltinHandler = (args) => {
   const field = String(args[1] ?? "");
   const direction = String(args[2] ?? "asc").toLowerCase();
   const mult = direction === "desc" ? -1 : 1;
-  return table.sort((a, b) => {
+  return table.sort((a: any, b: any) => {
     const va = a[field], vb = b[field];
     if (va === vb) return 0;
     if (va === null || va === undefined) return 1;
@@ -95,8 +95,8 @@ const aggregate: BuiltinHandler = (args) => {
   return Object.entries(groups).map(([key, rows]) => {
     const result: Row = { [groupField]: key };
     for (const agg of aggregations) {
-      const vals = rows.map((r) => r[agg.field]).filter((v) => v !== null && v !== undefined);
-      const nums = vals.map(Number).filter((n) => !isNaN(n));
+      const vals = rows.map((r: any) => r[agg.field]).filter((v: any) => v !== null && v !== undefined);
+      const nums = vals.map(Number).filter((n: any) => !isNaN(n));
       switch (agg.op) {
         case "sum": result[`${agg.field}_sum`] = nums.reduce((a, b) => a + b, 0); break;
         case "avg": result[`${agg.field}_avg`] = nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0; break;
@@ -152,8 +152,8 @@ const distinct: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const columns = args[1] as string[] | undefined;
   const seen = new Set<string>();
-  return table.filter((row) => {
-    const key = columns ? columns.map((c) => JSON.stringify(row[c])).join("|") : JSON.stringify(row);
+  return table.filter((row: any) => {
+    const key = columns ? columns.map((c: any) => JSON.stringify(row[c])).join("|") : JSON.stringify(row);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -174,13 +174,13 @@ const addColumn: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const colName = String(args[1] ?? "");
   const defaultValue = args[2];
-  return table.map((row) => ({ ...row, [colName]: defaultValue }));
+  return table.map((row: any) => ({ ...row, [colName]: defaultValue }));
 };
 
 const removeColumn: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const cols = Array.isArray(args[1]) ? args[1].map(String) : [String(args[1] ?? "")];
-  return table.map((row) => {
+  return table.map((row: any) => {
     const r = { ...row };
     for (const c of cols) delete r[c];
     return r;
@@ -191,7 +191,7 @@ const renameColumn: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const oldName = String(args[1] ?? "");
   const newName = String(args[2] ?? "");
-  return table.map((row) => {
+  return table.map((row: any) => {
     const r: Row = {};
     for (const [k, v] of Object.entries(row)) r[k === oldName ? newName : k] = v;
     return r;
@@ -218,7 +218,7 @@ const pivot: BuiltinHandler = (args) => {
   return [...groups.entries()].map(([rk, cols]) => {
     const r: Row = { [rowField]: rk };
     for (const [ck, vals] of cols) {
-      const nums = vals.map(Number).filter((n) => !isNaN(n));
+      const nums = vals.map(Number).filter((n: any) => !isNaN(n));
       switch (aggOp) {
         case "sum": r[ck] = nums.reduce((a, b) => a + b, 0); break;
         case "count": r[ck] = vals.length; break;
@@ -266,14 +266,14 @@ const avg: BuiltinHandler = (args) => {
 const min: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const field = String(args[1] ?? "");
-  const vals = table.map((r) => Number(r[field])).filter((n) => !isNaN(n));
+  const vals = table.map((r: any) => Number(r[field])).filter((n: any) => !isNaN(n));
   return vals.length ? Math.min(...vals) : null;
 };
 
 const max: BuiltinHandler = (args) => {
   const table = (args[0] ?? []) as Row[];
   const field = String(args[1] ?? "");
-  const vals = table.map((r) => Number(r[field])).filter((n) => !isNaN(n));
+  const vals = table.map((r: any) => Number(r[field])).filter((n: any) => !isNaN(n));
   return vals.length ? Math.max(...vals) : null;
 };
 
@@ -305,7 +305,7 @@ export const TableFunctions: Record<string, BuiltinHandler> = {
   count, sum, avg, min, max, head, tail, columns, shape,
 };
 
-export const TableFunctionMetadata: Record<string, FunctionMetadata> = {
+export const TableFunctionMetadata = {
   create: { description: "Create a table from array of objects or columns+rows", parameters: [{ name: "data", dataType: "object", description: "Array of objects or {columns, rows}", formInputType: "text", required: true }], returnType: "array", returnDescription: "Array of row objects", example: 'table.create [{"name": "Alice", "age": 30}]' },
   select: { description: "Select specific columns", parameters: [{ name: "table", dataType: "array", description: "Table data", formInputType: "text", required: true }, { name: "columns", dataType: "array", description: "Column names to keep", formInputType: "text", required: true }], returnType: "array", returnDescription: "Table with selected columns", example: 'table.select $data ["name", "age"]' },
   where: { description: "Filter rows by condition", parameters: [{ name: "table", dataType: "array", description: "Table data", formInputType: "text", required: true }, { name: "field", dataType: "string", description: "Column name", formInputType: "text", required: true }, { name: "operator", dataType: "string", description: "eq|neq|gt|lt|gte|lte|contains|startsWith|endsWith|in|notIn|isNull|notNull", formInputType: "text", required: true }, { name: "value", dataType: "any", description: "Comparison value", formInputType: "text", required: false }], returnType: "array", returnDescription: "Filtered rows", example: 'table.where $data "age" "gt" 25' },
@@ -332,7 +332,7 @@ export const TableFunctionMetadata: Record<string, FunctionMetadata> = {
   shape: { description: "Get row and column counts", parameters: [{ name: "table", dataType: "array", description: "Table data", formInputType: "text", required: true }], returnType: "object", returnDescription: "{rows, columns}", example: 'table.shape $data' },
 };
 
-export const TableModuleMetadata: ModuleMetadata = {
+export const TableModuleMetadata = {
   description: "Tabular data operations: filter, sort, join, group, aggregate, pivot — like a lightweight DataFrame",
   methods: ["create", "select", "where", "orderBy", "groupBy", "aggregate", "join", "distinct", "limit", "offset", "addColumn", "removeColumn", "renameColumn", "pivot", "unpivot", "count", "sum", "avg", "min", "max", "head", "tail", "columns", "shape"],
 };

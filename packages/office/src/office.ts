@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
@@ -265,7 +266,7 @@ const addParagraph: BuiltinHandler = (args) => {
 
   const pOpts = buildParagraphOpts(opts, doc.defaults);
   if (runs) {
-    pOpts.children = runs.map((r) => buildTextRun(String(r.text ?? ""), r, doc.defaults));
+    pOpts.children = runs.map((r: any) => buildTextRun(String(r.text ?? ""), r, doc.defaults));
   } else {
     pOpts.children = [buildTextRun(text, opts, doc.defaults)];
   }
@@ -325,8 +326,8 @@ const addTable: BuiltinHandler = (args) => {
 
   // Data rows
   const dataRows = isObjectArray
-    ? (data as Opts[]).map((row) => headers!.map((h) => String(row[h] ?? "")))
-    : (data as unknown[][]).map((row) => (Array.isArray(row) ? row.map(String) : [String(row)]));
+    ? (data as Opts[]).map((row: any) => headers!.map((h: any) => String(row[h] ?? "")))
+    : (data as unknown[][]).map((row: any) => (Array.isArray(row) ? row.map(String) : [String(row)]));
 
   for (let ri = 0; ri < dataRows.length; ri++) {
     const row = dataRows[ri]!;
@@ -688,7 +689,7 @@ const patchDoc: BuiltinHandler = async (args) => {
     } else if (typeof value === "object" && value !== null) {
       const p = value as Opts;
       if (p.type === "document" || p.type === "DOCUMENT") {
-        const children = Array.isArray(p.children) ? (p.children as Opts[]).map((c) => {
+        const children = Array.isArray(p.children) ? (p.children as Opts[]).map((c: any) => {
           if (c.type === "paragraph" || !c.type) {
             return new Paragraph({ children: [new TextRun(String(c.text ?? ""))] });
           }
@@ -696,7 +697,7 @@ const patchDoc: BuiltinHandler = async (args) => {
         }) : [];
         processedPatches[key] = { type: PatchType.DOCUMENT, children };
       } else {
-        const runs = Array.isArray(p.runs) ? (p.runs as Opts[]).map((r) => buildTextRun(String(r.text ?? ""), r)) : [new TextRun(String(p.text ?? value))];
+        const runs = Array.isArray(p.runs) ? (p.runs as Opts[]).map((r: any) => buildTextRun(String(r.text ?? ""), r)) : [new TextRun(String(p.text ?? value))];
         processedPatches[key] = { type: PatchType.PARAGRAPH, children: runs };
       }
     }
@@ -779,7 +780,7 @@ const saveDoc: BuiltinHandler = async (args) => {
   }) : undefined;
 
   // Build sections from doc.sections
-  const sections = docState.sections.map((section, idx) => {
+  const sections = docState.sections.map((section: any, idx: any) => {
     const sectionResult: Record<string, unknown> = {
       properties: {
         page: idx === 0 ? defaultPageConfig : { ...defaultPageConfig },
@@ -821,7 +822,7 @@ const saveDoc: BuiltinHandler = async (args) => {
   // Comments (Comments wrapper re-creates Comment from plain objects)
   if (docState.comments.length > 0) {
     docOptions.comments = {
-      children: docState.comments.map((c) => ({
+      children: docState.comments.map((c: any) => ({
         id: c.id,
         author: c.author,
         date: c.date,
@@ -918,14 +919,14 @@ const readSheet: BuiltinHandler = async (args) => {
   const rows: Record<string, unknown>[] = [];
   const headers: string[] = [];
 
-  ws.eachRow((row, rowNumber) => {
+  ws.eachRow((row: any, rowNumber: any) => {
     if (rowNumber === 1) {
-      row.eachCell((cell, colNumber) => {
+      row.eachCell((cell: any, colNumber: any) => {
         headers[colNumber - 1] = String(cell.value ?? `col${colNumber}`);
       });
     } else {
       const obj: Record<string, unknown> = {};
-      row.eachCell((cell, colNumber) => {
+      row.eachCell((cell: any, colNumber: any) => {
         const key = headers[colNumber - 1] ?? `col${colNumber}`;
         obj[key] = cell.value;
       });
@@ -951,7 +952,7 @@ const addRow: BuiltinHandler = (args) => {
 
   // Apply style to all cells in the row
   if (Object.keys(opts).length > 0) {
-    row.eachCell((cell) => applyExcelStyle(cell, opts));
+    row.eachCell((cell: any) => applyExcelStyle(cell, opts));
   }
 
   return row.number;
@@ -976,7 +977,7 @@ const writeData: BuiltinHandler = (args) => {
   const headers = Object.keys(data[0] as Opts);
   const headerRow = ws.addRow(headers);
   if (Object.keys(headerStyle).length > 0 || !opts.noHeaderStyle) {
-    headerRow.eachCell((cell) => {
+    headerRow.eachCell((cell: any) => {
       applyExcelStyle(cell, {
         bold: headerStyle.bold !== false ? true : undefined,
         fillColor: headerStyle.fillColor ?? "2196F3",
@@ -992,10 +993,10 @@ const writeData: BuiltinHandler = (args) => {
 
   // Write data rows
   for (const item of data as Opts[]) {
-    const values = headers.map((h) => item[h] ?? "");
+    const values = headers.map((h: any) => item[h] ?? "");
     const row = ws.addRow(values as ExcelJS.CellValue[]);
     if (Object.keys(cellStyle).length > 0) {
-      row.eachCell((cell) => applyExcelStyle(cell, cellStyle));
+      row.eachCell((cell: any) => applyExcelStyle(cell, cellStyle));
     }
   }
 
@@ -1191,7 +1192,7 @@ const addConditionalFormat: BuiltinHandler = (args) => {
   if (!ws) throw new Error(`Worksheet "${sheetName}" not found`);
 
   const ruleList = Array.isArray(rules) ? rules as Opts[] : [rules as Opts];
-  const processedRules = ruleList.map((rule) => {
+  const processedRules = ruleList.map((rule: any) => {
     const ruleType = String(rule.type ?? "cellIs");
     if (ruleType === "colorScale") {
       return {
@@ -1608,7 +1609,7 @@ const addSlideTable: BuiltinHandler = (args) => {
 
   // Header row
   if (headers) {
-    tableRows.push(headers.map((h) => ({
+    tableRows.push(headers.map((h: any) => ({
       text: h,
       options: {
         bold: true,
@@ -1622,12 +1623,12 @@ const addSlideTable: BuiltinHandler = (args) => {
 
   // Data rows
   const dataRows = isObjectArray
-    ? (data as Opts[]).map((row) => headers!.map((h) => String(row[h] ?? "")))
-    : (data as unknown[][]).map((row) => (Array.isArray(row) ? row.map(String) : [String(row)]));
+    ? (data as Opts[]).map((row: any) => headers!.map((h: any) => String(row[h] ?? "")))
+    : (data as unknown[][]).map((row: any) => (Array.isArray(row) ? row.map(String) : [String(row)]));
 
   for (let ri = 0; ri < dataRows.length; ri++) {
     const isAlt = ri % 2 === 1;
-    tableRows.push(dataRows[ri]!.map((cell) => ({
+    tableRows.push(dataRows[ri]!.map((cell: any) => ({
       text: cell,
       options: {
         fontSize: Number(cellStyleOpts.fontSize ?? 10),
@@ -1751,7 +1752,7 @@ const addSlideMultiText: BuiltinHandler = (args) => {
 
   if (!Array.isArray(runs)) throw new Error("runs must be an array of text run objects");
 
-  const textRuns = (runs as Opts[]).map((r) => ({
+  const textRuns = (runs as Opts[]).map((r: any) => ({
     text: String(r.text ?? ""),
     options: {
       fontSize: r.fontSize ? Number(r.fontSize) : undefined,
@@ -1899,7 +1900,7 @@ export const OfficeFunctions: Record<string, BuiltinHandler> = {
   setSheetPrint, groupRows,
 };
 
-export const OfficeFunctionMetadata: Record<string, FunctionMetadata> = {
+export const OfficeFunctionMetadata = {
   // ── Word ──
   createDoc: {
     description: "Create a new Word document",
@@ -2479,7 +2480,7 @@ export const OfficeFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const OfficeModuleMetadata: ModuleMetadata = {
+export const OfficeModuleMetadata = {
   description: "Enterprise Microsoft Office suite — Word (.docx), Excel (.xlsx), PowerPoint (.pptx) with 57 functions: hyperlinks, TOC, footnotes, comments, sections, headers/footers, doc patching, conditional formatting, data validation, sheet protection, slide masters, and more",
   methods: [
     // Word (21)

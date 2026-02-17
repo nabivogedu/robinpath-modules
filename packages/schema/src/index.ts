@@ -4,10 +4,10 @@ import { SchemaFunctions, SchemaFunctionMetadata, SchemaModuleMetadata } from ".
 const SchemaModule: ModuleAdapter = {
   name: "schema",
   functions: SchemaFunctions,
-  functionMetadata: SchemaFunctionMetadata,
-  moduleMetadata: SchemaModuleMetadata,
+  functionMetadata: SchemaFunctionMetadata as any,
+  moduleMetadata: SchemaModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default SchemaModule;
 export { SchemaModule };

@@ -4,10 +4,10 @@ import { WorkflowFunctions, WorkflowFunctionMetadata, WorkflowModuleMetadata } f
 const WorkflowModule: ModuleAdapter = {
   name: "workflow",
   functions: WorkflowFunctions,
-  functionMetadata: WorkflowFunctionMetadata,
-  moduleMetadata: WorkflowModuleMetadata,
+  functionMetadata: WorkflowFunctionMetadata as any,
+  moduleMetadata: WorkflowModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default WorkflowModule;
 export { WorkflowModule };

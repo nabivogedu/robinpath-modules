@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Internal State ──────────────────────────────────────────────────
 
@@ -116,18 +116,18 @@ const listTypes: BuiltinHandler = async (args) => {
   const clientName = String(args[0] ?? "default");
   const result = await introspect([clientName]) as { __schema: { types: { name: string; kind: string; description?: string }[] } };
   return result.__schema.types
-    .filter((t) => !t.name.startsWith("__"))
-    .map((t) => ({ name: t.name, kind: t.kind, description: t.description }));
+    .filter((t: any) => !t.name.startsWith("__"))
+    .map((t: any) => ({ name: t.name, kind: t.kind, description: t.description }));
 };
 
 const buildQuery: BuiltinHandler = (args) => {
   const type = String(args[0] ?? "query");
   const name = String(args[1] ?? "");
-  const fields = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s) => s.trim());
+  const fields = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s: any) => s.trim());
   const variables = (typeof args[3] === "object" && args[3] !== null ? args[3] : {}) as Record<string, string>;
 
   const varDefs = Object.entries(variables).map(([k, v]) => `$${k}: ${v}`).join(", ");
-  const varArgs = Object.keys(variables).map((k) => `${k}: $${k}`).join(", ");
+  const varArgs = Object.keys(variables).map((k: any) => `${k}: $${k}`).join(", ");
 
   let q = type;
   if (name) {
@@ -171,7 +171,7 @@ export const GraphqlFunctions: Record<string, BuiltinHandler> = {
   create, query, mutate, rawRequest, introspect, listTypes, buildQuery, batchQuery, destroy,
 };
 
-export const GraphqlFunctionMetadata: Record<string, FunctionMetadata> = {
+export const GraphqlFunctionMetadata = {
   create: { description: "Create a named GraphQL client", parameters: [{ name: "name", dataType: "string", description: "Client name", formInputType: "text", required: true }, { name: "endpoint", dataType: "string", description: "GraphQL endpoint URL", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{token, apiKey, headers}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{name, endpoint}", example: 'graphql.create "github" "https://api.github.com/graphql" {"token": $ghToken}' },
   query: { description: "Execute a GraphQL query", parameters: [{ name: "client", dataType: "string", description: "Client name", formInputType: "text", required: true }, { name: "query", dataType: "string", description: "GraphQL query string", formInputType: "text", required: true }, { name: "variables", dataType: "object", description: "Query variables", formInputType: "text", required: false }, { name: "options", dataType: "object", description: "{operationName, ignoreErrors, raw, headers}", formInputType: "text", required: false }], returnType: "object", returnDescription: "Query data", example: 'graphql.query "github" "{ viewer { login name } }"' },
   mutate: { description: "Execute a GraphQL mutation", parameters: [{ name: "client", dataType: "string", description: "Client name", formInputType: "text", required: true }, { name: "mutation", dataType: "string", description: "GraphQL mutation string", formInputType: "text", required: true }, { name: "variables", dataType: "object", description: "Mutation variables", formInputType: "text", required: false }], returnType: "object", returnDescription: "Mutation result", example: 'graphql.mutate "api" "mutation { createUser(name: $name) { id } }" {"name": "Alice"}' },
@@ -183,7 +183,7 @@ export const GraphqlFunctionMetadata: Record<string, FunctionMetadata> = {
   destroy: { description: "Remove a GraphQL client", parameters: [{ name: "client", dataType: "string", description: "Client name", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if removed", example: 'graphql.destroy "github"' },
 };
 
-export const GraphqlModuleMetadata: ModuleMetadata = {
+export const GraphqlModuleMetadata = {
   description: "GraphQL client with queries, mutations, variables, introspection, batch requests, and query builder",
   methods: ["create", "query", "mutate", "rawRequest", "introspect", "listTypes", "buildQuery", "batchQuery", "destroy"],
 };

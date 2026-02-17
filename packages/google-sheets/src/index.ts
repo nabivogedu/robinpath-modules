@@ -4,10 +4,10 @@ import { GoogleSheetsFunctions, GoogleSheetsFunctionMetadata, GoogleSheetsModule
 const GoogleSheetsModule: ModuleAdapter = {
   name: "googleSheets",
   functions: GoogleSheetsFunctions,
-  functionMetadata: GoogleSheetsFunctionMetadata,
-  moduleMetadata: GoogleSheetsModuleMetadata,
+  functionMetadata: GoogleSheetsFunctionMetadata as any,
+  moduleMetadata: GoogleSheetsModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default GoogleSheetsModule;
 export { GoogleSheetsModule };

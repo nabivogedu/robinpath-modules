@@ -4,10 +4,10 @@ import { DotenvFunctions, DotenvFunctionMetadata, DotenvModuleMetadata } from ".
 const DotenvModule: ModuleAdapter = {
   name: "dotenv",
   functions: DotenvFunctions,
-  functionMetadata: DotenvFunctionMetadata,
-  moduleMetadata: DotenvModuleMetadata,
+  functionMetadata: DotenvFunctionMetadata as any,
+  moduleMetadata: DotenvModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default DotenvModule;
 export { DotenvModule };

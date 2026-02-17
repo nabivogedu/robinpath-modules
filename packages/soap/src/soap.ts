@@ -8,7 +8,7 @@ function jsToXml(value: unknown, tag?: string): string {
   if (value === null || value === undefined) return tag ? `<${tag} xsi:nil="true"/>` : "";
   if (typeof value === "boolean" || typeof value === "number") return tag ? `<${tag}>${value}</${tag}>` : String(value);
   if (typeof value === "string") return tag ? `<${tag}>${escapeXml(value)}</${tag}>` : escapeXml(value);
-  if (Array.isArray(value)) return value.map((v) => jsToXml(v, tag)).join("");
+  if (Array.isArray(value)) return value.map((v: any) => jsToXml(v, tag)).join("");
   if (typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>);
     const inner = entries.map(([k, v]) => jsToXml(v, k)).join("");
@@ -17,7 +17,7 @@ function jsToXml(value: unknown, tag?: string): string {
   return tag ? `<${tag}>${String(value)}</${tag}>` : String(value);
 }
 
-function xmlToJs(xml: string): unknown {
+function xmlToJs(xml: string): any {
   const trimmed = xml.trim();
   if (!trimmed.startsWith("<")) return trimmed;
   const results: Record<string, unknown> = {};
@@ -99,7 +99,7 @@ const buildXmlRpc: BuiltinHandler = (args) => {
   return `<?xml version="1.0"?><methodCall><methodName>${escapeXml(method)}</methodName><params>${paramXml}</params></methodCall>`;
 };
 
-function parseXmlRpcValue(xml: string): unknown {
+function parseXmlRpcValue(xml: string): any {
   const trimmed = xml.trim();
   const intM = trimmed.match(/<(?:int|i4)>(.*?)<\/(?:int|i4)>/); if (intM) return parseInt(intM[1]!, 10);
   const dblM = trimmed.match(/<double>(.*?)<\/double>/); if (dblM) return parseFloat(dblM[1]!);
@@ -189,7 +189,7 @@ const getFault: BuiltinHandler = (args) => {
 
 export const SoapFunctions: Record<string, BuiltinHandler> = { call, buildEnvelope, parseEnvelope, xmlRpc, buildXmlRpc, parseXmlRpc, wsdl, fault, getFault };
 
-export const SoapFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SoapFunctionMetadata = {
   call: { description: "Call a SOAP web service", parameters: [{ name: "url", dataType: "string", description: "Service URL", formInputType: "text", required: true }, { name: "method", dataType: "string", description: "Method name", formInputType: "text", required: true }, { name: "params", dataType: "object", description: "Parameters", formInputType: "text", required: false }, { name: "options", dataType: "object", description: "{namespace, soapAction, headers, timeout}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{status, ok, fault, result, raw}", example: 'soap.call "http://example.com/ws" "GetUser" {"id": 1} {"namespace": "http://example.com"}' },
   buildEnvelope: { description: "Build SOAP XML envelope", parameters: [{ name: "method", dataType: "string", description: "Method name", formInputType: "text", required: true }, { name: "params", dataType: "object", description: "Parameters", formInputType: "text", required: false }, { name: "namespace", dataType: "string", description: "XML namespace", formInputType: "text", required: false }], returnType: "string", returnDescription: "SOAP XML", example: 'soap.buildEnvelope "GetUser" {"id": 1}' },
   parseEnvelope: { description: "Parse SOAP XML response", parameters: [{ name: "xml", dataType: "string", description: "SOAP XML", formInputType: "text", required: true }], returnType: "object", returnDescription: "{fault, result}", example: 'soap.parseEnvelope $xml' },
@@ -201,7 +201,7 @@ export const SoapFunctionMetadata: Record<string, FunctionMetadata> = {
   getFault: { description: "Extract fault from SOAP XML", parameters: [{ name: "xml", dataType: "string", description: "SOAP XML", formInputType: "text", required: true }], returnType: "object", returnDescription: "{code, message, detail} or null", example: 'soap.getFault $xml' },
 };
 
-export const SoapModuleMetadata: ModuleMetadata = {
+export const SoapModuleMetadata = {
   description: "SOAP web service client, XML-RPC support, WSDL parsing, and envelope building",
   methods: ["call", "buildEnvelope", "parseEnvelope", "xmlRpc", "buildXmlRpc", "parseXmlRpc", "wsdl", "fault", "getFault"],
 };

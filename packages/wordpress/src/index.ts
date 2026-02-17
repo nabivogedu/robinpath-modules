@@ -4,10 +4,10 @@ import { WordpressFunctions, WordpressFunctionMetadata, WordpressModuleMetadata 
 const WordpressModule: ModuleAdapter = {
   name: "wordpress",
   functions: WordpressFunctions,
-  functionMetadata: WordpressFunctionMetadata,
-  moduleMetadata: WordpressModuleMetadata,
+  functionMetadata: WordpressFunctionMetadata as any,
+  moduleMetadata: WordpressModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default WordpressModule;
 export { WordpressModule };

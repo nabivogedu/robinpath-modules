@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const countryData: Record<string, { code: string; dialCode: string; name: string; format: string; lengths: number[] }> = {
   US: { code: "US", dialCode: "1", name: "United States", format: "(XXX) XXX-XXXX", lengths: [10] },
@@ -126,7 +126,7 @@ const compare: BuiltinHandler = (args) => {
 
 export const PhoneFunctions: Record<string, BuiltinHandler> = { parse, format, formatE164, formatInternational, validate, getCountry, getType, normalize, mask, dialCode, countryInfo, listCountries, compare };
 
-export const PhoneFunctionMetadata: Record<string, FunctionMetadata> = {
+export const PhoneFunctionMetadata = {
   parse: { description: "Parse phone number", parameters: [{ name: "phone", dataType: "string", description: "Phone number", formInputType: "text", required: true }, { name: "country", dataType: "string", description: "Default country code", formInputType: "text", required: false }], returnType: "object", returnDescription: "{countryCode, dialCode, nationalNumber, e164, isValid}", example: 'phone.parse "+15551234567"' },
   format: { description: "Format phone in national format", parameters: [{ name: "phone", dataType: "string", description: "Phone", formInputType: "text", required: true }, { name: "country", dataType: "string", description: "Country code", formInputType: "text", required: false }], returnType: "string", returnDescription: "Formatted string", example: 'phone.format "5551234567" "US"' },
   formatE164: { description: "Format to E.164", parameters: [{ name: "phone", dataType: "string", description: "Phone", formInputType: "text", required: true }, { name: "country", dataType: "string", description: "Country code", formInputType: "text", required: false }], returnType: "string", returnDescription: "E.164 string", example: 'phone.formatE164 "5551234567"' },
@@ -142,7 +142,7 @@ export const PhoneFunctionMetadata: Record<string, FunctionMetadata> = {
   compare: { description: "Compare two phone numbers", parameters: [{ name: "phone1", dataType: "string", description: "First phone", formInputType: "text", required: true }, { name: "phone2", dataType: "string", description: "Second phone", formInputType: "text", required: true }, { name: "country", dataType: "string", description: "Default country", formInputType: "text", required: false }], returnType: "boolean", returnDescription: "true if same", example: 'phone.compare "(555) 123-4567" "+15551234567"' },
 };
 
-export const PhoneModuleMetadata: ModuleMetadata = {
+export const PhoneModuleMetadata = {
   description: "Phone number parsing, formatting, validation, country detection, and comparison",
   methods: ["parse", "format", "formatE164", "formatInternational", "validate", "getCountry", "getType", "normalize", "mask", "dialCode", "countryInfo", "listCountries", "compare"],
 };

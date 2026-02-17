@@ -165,7 +165,7 @@ export const CacheFunctions: Record<string, BuiltinHandler> = {
   deleteMany,
 };
 
-export const CacheFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CacheFunctionMetadata = {
   set: {
     description: "Store a value in the cache with an optional TTL",
     parameters: [
@@ -344,7 +344,7 @@ export const CacheFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const CacheModuleMetadata: ModuleMetadata = {
+export const CacheModuleMetadata = {
   description: "In-memory key-value cache with optional TTL expiration for temporary data storage",
   methods: [
     "set",

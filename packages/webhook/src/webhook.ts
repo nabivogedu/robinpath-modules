@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // ── Function Handlers ───────────────────────────────────────────────
@@ -179,7 +179,7 @@ export const WebhookFunctions: Record<string, BuiltinHandler> = {
   send, sign, verify, verifyTimestamp, parsePayload, buildPayload, headers, isValidUrl,
 };
 
-export const WebhookFunctionMetadata: Record<string, FunctionMetadata> = {
+export const WebhookFunctionMetadata = {
   send: {
     description: "Send a webhook POST request with optional HMAC signature",
     parameters: [
@@ -251,7 +251,7 @@ export const WebhookFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const WebhookModuleMetadata: ModuleMetadata = {
+export const WebhookModuleMetadata = {
   description: "Send webhooks with HMAC signatures, verify incoming webhook payloads, and prevent replay attacks",
   methods: ["send", "sign", "verify", "verifyTimestamp", "parsePayload", "buildPayload", "headers", "isValidUrl"],
 };

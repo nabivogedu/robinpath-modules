@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Internal State ──────────────────────────────────────────────────
 
@@ -149,7 +149,7 @@ const summarize: BuiltinHandler = async (args) => {
 const extract: BuiltinHandler = async (args) => {
   const providerName = String(args[0] ?? "default");
   const text = String(args[1] ?? "");
-  const fields = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s) => s.trim());
+  const fields = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s: any) => s.trim());
   const opts = (typeof args[3] === "object" && args[3] !== null ? args[3] : {}) as Record<string, unknown>;
 
   const prompt = `Extract the following fields from the text below and return ONLY a valid JSON object with these keys: ${fields.join(", ")}.\n\nText:\n${text}\n\nJSON:`;
@@ -166,7 +166,7 @@ const extract: BuiltinHandler = async (args) => {
 const classify: BuiltinHandler = async (args) => {
   const providerName = String(args[0] ?? "default");
   const text = String(args[1] ?? "");
-  const categories = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s) => s.trim());
+  const categories = Array.isArray(args[2]) ? args[2] : String(args[2] ?? "").split(",").map((s: any) => s.trim());
   const opts = (typeof args[3] === "object" && args[3] !== null ? args[3] : {}) as Record<string, unknown>;
 
   const prompt = `Classify the following text into exactly one of these categories: ${categories.join(", ")}.\n\nText: ${text}\n\nRespond with ONLY the category name, nothing else.`;
@@ -239,7 +239,7 @@ const embedding: BuiltinHandler = async (args) => {
   const data = await response.json() as Record<string, unknown>;
   if (!response.ok) throw new Error(`Embeddings error: ${JSON.stringify(data.error ?? data)}`);
 
-  const embeddings = (data.data as { embedding: number[]; index: number }[])?.map((d) => d.embedding) ?? [];
+  const embeddings = (data.data as { embedding: number[]; index: number }[])?.map((d: any) => d.embedding) ?? [];
   return texts.length === 1 ? embeddings[0] : embeddings;
 };
 
@@ -249,7 +249,7 @@ export const AiFunctions: Record<string, BuiltinHandler> = {
   configure, chat, complete, summarize, extract, classify, translate, sentiment, generateJson, embedding,
 };
 
-export const AiFunctionMetadata: Record<string, FunctionMetadata> = {
+export const AiFunctionMetadata = {
   configure: { description: "Configure an AI provider (OpenAI, Anthropic, or custom)", parameters: [{ name: "name", dataType: "string", description: "Provider name", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{provider, apiKey, baseUrl, model, maxTokens}", formInputType: "text", required: true }], returnType: "object", returnDescription: "{name, provider, model}", example: 'ai.configure "openai" {"provider": "openai", "apiKey": $key}' },
   chat: { description: "Send a chat message and get a response", parameters: [{ name: "provider", dataType: "string", description: "Provider name", formInputType: "text", required: true }, { name: "messages", dataType: "any", description: "String or array of {role, content}", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{model, maxTokens, temperature, system}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{content, role, model, usage}", example: 'ai.chat "openai" "Explain quantum computing" {"system": "You are a teacher"}' },
   complete: { description: "Get a simple text completion (returns just the text)", parameters: [{ name: "provider", dataType: "string", description: "Provider name", formInputType: "text", required: true }, { name: "prompt", dataType: "string", description: "Prompt text", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{model, maxTokens, temperature}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Generated text", example: 'ai.complete "openai" "Write a haiku about automation"' },
@@ -262,7 +262,7 @@ export const AiFunctionMetadata: Record<string, FunctionMetadata> = {
   embedding: { description: "Generate text embeddings (OpenAI only)", parameters: [{ name: "provider", dataType: "string", description: "Provider name", formInputType: "text", required: true }, { name: "input", dataType: "any", description: "String or array of strings", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{model}", formInputType: "text", required: false }], returnType: "array", returnDescription: "Embedding vector(s)", example: 'ai.embedding "openai" "Hello world"' },
 };
 
-export const AiModuleMetadata: ModuleMetadata = {
+export const AiModuleMetadata = {
   description: "LLM integration: chat, complete, summarize, extract, classify, translate, sentiment analysis, and embeddings",
   methods: ["configure", "chat", "complete", "summarize", "extract", "classify", "translate", "sentiment", "generateJson", "embedding"],
 };

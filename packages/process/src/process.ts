@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { spawn as nodeSpawn, exec as execCb, type ChildProcess } from "node:child_process";
 import { promisify } from "node:util";
 
@@ -119,7 +119,7 @@ export const ProcessFunctions: Record<string, BuiltinHandler> = {
   run, exec, spawn: spawnProcess, kill, isAlive, list, signal, pid, uptime, memoryUsage, cpuUsage, cwd, argv, env, exit,
 };
 
-export const ProcessFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ProcessFunctionMetadata = {
   run: { description: "Run command and wait for result", parameters: [{ name: "command", dataType: "string", description: "Shell command", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{cwd, env, timeout, shell}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{stdout, stderr, code}", example: 'process.run "ls -la"' },
   exec: { description: "Execute command in shell", parameters: [{ name: "command", dataType: "string", description: "Shell command", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{cwd, env, timeout, maxBuffer}", formInputType: "text", required: false }], returnType: "object", returnDescription: "{stdout, stderr}", example: 'process.exec "echo hello"' },
   spawn: { description: "Spawn long-running process", parameters: [{ name: "id", dataType: "string", description: "Process identifier", formInputType: "text", required: true }, { name: "command", dataType: "string", description: "Command to run", formInputType: "text", required: true }, { name: "args", dataType: "array", description: "Command arguments", formInputType: "text", required: false }, { name: "options", dataType: "object", description: "{cwd, env, shell, detached}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Process id", example: 'process.spawn "server" "node" ["app.js"]' },
@@ -137,7 +137,7 @@ export const ProcessFunctionMetadata: Record<string, FunctionMetadata> = {
   exit: { description: "Request process exit (safe, does not actually exit)", parameters: [{ name: "code", dataType: "number", description: "Exit code (default 0)", formInputType: "text", required: false }], returnType: "object", returnDescription: "{exitCode, note}", example: "process.exit 0" },
 };
 
-export const ProcessModuleMetadata: ModuleMetadata = {
+export const ProcessModuleMetadata = {
   description: "Child process management: run commands, spawn long-running processes, get system info",
   methods: ["run", "exec", "spawn", "kill", "isAlive", "list", "signal", "pid", "uptime", "memoryUsage", "cpuUsage", "cwd", "argv", "env", "exit"],
 };

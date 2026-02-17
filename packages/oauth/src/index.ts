@@ -4,10 +4,10 @@ import { OauthFunctions, OauthFunctionMetadata, OauthModuleMetadata } from "./oa
 const OauthModule: ModuleAdapter = {
   name: "oauth",
   functions: OauthFunctions,
-  functionMetadata: OauthFunctionMetadata,
-  moduleMetadata: OauthModuleMetadata,
+  functionMetadata: OauthFunctionMetadata as any,
+  moduleMetadata: OauthModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default OauthModule;
 export { OauthModule };

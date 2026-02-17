@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // -- RobinPath Function Handlers ----------------------------------------
 
@@ -21,7 +21,7 @@ const isIP: BuiltinHandler = (args) => {
   const value = String(args[0] ?? "");
   const parts = value.split(".");
   if (parts.length !== 4) return false;
-  return parts.every((part) => {
+  return parts.every((part: any) => {
     if (!/^\d{1,3}$/.test(part)) return false;
     const num = Number(part);
     return num >= 0 && num <= 255;
@@ -121,7 +121,7 @@ export const ValidateFunctions: Record<string, BuiltinHandler> = {
   isEmpty,
 };
 
-export const ValidateFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ValidateFunctionMetadata = {
   isEmail: {
     description: "Validate email format",
     parameters: [
@@ -376,7 +376,7 @@ export const ValidateFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const ValidateModuleMetadata: ModuleMetadata = {
+export const ValidateModuleMetadata = {
   description: "Validate strings, numbers, and data formats (email, URL, IP, UUID, JSON, etc.)",
   methods: [
     "isEmail",

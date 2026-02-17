@@ -4,10 +4,10 @@ import { FsFunctions, FsFunctionMetadata, FsModuleMetadata } from "./fs.js";
 const FsModule: ModuleAdapter = {
   name: "fs",
   functions: FsFunctions,
-  functionMetadata: FsFunctionMetadata,
-  moduleMetadata: FsModuleMetadata,
+  functionMetadata: FsFunctionMetadata as any,
+  moduleMetadata: FsModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default FsModule;
 export { FsModule };

@@ -4,10 +4,10 @@ import { GlobFunctions, GlobFunctionMetadata, GlobModuleMetadata } from "./glob.
 const GlobModule: ModuleAdapter = {
   name: "glob",
   functions: GlobFunctions,
-  functionMetadata: GlobFunctionMetadata,
-  moduleMetadata: GlobModuleMetadata,
+  functionMetadata: GlobFunctionMetadata as any,
+  moduleMetadata: GlobModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default GlobModule;
 export { GlobModule };

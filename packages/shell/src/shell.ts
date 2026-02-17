@@ -97,7 +97,7 @@ export const ShellFunctions: Record<string, BuiltinHandler> = {
   uptime,
 };
 
-export const ShellFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ShellFunctionMetadata = {
   exec: {
     description: "Execute a command string in the system shell and return stdout, stderr, and exitCode",
     parameters: [
@@ -191,7 +191,7 @@ export const ShellFunctionMetadata: Record<string, FunctionMetadata> = {
         defaultValue: 0,
       },
     ],
-    returnType: "void",
+    returnType: "string",
     returnDescription: "Does not return; the process exits immediately",
     example: "shell.exit 0",
   },
@@ -218,7 +218,7 @@ export const ShellFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const ShellModuleMetadata: ModuleMetadata = {
+export const ShellModuleMetadata = {
   description: "Execute shell commands, inspect the process environment, and query system information",
   methods: ["exec", "run", "execFile", "which", "env", "cwd", "exit", "pid", "platform", "uptime"],
 };

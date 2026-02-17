@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,7 +8,7 @@ function getConfig(key: string): string {
   return val;
 }
 
-async function whatsappApi(path: string, method = "GET", body?: unknown): Promise<unknown> {
+async function whatsappApi(path: string, method = "GET", body?: unknown): Promise<Value> {
   const token = getConfig("accessToken");
   const phoneNumberId = getConfig("phoneNumberId");
   const res = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}${path}`, {
@@ -162,7 +162,7 @@ export const WhatsappFunctions: Record<string, BuiltinHandler> = {
   updateProfile,
 };
 
-export const WhatsappFunctionMetadata: Record<string, FunctionMetadata> = {
+export const WhatsappFunctionMetadata = {
   setCredentials: {
     description: "Set WhatsApp Cloud API credentials.",
     parameters: [
@@ -266,7 +266,7 @@ export const WhatsappFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const WhatsappModuleMetadata: ModuleMetadata = {
+export const WhatsappModuleMetadata = {
   description: "Send messages, templates, media, and manage WhatsApp Business profiles via the WhatsApp Cloud API.",
   methods: Object.keys(WhatsappFunctions),
   category: "messaging",

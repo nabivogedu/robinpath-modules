@@ -4,10 +4,10 @@ import { JwtFunctions, JwtFunctionMetadata, JwtModuleMetadata } from "./jwt.js";
 const JwtModule: ModuleAdapter = {
   name: "jwt",
   functions: JwtFunctions,
-  functionMetadata: JwtFunctionMetadata,
-  moduleMetadata: JwtModuleMetadata,
+  functionMetadata: JwtFunctionMetadata as any,
+  moduleMetadata: JwtModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default JwtModule;
 export { JwtModule };

@@ -4,10 +4,10 @@ import { NotificationFunctions, NotificationFunctionMetadata, NotificationModule
 const NotificationModule: ModuleAdapter = {
   name: "notification",
   functions: NotificationFunctions,
-  functionMetadata: NotificationFunctionMetadata,
-  moduleMetadata: NotificationModuleMetadata,
+  functionMetadata: NotificationFunctionMetadata as any,
+  moduleMetadata: NotificationModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default NotificationModule;
 export { NotificationModule };

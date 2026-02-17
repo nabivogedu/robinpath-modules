@@ -15,7 +15,7 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
   return result;
 }
 
-function getByPath(obj: Record<string, unknown>, path: string): unknown {
+function getByPath(obj: Record<string, unknown>, path: string): any {
   const parts = path.split(".");
   let current: unknown = obj;
   for (const part of parts) {
@@ -156,7 +156,7 @@ const validate: BuiltinHandler = (args) => {
   const required = (Array.isArray(args[0]) ? args[0] : []) as string[];
   const name = String(args[1] ?? "default");
   const config = configs.get(name) ?? {};
-  const missing = required.filter((key) => getByPath(config, key) === undefined);
+  const missing = required.filter((key: any) => getByPath(config, key) === undefined);
   return { valid: missing.length === 0, missing };
 };
 
@@ -185,7 +185,7 @@ const toEnv: BuiltinHandler = (args) => {
 
 export const ConfigFunctions: Record<string, BuiltinHandler> = { create, load, loadEnv, get, set, getAll, merge, has, remove, clear, list: listConfigs, validate, freeze, toEnv };
 
-export const ConfigFunctionMetadata: Record<string, FunctionMetadata> = {
+export const ConfigFunctionMetadata = {
   create: { description: "Create config with defaults", parameters: [{ name: "name", dataType: "string", description: "Config name", formInputType: "text", required: false }, { name: "defaults", dataType: "object", description: "Default values", formInputType: "text", required: false }], returnType: "object", returnDescription: "Config object", example: 'config.create "app" {"port": 3000, "debug": false}' },
   load: { description: "Load config from file (.json, .env)", parameters: [{ name: "filePath", dataType: "string", description: "Config file path", formInputType: "text", required: true }, { name: "name", dataType: "string", description: "Config name", formInputType: "text", required: false }], returnType: "object", returnDescription: "Merged config", example: 'config.load "./config.json"' },
   loadEnv: { description: "Load from environment variables", parameters: [{ name: "prefix", dataType: "string", description: "Env var prefix filter", formInputType: "text", required: false }, { name: "name", dataType: "string", description: "Config name", formInputType: "text", required: false }], returnType: "object", returnDescription: "Merged config", example: 'config.loadEnv "APP_"' },
@@ -202,7 +202,7 @@ export const ConfigFunctionMetadata: Record<string, FunctionMetadata> = {
   toEnv: { description: "Convert config to env format", parameters: [{ name: "name", dataType: "string", description: "Config name", formInputType: "text", required: false }, { name: "prefix", dataType: "string", description: "Key prefix", formInputType: "text", required: false }], returnType: "string", returnDescription: "Env-format string", example: 'config.toEnv "app" "APP_"' },
 };
 
-export const ConfigModuleMetadata: ModuleMetadata = {
+export const ConfigModuleMetadata = {
   description: "Multi-source configuration management with deep merge, dot-path access, env loading, and validation",
   methods: ["create", "load", "loadEnv", "get", "set", "getAll", "merge", "has", "remove", "clear", "list", "validate", "freeze", "toEnv"],
 };

@@ -4,10 +4,10 @@ import { TrelloFunctions, TrelloFunctionMetadata, TrelloModuleMetadata } from ".
 const TrelloModule: ModuleAdapter = {
   name: "trello",
   functions: TrelloFunctions,
-  functionMetadata: TrelloFunctionMetadata,
-  moduleMetadata: TrelloModuleMetadata,
+  functionMetadata: TrelloFunctionMetadata as any,
+  moduleMetadata: TrelloModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default TrelloModule;
 export { TrelloModule };

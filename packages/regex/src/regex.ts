@@ -27,7 +27,7 @@ const matchAll: BuiltinHandler = (args) => {
   const effectiveFlags = flags.includes("g") ? flags : flags + "g";
   const re = new RegExp(pattern, effectiveFlags);
   const matches = [...str.matchAll(re)];
-  return matches.map((m) => m[0]!);
+  return matches.map((m: any) => m[0]!);
 };
 
 const replace: BuiltinHandler = (args) => {
@@ -76,7 +76,7 @@ export const RegexFunctions: Record<string, BuiltinHandler> = {
   escape,
 };
 
-export const RegexFunctionMetadata: Record<string, FunctionMetadata> = {
+export const RegexFunctionMetadata = {
   test: {
     description: "Test if a string matches a regular expression pattern",
     parameters: [
@@ -281,7 +281,7 @@ export const RegexFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const RegexModuleMetadata: ModuleMetadata = {
+export const RegexModuleMetadata = {
   description: "Regular expression operations for pattern matching, searching, and replacing",
   methods: ["test", "match", "matchAll", "replace", "split", "capture", "escape"],
 };

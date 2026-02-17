@@ -75,7 +75,7 @@ const remove: BuiltinHandler = (args) => {
 
 const parseSetCookie: BuiltinHandler = (args) => {
   const header = String(args[0] ?? "");
-  const parts = header.split(";").map((s) => s.trim());
+  const parts = header.split(";").map((s: any) => s.trim());
   if (parts.length === 0) return null;
   const first = parts[0]!;
   const eq = first.indexOf("=");
@@ -116,7 +116,7 @@ const decode: BuiltinHandler = (args) => decodeURIComponent(String(args[0] ?? ""
 
 export const CookieFunctions: Record<string, BuiltinHandler> = { parse, serialize, sign, unsign, get, remove, parseSetCookie, isExpired, jar, toHeader, encode, decode };
 
-export const CookieFunctionMetadata: Record<string, FunctionMetadata> = {
+export const CookieFunctionMetadata = {
   parse: { description: "Parse Cookie header string", parameters: [{ name: "header", dataType: "string", description: "Cookie header value", formInputType: "text", required: true }], returnType: "object", returnDescription: "Name-value pairs", example: 'cookie.parse "session=abc; theme=dark"' },
   serialize: { description: "Serialize Set-Cookie header", parameters: [{ name: "name", dataType: "string", description: "Cookie name", formInputType: "text", required: true }, { name: "value", dataType: "string", description: "Cookie value", formInputType: "text", required: true }, { name: "options", dataType: "object", description: "{domain, path, expires, maxAge, secure, httpOnly, sameSite}", formInputType: "text", required: false }], returnType: "string", returnDescription: "Set-Cookie header value", example: 'cookie.serialize "session" "abc123" {"httpOnly": true, "maxAge": 3600}' },
   sign: { description: "Sign cookie value with HMAC", parameters: [{ name: "value", dataType: "string", description: "Value to sign", formInputType: "text", required: true }, { name: "secret", dataType: "string", description: "Signing secret", formInputType: "text", required: true }], returnType: "string", returnDescription: "Signed value", example: 'cookie.sign "userId=123" "my-secret"' },
@@ -131,7 +131,7 @@ export const CookieFunctionMetadata: Record<string, FunctionMetadata> = {
   decode: { description: "URL-decode cookie value", parameters: [{ name: "value", dataType: "string", description: "Encoded value", formInputType: "text", required: true }], returnType: "string", returnDescription: "Decoded value", example: 'cookie.decode "hello%20world"' },
 };
 
-export const CookieModuleMetadata: ModuleMetadata = {
+export const CookieModuleMetadata = {
   description: "HTTP cookie parsing, serialization, signing/verification, Set-Cookie handling, and cookie jar management",
   methods: ["parse", "serialize", "sign", "unsign", "get", "remove", "parseSetCookie", "isExpired", "jar", "toHeader", "encode", "decode"],
 };

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { appendFileSync } from "node:fs";
 
 // ── Module-level state ──────────────────────────────────────────────
@@ -39,7 +39,7 @@ function formatMessage(level: string, message: string): string {
 function emit(level: LevelName, args: unknown[]): boolean {
   if (LEVELS[level] < currentLevel) return true;
 
-  const message = args.map((a) => String(a ?? "")).join(" ");
+  const message = args.map((a: any) => String(a ?? "")).join(" ");
   const line = formatMessage(level, message);
 
   // debug and info go to stdout; warn, error, fatal go to stderr
@@ -143,15 +143,15 @@ const table: BuiltinHandler = (args) => {
   }
 
   // Build header
-  const header = columns.map((c) => c.padEnd(widths[c]!)).join(" | ");
-  const separator = columns.map((c) => "-".repeat(widths[c]!)).join("-+-");
+  const header = columns.map((c: any) => c.padEnd(widths[c]!)).join(" | ");
+  const separator = columns.map((c: any) => "-".repeat(widths[c]!)).join("-+-");
 
   const lines: string[] = [header, separator];
 
   // Build rows
   for (const row of data) {
     if (row && typeof row === "object") {
-      const cells = columns.map((c) =>
+      const cells = columns.map((c: any) =>
         String((row as Record<string, unknown>)[c] ?? "").padEnd(widths[c]!),
       );
       lines.push(cells.join(" | "));
@@ -212,7 +212,7 @@ export const LogFunctions: Record<string, BuiltinHandler> = {
   timeEnd,
 };
 
-export const LogFunctionMetadata: Record<string, FunctionMetadata> = {
+export const LogFunctionMetadata = {
   debug: {
     description: "Log a message at DEBUG level to stdout",
     parameters: [
@@ -416,7 +416,7 @@ export const LogFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const LogModuleMetadata: ModuleMetadata = {
+export const LogModuleMetadata = {
   description: "Structured logging with levels, file output, JSON format, timers, and grouping",
   methods: [
     "debug",

@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Types ─────────────────────────────────────────────────────────
 
@@ -116,7 +116,7 @@ function parseComparator(raw: string): Comparator {
   // Tilde ranges: ~1.2.3 means >=1.2.3 <1.3.0; ~1.2 means >=1.2.0 <1.3.0
   if (s.startsWith("~")) {
     const v = parseSemVer(s.slice(1));
-    return (t) =>
+    return (t: any) =>
       compareSemVer(t, { major: v.major, minor: v.minor, patch: v.patch, prerelease: v.prerelease, build: null }) >= 0 &&
       compareSemVer(t, { major: v.major, minor: v.minor + 1, patch: 0, prerelease: "0", build: null }) < 0;
   }
@@ -132,15 +132,15 @@ function parseComparator(raw: string): Comparator {
     } else {
       upper = { major: 0, minor: 0, patch: v.patch + 1, prerelease: "0", build: null };
     }
-    return (t) =>
+    return (t: any) =>
       compareSemVer(t, { major: v.major, minor: v.minor, patch: v.patch, prerelease: v.prerelease, build: null }) >= 0 &&
       compareSemVer(t, upper) < 0;
   }
 
   // Hyphen ranges: 1.2.3 - 2.3.4  =>  >=1.2.3 <=2.3.4
   if (s.includes(" - ")) {
-    const [lo, hi] = s.split(" - ").map((p) => parseSemVer(p.trim()));
-    return (t) => compareSemVer(t, lo!) >= 0 && compareSemVer(t, hi!) <= 0;
+    const [lo, hi] = s.split(" - ").map((p: any) => parseSemVer(p.trim()));
+    return (t: any) => compareSemVer(t, lo!) >= 0 && compareSemVer(t, hi!) <= 0;
   }
 
   // Operators: >=, <=, >, <, =
@@ -149,11 +149,11 @@ function parseComparator(raw: string): Comparator {
     const op = opMatch[1]!;
     const v = parseSemVer(opMatch[2]!);
     switch (op) {
-      case ">=": return (t) => compareSemVer(t, v) >= 0;
-      case "<=": return (t) => compareSemVer(t, v) <= 0;
-      case ">":  return (t) => compareSemVer(t, v) > 0;
-      case "<":  return (t) => compareSemVer(t, v) < 0;
-      case "=":  return (t) => compareSemVer(t, v) === 0;
+      case ">=": return (t: any) => compareSemVer(t, v) >= 0;
+      case "<=": return (t: any) => compareSemVer(t, v) <= 0;
+      case ">":  return (t: any) => compareSemVer(t, v) > 0;
+      case "<":  return (t: any) => compareSemVer(t, v) < 0;
+      case "=":  return (t: any) => compareSemVer(t, v) === 0;
     }
   }
 
@@ -166,35 +166,35 @@ function parseComparator(raw: string): Comparator {
 
     if (minRaw === undefined || minRaw === "x" || minRaw === "*") {
       // 1.x or 1.* => >=1.0.0 <2.0.0
-      return (t) => t.major === maj;
+      return (t: any) => t.major === maj;
     }
     const min = Number(minRaw);
     if (patRaw === undefined || patRaw === "x" || patRaw === "*") {
       // 1.2.x => >=1.2.0 <1.3.0
-      return (t) => t.major === maj && t.minor === min;
+      return (t: any) => t.major === maj && t.minor === min;
     }
     // Exact match
     const pat = Number(patRaw);
     const exact: SemVer = { major: maj, minor: min, patch: pat, prerelease: null, build: null };
-    return (t) => compareSemVer(t, exact) === 0;
+    return (t: any) => compareSemVer(t, exact) === 0;
   }
 
   // Plain version (exact match)
   const v = parseSemVer(s);
-  return (t) => compareSemVer(t, v) === 0;
+  return (t: any) => compareSemVer(t, v) === 0;
 }
 
 function satisfiesRange(version: SemVer, range: string): boolean {
   // Split on || for union ranges
-  const orParts = range.split("||").map((p) => p.trim());
-  return orParts.some((orPart) => {
+  const orParts = range.split("||").map((p: any) => p.trim());
+  return orParts.some((orPart: any) => {
     // Within an OR-group, split on whitespace for intersection (AND)
     // But first handle hyphen ranges (they contain spaces around " - ")
     if (orPart.includes(" - ")) {
       return parseComparator(orPart)(version);
     }
     const andParts = orPart.split(/\s+/).filter(Boolean);
-    return andParts.every((part) => parseComparator(part)(version));
+    return andParts.every((part: any) => parseComparator(part)(version));
   });
 }
 
@@ -372,7 +372,7 @@ export const SemverFunctions: Record<string, BuiltinHandler> = {
   diff,
 };
 
-export const SemverFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SemverFunctionMetadata = {
   parse: {
     description: "Parse a semver version string into its components (major, minor, patch, prerelease, build)",
     parameters: [
@@ -663,7 +663,7 @@ export const SemverFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const SemverModuleMetadata: ModuleMetadata = {
+export const SemverModuleMetadata = {
   description: "Parse, compare, validate, and manipulate semantic version strings (semver 2.0.0 compliant)",
   methods: [
     "parse",

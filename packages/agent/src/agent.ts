@@ -82,7 +82,7 @@ let notifyConfig: NotifyConfig = {
 
 function debugLog(level: number, ...parts: unknown[]): void {
   if (debugLevel >= level) {
-    const msg = `[agent:debug:${level}] ${parts.map((p) => (typeof p === "object" ? JSON.stringify(p) : String(p))).join(" ")}`;
+    const msg = `[agent:debug:${level}] ${parts.map((p: any) => (typeof p === "object" ? JSON.stringify(p) : String(p))).join(" ")}`;
     console.error(msg);
     if (logPath) {
       try {
@@ -137,7 +137,7 @@ function parseCsvLine(line: string): string[] {
   return fields;
 }
 
-function parseResponse(raw: string, format: OutputFormat): unknown {
+function parseResponse(raw: string, format: OutputFormat): any {
   const cleaned = stripFences(raw);
 
   switch (format) {
@@ -192,7 +192,7 @@ function parseResponse(raw: string, format: OutputFormat): unknown {
     }
 
     case "CSV": {
-      const lines = cleaned.split("\n").map((l) => l.trim()).filter(Boolean);
+      const lines = cleaned.split("\n").map((l: any) => l.trim()).filter(Boolean);
       return lines.map(parseCsvLine);
     }
 
@@ -305,7 +305,7 @@ function executeAgentStep(
   provider: "claude" | "codex",
   stepName: string,
   opts: Record<string, unknown>,
-): unknown {
+): any {
   const question = String(opts.question ?? "");
   const format = (String(opts.expectedOutput ?? "TEXT").toUpperCase()) as OutputFormat;
   const condition = opts.condition;
@@ -330,8 +330,7 @@ function executeAgentStep(
   let contextPrefix = "";
   if (contextId && contexts.has(contextId)) {
     const messages = contexts.get(contextId)!;
-    contextPrefix = messages.map((m) =>
-      m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`
+    contextPrefix = messages.map((m: any) => m.role === "user" ? `User: ${m.content}` : `Assistant: ${m.content}`
     ).join("\n\n") + "\n\nUser: ";
   }
 
@@ -492,8 +491,8 @@ const log: BuiltinHandler = (args) => {
 const cost: BuiltinHandler = () => {
   const totalMs = stepHistory.reduce((sum, s) => sum + s.durationMs, 0);
   const totalRetries = stepHistory.reduce((sum, s) => sum + s.retries, 0);
-  const cacheHits = stepHistory.filter((s) => s.cached).length;
-  const errors = stepHistory.filter((s) => s.error !== null).length;
+  const cacheHits = stepHistory.filter((s: any) => s.cached).length;
+  const errors = stepHistory.filter((s: any) => s.error !== null).length;
 
   return {
     steps: stepHistory.length,
@@ -501,7 +500,7 @@ const cost: BuiltinHandler = () => {
     totalRetries,
     cacheHits,
     errors,
-    history: stepHistory.map((s) => ({
+    history: stepHistory.map((s: any) => ({
       step: s.step,
       provider: s.provider,
       format: s.format,
@@ -779,7 +778,7 @@ const extract: BuiltinHandler = (args) => {
   if (!text) throw new Error('agent.extract: "text" is required');
   if (fields.length === 0) throw new Error('agent.extract: at least one "fields" entry required');
 
-  const fieldList = fields.map((f) => `"${f}"`).join(", ");
+  const fieldList = fields.map((f: any) => `"${f}"`).join(", ");
   const question = `Extract the following fields from the text: ${fieldList}.\n\nText: ${text}\n\nRespond with a JSON object containing only these keys: ${fieldList}. If a field is not found, use null.`;
 
   return executeAgentStep(provider, stepName, {
@@ -884,7 +883,7 @@ export const AgentFunctions: Record<string, BuiltinHandler> = {
   model, prompt, context, batch, classify, extract, guard,
 };
 
-export const AgentFunctionMetadata: Record<string, FunctionMetadata> = {
+export const AgentFunctionMetadata = {
   pipeline: {
     description: "Configure pipeline settings for AI agent execution",
     parameters: [
@@ -1037,7 +1036,7 @@ export const AgentFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const AgentModuleMetadata: ModuleMetadata = {
+export const AgentModuleMetadata = {
   description: "AI agent integration for Claude Code and OpenAI Codex — prompts, parsing, caching, retries, batch processing, classification, extraction, guards, and context management",
   methods: ["pipeline", "claude", "codex", "debug", "log", "cost", "notify", "model", "prompt", "context", "batch", "classify", "extract", "guard"],
 };

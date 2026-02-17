@@ -4,10 +4,10 @@ import { GoogleDriveFunctions, GoogleDriveFunctionMetadata, GoogleDriveModuleMet
 const GoogleDriveModule: ModuleAdapter = {
   name: "googleDrive",
   functions: GoogleDriveFunctions,
-  functionMetadata: GoogleDriveFunctionMetadata,
-  moduleMetadata: GoogleDriveModuleMetadata,
+  functionMetadata: GoogleDriveFunctionMetadata as any,
+  moduleMetadata: GoogleDriveModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default GoogleDriveModule;
 export { GoogleDriveModule };

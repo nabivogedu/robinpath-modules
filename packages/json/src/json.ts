@@ -1,6 +1,6 @@
 import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
-function resolvePath(obj: unknown, path: string): unknown {
+function resolvePath(obj: unknown, path: string): any {
   const keys = path.split(".");
   let current: unknown = obj;
   for (const key of keys) {
@@ -10,7 +10,7 @@ function resolvePath(obj: unknown, path: string): unknown {
   return current;
 }
 
-function setPath(obj: unknown, path: string, value: unknown): unknown {
+function setPath(obj: unknown, path: string, value: unknown): any {
   const clone = JSON.parse(JSON.stringify(obj));
   const keys = path.split(".");
   let current = clone;
@@ -115,7 +115,7 @@ const get: BuiltinHandler = (args) => resolvePath(args[0], String(args[1] ?? "")
 const set: BuiltinHandler = (args) => setPath(args[0], String(args[1] ?? ""), args[2]);
 
 const merge: BuiltinHandler = (args) => {
-  const objects = args.filter((a) => a && typeof a === "object") as Record<string, unknown>[];
+  const objects = args.filter((a: any) => a && typeof a === "object") as Record<string, unknown>[];
   if (objects.length === 0) return {};
   return objects.reduce((acc, obj) => deepMerge(acc, obj));
 };
@@ -156,7 +156,7 @@ export const JsonFunctions: Record<string, BuiltinHandler> = {
   parse, stringify, get, set, merge, flatten, unflatten, diff, clone, isValid, keys, pick, omit,
 };
 
-export const JsonFunctionMetadata: Record<string, FunctionMetadata> = {
+export const JsonFunctionMetadata = {
   parse: { description: "Parse a JSON string into an object", parameters: [{ name: "jsonString", dataType: "string", description: "JSON string to parse", formInputType: "textarea", required: true }], returnType: "object", returnDescription: "Parsed JavaScript value", example: 'json.parse \'{"name":"Alice"}\'' },
   stringify: { description: "Convert a value to a JSON string", parameters: [{ name: "value", dataType: "any", description: "Value to stringify", formInputType: "json", required: true }, { name: "indent", dataType: "number", description: "Indentation spaces (default: 2)", formInputType: "number", required: false, defaultValue: "2" }], returnType: "string", returnDescription: "JSON string", example: "json.stringify $obj" },
   get: { description: "Get a nested value by dot-separated path", parameters: [{ name: "obj", dataType: "object", description: "Source object", formInputType: "json", required: true }, { name: "path", dataType: "string", description: "Dot-separated path (e.g. user.name)", formInputType: "text", required: true }], returnType: "any", returnDescription: "Value at the path", example: 'json.get $obj "user.name"' },
@@ -172,7 +172,7 @@ export const JsonFunctionMetadata: Record<string, FunctionMetadata> = {
   omit: { description: "Omit specific keys from an object", parameters: [{ name: "obj", dataType: "object", description: "Source object", formInputType: "json", required: true }, { name: "keys", dataType: "array", description: "Array of keys to omit", formInputType: "json", required: true }], returnType: "object", returnDescription: "Object without omitted keys", example: 'json.omit $obj ["password"]' },
 };
 
-export const JsonModuleMetadata: ModuleMetadata = {
+export const JsonModuleMetadata = {
   description: "JSON manipulation: parse, stringify, deep merge, flatten, unflatten, diff, query by path, pick, and omit",
   methods: ["parse", "stringify", "get", "set", "merge", "flatten", "unflatten", "diff", "clone", "isValid", "keys", "pick", "omit"],
 };

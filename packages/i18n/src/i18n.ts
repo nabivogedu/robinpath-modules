@@ -58,8 +58,8 @@ const formatRelativeTime: BuiltinHandler = (args) => {
 const formatList: BuiltinHandler = (args) => {
   const items = (Array.isArray(args[0]) ? args[0] : []).map(String);
   const locale = args[1] ? String(args[1]) : defaultLocale;
-  const opts = (typeof args[2] === "object" && args[2] !== null ? args[2] : { type: "conjunction" }) as Intl.ListFormatOptions;
-  return new Intl.ListFormat(locale, opts).format(items);
+  const opts = (typeof args[2] === "object" && args[2] !== null ? args[2] : { type: "conjunction" }) as any;
+  return new (Intl as any).ListFormat(locale, opts).format(items);
 };
 
 const pluralize: BuiltinHandler = (args) => {
@@ -96,7 +96,7 @@ const regionName: BuiltinHandler = (args) => {
 
 export const I18nFunctions: Record<string, BuiltinHandler> = { setLocale, getLocale, loadTranslations, t, formatNumber, formatCurrency, formatDate, formatRelativeTime, formatList, pluralize, direction, listLocales, hasTranslation, languageName, regionName };
 
-export const I18nFunctionMetadata: Record<string, FunctionMetadata> = {
+export const I18nFunctionMetadata = {
   setLocale: { description: "Set default locale", parameters: [{ name: "locale", dataType: "string", description: "Locale code", formInputType: "text", required: true }], returnType: "string", returnDescription: "Locale", example: 'i18n.setLocale "de-DE"' },
   getLocale: { description: "Get current locale", parameters: [], returnType: "string", returnDescription: "Current locale", example: "i18n.getLocale" },
   loadTranslations: { description: "Load translations for a locale", parameters: [{ name: "locale", dataType: "string", description: "Locale code", formInputType: "text", required: true }, { name: "strings", dataType: "object", description: "Key-value translations", formInputType: "text", required: true }], returnType: "object", returnDescription: "{locale, keys}", example: 'i18n.loadTranslations "es" {"hello": "Hola", "bye": "Adiós"}' },
@@ -114,7 +114,7 @@ export const I18nFunctionMetadata: Record<string, FunctionMetadata> = {
   regionName: { description: "Get region display name", parameters: [{ name: "regionCode", dataType: "string", description: "Region code (US, GB, etc)", formInputType: "text", required: true }, { name: "locale", dataType: "string", description: "Display locale", formInputType: "text", required: false }], returnType: "string", returnDescription: "Region name", example: 'i18n.regionName "JP" "en"' },
 };
 
-export const I18nModuleMetadata: ModuleMetadata = {
+export const I18nModuleMetadata = {
   description: "Internationalization: translations, number/currency/date formatting, relative time, pluralization, RTL detection",
   methods: ["setLocale", "getLocale", "loadTranslations", "t", "formatNumber", "formatCurrency", "formatDate", "formatRelativeTime", "formatList", "pluralize", "direction", "listLocales", "hasTranslation", "languageName", "regionName"],
 };

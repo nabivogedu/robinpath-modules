@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // -- Base64url helpers ------------------------------------------------------
@@ -196,7 +196,7 @@ export const JwtFunctions: Record<string, BuiltinHandler> = {
   getExpiration,
 };
 
-export const JwtFunctionMetadata: Record<string, FunctionMetadata> = {
+export const JwtFunctionMetadata = {
   sign: {
     description: "Create a signed JWT token from a payload object using HMAC (HS256, HS384, or HS512)",
     parameters: [
@@ -332,7 +332,7 @@ export const JwtFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const JwtModuleMetadata: ModuleMetadata = {
+export const JwtModuleMetadata = {
   description: "JWT (JSON Web Token) creation, signing, verification, and decoding using HMAC (HS256, HS384, HS512)",
   methods: [
     "sign",

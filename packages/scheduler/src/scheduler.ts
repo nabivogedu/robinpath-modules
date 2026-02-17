@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ---------------------------------------------------------------------------
 // Internal cron parser (5-field: minute hour day-of-month month day-of-week)
@@ -260,7 +260,7 @@ export const SchedulerFunctions: Record<string, BuiltinHandler> = {
   schedule, once, cancel, cancelAll, list, get, pause, resume, isRunning, nextRun, history,
 };
 
-export const SchedulerFunctionMetadata: Record<string, FunctionMetadata> = {
+export const SchedulerFunctionMetadata = {
   schedule: {
     description: "Schedule a recurring task using a cron expression",
     parameters: [
@@ -362,7 +362,7 @@ export const SchedulerFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const SchedulerModuleMetadata: ModuleMetadata = {
+export const SchedulerModuleMetadata = {
   description: "Schedule and run recurring or one-time tasks with cron expressions, pause/resume support, and execution history",
   methods: ["schedule", "once", "cancel", "cancelAll", "list", "get", "pause", "resume", "isRunning", "nextRun", "history"],
 };

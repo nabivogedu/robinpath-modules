@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 
@@ -16,7 +16,7 @@ function getToken(botId: string): string {
   return token;
 }
 
-async function callApi(botId: string, method: string, params: Record<string, unknown>): Promise<unknown> {
+async function callApi(botId: string, method: string, params: Record<string, unknown>): Promise<Value> {
   const token = getToken(botId);
   const response = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: "POST",
@@ -27,7 +27,7 @@ async function callApi(botId: string, method: string, params: Record<string, unk
   if (!data.ok) {
     throw new Error(`Telegram API error: ${data.description ?? JSON.stringify(data)}`);
   }
-  return data.result;
+  return data.result as Value;
 }
 
 async function callApiWithFile(
@@ -36,7 +36,7 @@ async function callApiWithFile(
   fileField: string,
   filePath: string,
   params: Record<string, unknown>,
-): Promise<unknown> {
+): Promise<Value> {
   const token = getToken(botId);
   const fileBuffer = readFileSync(filePath);
   const fileName = basename(filePath);
@@ -57,7 +57,7 @@ async function callApiWithFile(
   if (!data.ok) {
     throw new Error(`Telegram API error: ${data.description ?? JSON.stringify(data)}`);
   }
-  return data.result;
+  return data.result as Value;
 }
 
 // ── Functions ────────────────────────────────────────────────────────
@@ -213,7 +213,7 @@ export const TelegramFunctions: Record<string, BuiltinHandler> = {
   editMessage, deleteMessage, getUpdates, sendSticker, getChat,
 };
 
-export const TelegramFunctionMetadata: Record<string, FunctionMetadata> = {
+export const TelegramFunctionMetadata = {
   setToken: {
     description: "Store a Telegram bot token for subsequent API calls",
     parameters: [
@@ -350,7 +350,7 @@ export const TelegramFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const TelegramModuleMetadata: ModuleMetadata = {
+export const TelegramModuleMetadata = {
   description: "Telegram Bot API client for sending messages, photos, documents, locations, polls, stickers, and managing chats",
   methods: [
     "setToken", "getMe", "send", "sendPhoto", "sendDocument", "sendLocation",

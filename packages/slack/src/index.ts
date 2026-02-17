@@ -4,10 +4,10 @@ import { SlackFunctions, SlackFunctionMetadata, SlackModuleMetadata } from "./sl
 const SlackModule: ModuleAdapter = {
   name: "slack",
   functions: SlackFunctions,
-  functionMetadata: SlackFunctionMetadata,
-  moduleMetadata: SlackModuleMetadata,
+  functionMetadata: SlackFunctionMetadata as any,
+  moduleMetadata: SlackModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default SlackModule;
 export { SlackModule };

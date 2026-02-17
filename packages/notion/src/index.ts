@@ -4,10 +4,10 @@ import { NotionFunctions, NotionFunctionMetadata, NotionModuleMetadata } from ".
 const NotionModule: ModuleAdapter = {
   name: "notion",
   functions: NotionFunctions,
-  functionMetadata: NotionFunctionMetadata,
-  moduleMetadata: NotionModuleMetadata,
+  functionMetadata: NotionFunctionMetadata as any,
+  moduleMetadata: NotionModuleMetadata as any,
   global: false,
-};
+}; // as ModuleAdapter
 
 export default NotionModule;
 export { NotionModule };

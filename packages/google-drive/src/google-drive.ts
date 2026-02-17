@@ -1,4 +1,4 @@
-import type { BuiltinHandler } from "@wiredwp/robinpath";
+import type { BuiltinHandler, Value, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
 
 const config = new Map<string, string>();
 
@@ -8,17 +8,17 @@ function getToken(): string {
   return token;
 }
 
-async function driveApi(path: string, method = "GET", body?: unknown, isUpload = false): Promise<unknown> {
+async function driveApi(path: string, method = "GET", body?: unknown, isUpload = false): Promise<Value> {
   const token = getToken();
   const base = isUpload ? "https://www.googleapis.com/upload/drive/v3" : "https://www.googleapis.com/drive/v3";
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token}`
   };
   if (!isUpload) headers["Content-Type"] = "application/json";
   const res = await fetch(`${base}${path}`, {
     method,
     headers,
-    body: body ? (isUpload ? (body as BodyInit) : JSON.stringify(body)) : undefined,
+    body: body ? (isUpload ? (body as any) : JSON.stringify(body)) : undefined
   });
   if (!res.ok) {
     const text = await res.text();
@@ -58,7 +58,7 @@ const downloadFile: BuiltinHandler = async (args) => {
   if (!fileId) throw new Error("googleDrive.downloadFile requires a fileId.");
   const token = getToken();
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
   if (!res.ok) {
     const text = await res.text();
@@ -85,9 +85,9 @@ const uploadFile: BuiltinHandler = async (args) => {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": `multipart/related; boundary=${boundary}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`
     },
-    body,
+    body
   });
   if (!res.ok) {
     const text = await res.text();
@@ -111,7 +111,7 @@ const deleteFile: BuiltinHandler = async (args) => {
   const token = getToken();
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
   if (!res.ok) {
     const text = await res.text();
@@ -147,7 +147,7 @@ const shareFile: BuiltinHandler = async (args) => {
   return driveApi(`/files/${fileId}/permissions`, "POST", {
     type: "user",
     role,
-    emailAddress: email,
+    emailAddress: email
   });
 };
 
@@ -161,18 +161,18 @@ export const GoogleDriveFunctions: Record<string, BuiltinHandler> = {
   deleteFile,
   moveFile,
   copyFile,
-  shareFile,
+  shareFile
 };
 
-export const GoogleDriveFunctionMetadata: Record<string, object> = {
+export const GoogleDriveFunctionMetadata = {
   setCredentials: {
     description: "Set the OAuth2 access token for Google Drive API.",
     parameters: [
-      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "password", required: true },
+      { name: "accessToken", dataType: "string", description: "OAuth2 access token", formInputType: "text", required: true },
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
-    example: 'googleDrive.setCredentials "ya29.xxx"',
+    example: 'googleDrive.setCredentials "ya29.xxx"'
   },
   listFiles: {
     description: "List files in Google Drive with optional query filter.",
@@ -181,7 +181,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Object with files array and nextPageToken.",
-    example: 'googleDrive.listFiles {"q":"mimeType=\'application/pdf\'","pageSize":10}',
+    example: 'googleDrive.listFiles {"q":"mimeType=\'application/pdf\'","pageSize":10}'
   },
   getFile: {
     description: "Get file metadata by ID.",
@@ -190,7 +190,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "File metadata object.",
-    example: 'googleDrive.getFile "file-id"',
+    example: 'googleDrive.getFile "file-id"'
   },
   downloadFile: {
     description: "Download file content as text.",
@@ -199,7 +199,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "string",
     returnDescription: "File content as text.",
-    example: 'googleDrive.downloadFile "file-id"',
+    example: 'googleDrive.downloadFile "file-id"'
   },
   uploadFile: {
     description: "Upload a file to Google Drive.",
@@ -210,7 +210,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Uploaded file metadata.",
-    example: 'googleDrive.uploadFile "report.txt" "Hello world" {"folderId":"folder-id"}',
+    example: 'googleDrive.uploadFile "report.txt" "Hello world" {"folderId":"folder-id"}'
   },
   createFolder: {
     description: "Create a new folder in Google Drive.",
@@ -220,7 +220,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Created folder metadata.",
-    example: 'googleDrive.createFolder "My Folder"',
+    example: 'googleDrive.createFolder "My Folder"'
   },
   deleteFile: {
     description: "Permanently delete a file or folder.",
@@ -229,7 +229,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "string",
     returnDescription: "Confirmation message.",
-    example: 'googleDrive.deleteFile "file-id"',
+    example: 'googleDrive.deleteFile "file-id"'
   },
   moveFile: {
     description: "Move a file to a different folder.",
@@ -239,7 +239,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Updated file metadata.",
-    example: 'googleDrive.moveFile "file-id" "folder-id"',
+    example: 'googleDrive.moveFile "file-id" "folder-id"'
   },
   copyFile: {
     description: "Copy a file, optionally with a new name or destination.",
@@ -249,7 +249,7 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Copied file metadata.",
-    example: 'googleDrive.copyFile "file-id" {"name":"Copy of Report"}',
+    example: 'googleDrive.copyFile "file-id" {"name":"Copy of Report"}'
   },
   shareFile: {
     description: "Share a file with a user by email.",
@@ -260,13 +260,12 @@ export const GoogleDriveFunctionMetadata: Record<string, object> = {
     ],
     returnType: "object",
     returnDescription: "Permission object.",
-    example: 'googleDrive.shareFile "file-id" "user@example.com" "writer"',
-  },
+    example: 'googleDrive.shareFile "file-id" "user@example.com" "writer"'
+  }
 };
 
 export const GoogleDriveModuleMetadata = {
-  name: "googleDrive",
   description: "List, upload, download, move, copy, and share files in Google Drive via the Google Drive API v3.",
-  icon: "hard-drive",
   category: "storage",
+  methods: Object.keys(GoogleDriveFunctions)
 };

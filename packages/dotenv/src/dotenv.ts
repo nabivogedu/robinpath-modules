@@ -129,7 +129,7 @@ const expand: BuiltinHandler = (args) => {
   const useProcessEnv = args[1] === true;
   const result: Record<string, string> = { ...vars };
   for (const [key, value] of Object.entries(result)) {
-    result[key] = value.replace(/\$\{(\w+)\}/g, (_, ref) => {
+    result[key] = value.replace(/\$\{(\w+)\}/g, (_: any, ref: any) => {
       return result[ref] ?? (useProcessEnv ? (process.env[ref] ?? "") : "");
     });
   }
@@ -142,7 +142,7 @@ export const DotenvFunctions: Record<string, BuiltinHandler> = {
   parse, stringify, load, read, get, set, remove, exists, keys, expand,
 };
 
-export const DotenvFunctionMetadata: Record<string, FunctionMetadata> = {
+export const DotenvFunctionMetadata = {
   parse: { description: "Parse a .env format string into an object", parameters: [{ name: "content", dataType: "string", description: ".env format string", formInputType: "textarea", required: true }], returnType: "object", returnDescription: "Key-value object", example: 'dotenv.parse "KEY=value"' },
   stringify: { description: "Convert an object to .env format string", parameters: [{ name: "obj", dataType: "object", description: "Key-value object", formInputType: "json", required: true }], returnType: "string", returnDescription: ".env format string", example: "dotenv.stringify $vars" },
   load: { description: "Read a .env file and load values into process.env (won't override existing or protected vars by default)", parameters: [{ name: "filePath", dataType: "string", description: "Path to .env file (must be a .env file)", formInputType: "text", required: false, defaultValue: ".env" }, { name: "override", dataType: "boolean", description: "Set true to override existing vars (default: false)", formInputType: "text", required: false }], returnType: "object", returnDescription: "Actually loaded key-value pairs", example: 'dotenv.load ".env"' },
@@ -155,7 +155,7 @@ export const DotenvFunctionMetadata: Record<string, FunctionMetadata> = {
   expand: { description: "Expand variable references like ${VAR} in values (process.env fallback disabled by default)", parameters: [{ name: "vars", dataType: "object", description: "Key-value object with variable references", formInputType: "json", required: true }, { name: "useProcessEnv", dataType: "boolean", description: "Allow fallback to process.env for unresolved vars (default: false)", formInputType: "text", required: false }], returnType: "object", returnDescription: "Object with expanded values", example: "dotenv.expand $vars" },
 };
 
-export const DotenvModuleMetadata: ModuleMetadata = {
+export const DotenvModuleMetadata = {
   description: "Secure .env file management with key validation, path restrictions, and protected system variables",
   methods: ["parse", "stringify", "load", "read", "get", "set", "remove", "exists", "keys", "expand"],
 };

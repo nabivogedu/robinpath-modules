@@ -1,4 +1,4 @@
-import type { BuiltinHandler, FunctionMetadata, ModuleMetadata } from "@wiredwp/robinpath";
+import type { BuiltinHandler, FunctionMetadata, ModuleMetadata, Value } from "@wiredwp/robinpath";
 
 // ── Internal State ──────────────────────────────────────────────────
 
@@ -80,7 +80,7 @@ const off: BuiltinHandler = (args) => {
 
   if (typeof fn === "function") {
     const before = list.length;
-    const filtered = list.filter((l) => l.fn !== fn);
+    const filtered = list.filter((l: any) => l.fn !== fn);
     bus.listeners.set(event, filtered);
     return { event, removed: before - filtered.length };
   }
@@ -164,7 +164,7 @@ const history: BuiltinHandler = (args) => {
 
   let items = bus.history;
   if (event) {
-    items = items.filter((h) => h.event === event);
+    items = items.filter((h: any) => h.event === event);
   }
   return items.slice(-limit);
 };
@@ -177,12 +177,12 @@ const waitFor: BuiltinHandler = async (args) => {
 
   const bus = getBus(busName);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve: any, reject: any) => {
     const timer = setTimeout(() => {
       // Remove the listener
       const list = bus.listeners.get(event);
       if (list) {
-        bus.listeners.set(event, list.filter((l) => l.fn !== handler));
+        bus.listeners.set(event, list.filter((l: any) => l.fn !== handler));
       }
       reject(new Error(`Timeout waiting for event "${event}" after ${timeoutMs}ms`));
     }, timeoutMs);
@@ -221,7 +221,7 @@ export const EventFunctions: Record<string, BuiltinHandler> = {
   destroy,
 };
 
-export const EventFunctionMetadata: Record<string, FunctionMetadata> = {
+export const EventFunctionMetadata = {
   create: {
     description: "Create a named event bus with an optional max listener limit",
     parameters: [
@@ -237,7 +237,7 @@ export const EventFunctionMetadata: Record<string, FunctionMetadata> = {
     parameters: [
       { name: "bus", dataType: "string", description: "Event bus name", formInputType: "text", required: true },
       { name: "event", dataType: "string", description: "Event name to listen for", formInputType: "text", required: true },
-      { name: "listener", dataType: "function", description: "Callback function", formInputType: "text", required: true },
+      { name: "listener", dataType: "string", description: "Callback function", formInputType: "text", required: true },
     ],
     returnType: "object",
     returnDescription: "Object with event name and listener count",
@@ -248,7 +248,7 @@ export const EventFunctionMetadata: Record<string, FunctionMetadata> = {
     parameters: [
       { name: "bus", dataType: "string", description: "Event bus name", formInputType: "text", required: true },
       { name: "event", dataType: "string", description: "Event name", formInputType: "text", required: true },
-      { name: "listener", dataType: "function", description: "Callback function", formInputType: "text", required: true },
+      { name: "listener", dataType: "string", description: "Callback function", formInputType: "text", required: true },
     ],
     returnType: "object",
     returnDescription: "Object with event name and listener count",
@@ -259,7 +259,7 @@ export const EventFunctionMetadata: Record<string, FunctionMetadata> = {
     parameters: [
       { name: "bus", dataType: "string", description: "Event bus name", formInputType: "text", required: true },
       { name: "event", dataType: "string", description: "Event name (omit to remove all)", formInputType: "text", required: false },
-      { name: "listener", dataType: "function", description: "Specific listener to remove (omit to remove all for event)", formInputType: "text", required: false },
+      { name: "listener", dataType: "string", description: "Specific listener to remove (omit to remove all for event)", formInputType: "text", required: false },
     ],
     returnType: "object",
     returnDescription: "Object with event name and number removed",
@@ -337,7 +337,7 @@ export const EventFunctionMetadata: Record<string, FunctionMetadata> = {
   },
 };
 
-export const EventModuleMetadata: ModuleMetadata = {
+export const EventModuleMetadata = {
   description: "Pub/sub event system with named buses, listener management, history, and async waitFor",
   methods: ["create", "on", "once", "off", "emit", "listenerCount", "eventNames", "removeAll", "history", "waitFor", "destroy"],
 };

@@ -12,7 +12,7 @@ function deepEqual(a: unknown, b: unknown): boolean {
     const keysA = Object.keys(a as object);
     const keysB = Object.keys(b as object);
     if (keysA.length !== keysB.length) return false;
-    return keysA.every((key) => deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]));
+    return keysA.every((key: any) => deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]));
   }
   return false;
 }
@@ -120,7 +120,7 @@ export const AssertFunctions: Record<string, BuiltinHandler> = {
   equal, notEqual, deepEqual: deepEqualHandler, truthy, falsy, isNull, isNotNull, isType, includes, matches, throws, lengthOf, hasProperty, isAbove, isBelow,
 };
 
-export const AssertFunctionMetadata: Record<string, FunctionMetadata> = {
+export const AssertFunctionMetadata = {
   equal: { description: "Assert two values are strictly equal (===)", parameters: [{ name: "actual", dataType: "any", description: "Actual value", formInputType: "text", required: true }, { name: "expected", dataType: "any", description: "Expected value", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if equal, throws otherwise", example: "assert.equal $a $b" },
   notEqual: { description: "Assert two values are not equal", parameters: [{ name: "actual", dataType: "any", description: "Actual value", formInputType: "text", required: true }, { name: "expected", dataType: "any", description: "Value to not match", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if not equal", example: "assert.notEqual $a $b" },
   deepEqual: { description: "Assert deep equality of two values", parameters: [{ name: "actual", dataType: "any", description: "Actual value", formInputType: "json", required: true }, { name: "expected", dataType: "any", description: "Expected value", formInputType: "json", required: true }], returnType: "boolean", returnDescription: "True if deeply equal", example: "assert.deepEqual $obj1 $obj2" },
@@ -131,14 +131,14 @@ export const AssertFunctionMetadata: Record<string, FunctionMetadata> = {
   isType: { description: "Assert typeof value matches expected type", parameters: [{ name: "value", dataType: "any", description: "Value to check", formInputType: "text", required: true }, { name: "type", dataType: "string", description: "Expected type string", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if type matches", example: 'assert.isType $val "string"' },
   includes: { description: "Assert array/string includes a value", parameters: [{ name: "haystack", dataType: "any", description: "Array or string to search", formInputType: "text", required: true }, { name: "needle", dataType: "any", description: "Value to find", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if includes", example: 'assert.includes "hello" "ell"' },
   matches: { description: "Assert string matches a regex pattern", parameters: [{ name: "str", dataType: "string", description: "String to test", formInputType: "text", required: true }, { name: "pattern", dataType: "string", description: "Regex pattern", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if matches", example: 'assert.matches "hello" "^h"' },
-  throws: { description: "Assert that a function throws", parameters: [{ name: "fn", dataType: "function", description: "Function to call", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if throws", example: "assert.throws $fn" },
+  throws: { description: "Assert that a function throws", parameters: [{ name: "fn", dataType: "string", description: "Function to call", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if throws", example: "assert.throws $fn" },
   lengthOf: { description: "Assert array/string has specific length", parameters: [{ name: "value", dataType: "any", description: "Array or string", formInputType: "text", required: true }, { name: "length", dataType: "number", description: "Expected length", formInputType: "number", required: true }], returnType: "boolean", returnDescription: "True if length matches", example: "assert.lengthOf $arr 3" },
   hasProperty: { description: "Assert object has a specific property", parameters: [{ name: "obj", dataType: "object", description: "Object to check", formInputType: "json", required: true }, { name: "property", dataType: "string", description: "Property name", formInputType: "text", required: true }], returnType: "boolean", returnDescription: "True if has property", example: 'assert.hasProperty $obj "name"' },
   isAbove: { description: "Assert number is above threshold", parameters: [{ name: "value", dataType: "number", description: "Number to check", formInputType: "number", required: true }, { name: "threshold", dataType: "number", description: "Threshold", formInputType: "number", required: true }], returnType: "boolean", returnDescription: "True if above", example: "assert.isAbove 5 3" },
   isBelow: { description: "Assert number is below threshold", parameters: [{ name: "value", dataType: "number", description: "Number to check", formInputType: "number", required: true }, { name: "threshold", dataType: "number", description: "Threshold", formInputType: "number", required: true }], returnType: "boolean", returnDescription: "True if below", example: "assert.isBelow 3 5" },
 };
 
-export const AssertModuleMetadata: ModuleMetadata = {
+export const AssertModuleMetadata = {
   description: "Testing assertions: equal, deepEqual, truthy, falsy, type checks, includes, matches, throws, and more",
   methods: ["equal", "notEqual", "deepEqual", "truthy", "falsy", "isNull", "isNotNull", "isType", "includes", "matches", "throws", "lengthOf", "hasProperty", "isAbove", "isBelow"],
 };
