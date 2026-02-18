@@ -13,7 +13,8 @@
       "Bash(npx tsc:*)",
       "Bash(for pkg in archive assert barcode buffer cache database debug docker encode encrypt event faker feed ftp git google-calendar google-drive google-sheets graphql hash hubspot i18n image json ldap mime mongo mqtt mysql notification notion pagination pdf postgres promise proxy redis retry router rss s3 sanitize server shell shopify soap socket ssh state storage stream teams toml transform trello xml yaml)",
       "Bash(do echo \"=== $pkg ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(dir:*)"
     ]
   }
 }
