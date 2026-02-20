@@ -1,15 +1,37 @@
 {
   "name": "@robinpath/pdf",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PDF generation from HTML/text and text extraction from PDFs",
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": { ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" } },
-  "files": ["dist"],
-  "scripts": { "build": "tsc", "test": "node --import tsx --test tests/*.test.ts" },
-  "peerDependencies": { "@wiredwp/robinpath": ">=0.20.0" },
-  "dependencies": { "pdfkit": "^0.15.0", "pdf-parse": "^1.1.1" },
-  "devDependencies": { "@wiredwp/robinpath": "^0.30.1", "@types/pdfkit": "^0.13.0", "tsx": "^4.19.0", "typescript": "^5.6.0" }
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "peerDependencies": {
+    "@wiredwp/robinpath": ">=0.20.0"
+  },
+  "dependencies": {
+    "pdfkit": "^0.15.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@wiredwp/robinpath": "^0.30.1",
+    "@types/pdfkit": "^0.13.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
 }
