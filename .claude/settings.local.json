@@ -29,7 +29,17 @@
       "WebFetch(domain:developers.cloudflare.com)",
       "Bash(xxd:*)",
       "Bash(kill:*)",
-      "Bash(npx wrangler secret put:*)"
+      "Bash(npx wrangler secret put:*)",
+      "Bash(cd \"C:/Users/Nabivogedu/Desktop/robinPath/robinpath-workspace/robinpath-cdn\" && npx wrangler deploy 2>&1)",
+      "Bash(cd \"C:/Users/Nabivogedu/Desktop/robinPath/robinpath-platform\" && npx wrangler deploy 2>&1)",
+      "Bash(tail:*)",
+      "WebFetch(domain:developers.hubspot.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "WebFetch(domain:snyk.io)",
+      "WebFetch(domain:medium.com)",
+      "Bash(curl -sL \"https://api.github.com/repos/Typeform/embed/contents/packages/embed/src/factories\" 2>/dev/null | python3 -c \"import sys,json; [print\\(f['name']\\) for f in json.load\\(sys.stdin\\)]\" 2>/dev/null)",
+      "Bash(cd \"C:\\\\Users\\\\Nabivogedu\\\\Desktop\\\\robinPath\\\\robinpath-workspace\\\\robinpath-tool\\\\apps\\\\robinpath-modules\" && npm run test -w packages/form 2>&1)"
     ]
   }
 }
