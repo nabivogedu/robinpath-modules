@@ -16,6 +16,84 @@
  */
 
 import { Parser } from "@wiredwp/robinpath";
+// @ts-ignore — JSON import works with resolveJsonModule, suppress module resolution warning
+import builtinRegistry from "./functions.json";
+
+// ─── Named Regex Constants ──────────────────────────────────────────────────
+
+const RE_CODE_BLOCK = /```(?:robinpath|robin|rp)\s*\n([\s\S]*?)```/g;
+const RE_PAREN_CALL = /([a-zA-Z_]\w*\.[a-zA-Z_]\w*)\s*\(/;
+const RE_ARROW_FN = /=>/;
+const RE_FUNC_CALL = /(?<!\$)\b([a-zA-Z_]\w*\.[a-zA-Z_]\w*)\b/g;
+const RE_LINE_NUM = /line (\d+)/i;
+const RE_MISSING_ENDIF = /missing endif/i;
+const RE_IF_FN_COND = /^if\s+[a-zA-Z]\w*\.?\w*\s+\$/i;
+const RE_IF_DOLLAR = /^if\s+\$/;
+const RE_IF_NOT_DOLLAR = /^if\s+not\s+\$/i;
+const RE_DECORATOR_DESC = /DECORATOR '@desc'/;
+const RE_RPAREN = /RPAREN|Unexpected token.*\)/;
+const RE_PAREN_FN_LINE = /([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)\s*\(/;
+const RE_INVALID_PROP_ACCESS = /Invalid property access.*\.\./;
+const RE_EXPECTED_EQ_AS = /Expected '=' or 'as' after variable/;
+const RE_IF_ELSEIF = /^(if|elseif)\s+/i;
+const RE_IF_ELSEIF_DOLLAR = /^(if|elseif)\s+\$/i;
+const RE_IF_ELSEIF_NOT_DOLLAR = /^(if|elseif)\s+not\s+\$/i;
+const RE_IF_COND_WORD = /^(?:if|elseif)\s+([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)/i;
+const RE_AND_OR_FN_CALL = /\b(and|or)\s+[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)\s+\$/;
+const RE_FOR_PAREN_RANGE = /^for\s+\$\w+\s+in\s+\(/;
+const RE_FOR_IN_RANGE = /^for\s+\$\w+\s+in\s+range\b/i;
+const RE_FOR_DOTDOT = /^for\s+.*\.\./;
+const RE_MATH_PARENS = /\w\s+\([^)]*[\+\-\*\/][^)]*\)/;
+const RE_NESTED_CALL_PARENS = /^[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?\s+.*\([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?\s+\$/;
+const RE_INLINE_ARITH = /^([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)\s+.*\$\w+\s*[\+\-]\s*\d+\s*$/;
+const RE_STRIP_DBL_QUOTES = /"(?:[^"\\]|\\.)*"/g;
+const RE_STRIP_SGL_QUOTES = /'(?:[^'\\]|\\.)*'/g;
+const RE_STRIP_BACKTICKS = /`(?:[^`\\]|\\.)*`/g;
+
+// ─── Built-in Module Registry ────────────────────────────────────────────────
+// Loaded from functions.json — 20 native modules bundled with the CLI.
+
+const BUILTIN_MODULES: Record<string, string[]> = builtinRegistry.modules;
+
+// Build a Set of "module.function" strings for fast lookup
+const BUILTIN_FUNCTIONS: Set<string> = new Set();
+for (const [mod, fns] of Object.entries(BUILTIN_MODULES)) {
+	for (const fn of fns) {
+		BUILTIN_FUNCTIONS.add(`${mod}.${fn}`);
+	}
+}
+
+// Set of known module names (for suggesting corrections)
+const BUILTIN_MODULE_NAMES = new Set(Object.keys(BUILTIN_MODULES));
+
+// ─── Module Aliases with Confidence Tiers ────────────────────────────────────
+
+interface ModuleAlias {
+	target: string;
+	confidence: "high" | "medium";
+}
+
+const MODULE_ALIASES: Record<string, ModuleAlias> = {
+	fs: { target: "file", confidence: "high" },
+	filesystem: { target: "file", confidence: "high" },
+	io: { target: "file", confidence: "medium" },
+	fetch: { target: "http", confidence: "high" },
+	request: { target: "http", confidence: "high" },
+	axios: { target: "http", confidence: "high" },
+	curl: { target: "http", confidence: "medium" },
+	sys: { target: "os", confidence: "medium" },
+	system: { target: "os", confidence: "medium" },
+	proc: { target: "process", confidence: "medium" },
+	hash: { target: "crypto", confidence: "medium" },
+	exec: { target: "child", confidence: "high" },
+	spawn: { target: "child", confidence: "high" },
+	shell: { target: "child", confidence: "medium" },
+	command: { target: "child", confidence: "medium" },
+	time: { target: "timer", confidence: "medium" },
+	wait: { target: "timer", confidence: "medium" },
+	sleep: { target: "timer", confidence: "medium" },
+	compress: { target: "zlib", confidence: "medium" },
+};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -38,13 +116,11 @@ export interface ValidatorOptions {
 
 // ─── Code block extraction ───────────────────────────────────────────────────
 
-const CODE_BLOCK_REGEX = /```(?:robinpath|robin|rp)\s*\n([\s\S]*?)```/g;
-
 export function extractCodeBlocks(text: string): string[] {
 	const blocks: string[] = [];
 	let match: RegExpExecArray | null;
-	CODE_BLOCK_REGEX.lastIndex = 0;
-	while ((match = CODE_BLOCK_REGEX.exec(text)) !== null) {
+	RE_CODE_BLOCK.lastIndex = 0;
+	while ((match = RE_CODE_BLOCK.exec(text)) !== null) {
 		blocks.push(match[1].trim());
 	}
 	return blocks;
@@ -61,7 +137,7 @@ export async function parserValidate(
 		return [];
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);
-		const lineMatch = msg.match(/line (\d+)/i);
+		const lineMatch = msg.match(RE_LINE_NUM);
 		const line = lineMatch ? parseInt(lineMatch[1], 10) : 1;
 		return [{ line, type: "parse", error: enrichParserError(msg, code, line) }];
 	}
@@ -73,12 +149,12 @@ function enrichParserError(msg: string, code: string, line: number): string {
 	const srcLine = (lines[line - 1] || "").trim();
 
 	// "missing endif" when the real problem is function-call in if condition
-	if (/missing endif/i.test(msg) && /^if\s+[a-zA-Z]\w*\.?\w*\s+\$/i.test(srcLine) && !/^if\s+\$/.test(srcLine) && !/^if\s+not\s+\$/i.test(srcLine)) {
+	if (RE_MISSING_ENDIF.test(msg) && RE_IF_FN_COND.test(srcLine) && !RE_IF_DOLLAR.test(srcLine) && !RE_IF_NOT_DOLLAR.test(srcLine)) {
 		return `${msg}. Line ${line} uses a function call as if-condition ('${srcLine.slice(0, 50)}...'). Compute the result into a variable first, then use 'if $var ...'`;
 	}
 
 	// DECORATOR '@desc' inside unclosed block — usually def nested inside do
-	if (/DECORATOR '@desc'/.test(msg)) {
+	if (RE_DECORATOR_DESC.test(msg)) {
 		// Scan earlier lines for def inside do
 		const priorLines = lines.slice(0, line - 1);
 		let inDo = false;
@@ -96,21 +172,20 @@ function enrichParserError(msg: string, code: string, line: number): string {
 	}
 
 	// RPAREN — parenthesized function calls
-	if (/RPAREN|Unexpected token.*\)/.test(msg)) {
-		// Find what looks like fn(...) on that line
-		const parenMatch = srcLine.match(/([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)\s*\(/);
+	if (RE_RPAREN.test(msg)) {
+		const parenMatch = srcLine.match(RE_PAREN_FN_LINE);
 		if (parenMatch) {
 			return `${msg}. Do NOT use parentheses for function calls. Write '${parenMatch[1]} arg1 arg2' instead of '${parenMatch[1]}(arg1, arg2)'`;
 		}
 	}
 
 	// "Invalid property access: .." — usually range syntax like [$x..$y]
-	if (/Invalid property access.*\.\./.test(msg)) {
+	if (RE_INVALID_PROP_ACCESS.test(msg)) {
 		return `${msg}. The '..' range operator does not exist. Use 'for $i from $start to $end'. If you need $n-1, compute first: 'math.subtract $n 1 into $limit'`;
 	}
 
 	// "Expected '=' or 'as' after variable" — usually wrong assignment syntax
-	if (/Expected '=' or 'as' after variable/.test(msg)) {
+	if (RE_EXPECTED_EQ_AS.test(msg)) {
 		return `${msg}. To capture output, use 'command arg1 arg2 into $var' — not '$var = command(args)' or '$var command args'`;
 	}
 
@@ -171,9 +246,23 @@ const BLOCK_CLOSERS = new Set(Object.values(BLOCK_OPENERS));
 /** Strip string literals to avoid false positives */
 function stripStrings(line: string): string {
 	return line
-		.replace(/"(?:[^"\\]|\\.)*"/g, '""')
-		.replace(/'(?:[^'\\]|\\.)*'/g, "''")
-		.replace(/`(?:[^`\\]|\\.)*`/g, "``");
+		.replace(RE_STRIP_DBL_QUOTES, '""')
+		.replace(RE_STRIP_SGL_QUOTES, "''")
+		.replace(RE_STRIP_BACKTICKS, "``");
+}
+
+/**
+ * Check if a match position falls inside a JSON object literal (between { and }).
+ * Used to prevent false positives in Check 6 for patterns like: set $cfg = { "file.path": "/tmp" }
+ */
+function isInsideJsonObject(text: string, matchIndex: number): boolean {
+	let depth = 0;
+	for (let i = 0; i < text.length; i++) {
+		if (text[i] === "{") depth++;
+		if (text[i] === "}") depth--;
+		if (i === matchIndex && depth > 0) return true;
+	}
+	return false;
 }
 
 export function semanticValidate(
@@ -244,8 +333,8 @@ export function semanticValidate(
 
 		// ── Check 5: Function call in if condition ──
 		// Catches: if isEqual $x $y, if array.length $arr < 5, if string.contains $s "x"
-		if (/^(if|elseif)\s+/i.test(noStrings) && !/^(if|elseif)\s+\$/i.test(noStrings) && !/^(if|elseif)\s+not\s+\$/i.test(noStrings)) {
-			const condMatch = noStrings.match(/^(?:if|elseif)\s+([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)/i);
+		if (RE_IF_ELSEIF.test(noStrings) && !RE_IF_ELSEIF_DOLLAR.test(noStrings) && !RE_IF_ELSEIF_NOT_DOLLAR.test(noStrings)) {
+			const condMatch = noStrings.match(RE_IF_COND_WORD);
 			if (condMatch) {
 				const condWord = condMatch[1].toLowerCase();
 				if (!["true", "false", "not"].includes(condWord)) {
@@ -262,7 +351,7 @@ export function semanticValidate(
 		}
 
 		// ── Check 5a2: Function call after and/or in if conditions ──
-		if (/^(if|elseif)\s+/.test(noStrings) && /\b(and|or)\s+[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)\s+\$/.test(noStrings)) {
+		if (/^(if|elseif)\s+/.test(noStrings) && RE_AND_OR_FN_CALL.test(noStrings)) {
 			errors.push({
 				line: lineNum,
 				type: "semantic",
@@ -271,7 +360,7 @@ export function semanticValidate(
 		}
 
 		// ── Check 5b: Parenthesized range/expression in for loops ──
-		if (/^for\s+\$\w+\s+in\s+\(/.test(noStrings)) {
+		if (RE_FOR_PAREN_RANGE.test(noStrings)) {
 			errors.push({
 				line: lineNum,
 				type: "semantic",
@@ -280,7 +369,7 @@ export function semanticValidate(
 		}
 
 		// ── Check 5b2: for ... in range — 'range' is not a keyword ──
-		if (/^for\s+\$\w+\s+in\s+range\b/i.test(noStrings)) {
+		if (RE_FOR_IN_RANGE.test(noStrings)) {
 			errors.push({
 				line: lineNum,
 				type: "semantic",
@@ -289,7 +378,7 @@ export function semanticValidate(
 		}
 
 		// ── Check 5b3: for ... in [$x..$y] — '..' range syntax not supported ──
-		if (/^for\s+.*\.\./.test(noStrings)) {
+		if (RE_FOR_DOTDOT.test(noStrings)) {
 			errors.push({
 				line: lineNum,
 				type: "semantic",
@@ -300,8 +389,8 @@ export function semanticValidate(
 		// ── Check 5c: Parenthesized subexpression as function argument ──
 		// Catches: array.get $arr ($i+1), math.subtract (array.length $arr) 1, fn (call + 1)
 		if (!noStrings.startsWith("if") && !noStrings.startsWith("elseif")) {
-			const hasMathParens = /\w\s+\([^)]*[\+\-\*\/][^)]*\)/.test(noStrings);
-			const hasNestedCallParens = /^[a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?\s+.*\([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?\s+\$/.test(noStrings);
+			const hasMathParens = RE_MATH_PARENS.test(noStrings);
+			const hasNestedCallParens = RE_NESTED_CALL_PARENS.test(noStrings);
 			if (hasMathParens || hasNestedCallParens) {
 				const isForLine = noStrings.startsWith("for");
 				errors.push({
@@ -310,6 +399,36 @@ export function semanticValidate(
 					error: isForLine
 						? "Don't use parenthesized math in 'for' ranges. Compute the limit BEFORE the loop: 'math.subtract $n 1 into $limit', then 'for $i from 0 to $limit'"
 						: "Don't use parenthesized expressions as arguments. Compute each step separately: 'array.length $arr into $len', then 'math.subtract $len 1 into $result'",
+				});
+			}
+		}
+
+		// ── Check 5c1.5: Arrow functions => ──
+		if (RE_ARROW_FN.test(noStrings) && !noStrings.startsWith("#")) {
+			errors.push({
+				line: lineNum,
+				type: "semantic",
+				error: "Arrow functions '=>' are not supported in RobinPath. Use 'for $item in $list ... endfor' for iteration or 'def name ... enddef' for functions",
+			});
+		}
+
+		// ── Check 5c2: Parenthesized function calls — module.fn(...) ──
+		// Catches: csv.parse(...), json.stringify($obj), api.get("url"), uuid.uuid()
+		// But NOT: $obj.prop (variable access), assignments with JSON objects
+		{
+			const parenCallMatch = noStrings.match(RE_PAREN_CALL);
+			if (
+				parenCallMatch &&
+				!noStrings.startsWith("$") &&
+				!noStrings.startsWith("set ") &&
+				!noStrings.startsWith("if ") &&
+				!noStrings.startsWith("elseif ")
+			) {
+				const fn = parenCallMatch[1];
+				errors.push({
+					line: lineNum,
+					type: "semantic",
+					error: `Do NOT use parentheses for function calls. Write '${fn} arg1 arg2' instead of '${fn}(arg1, arg2)'`,
 				});
 			}
 		}
@@ -324,8 +443,7 @@ export function semanticValidate(
 			!noStrings.startsWith("$") &&
 			!/\binto\b/.test(noStrings)
 		) {
-			// Look for: command args $var +/- number (arithmetic as trailing args)
-			const inlineArithMatch = noStrings.match(/^([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)\s+.*\$\w+\s*[\+\-]\s*\d+\s*$/);
+			const inlineArithMatch = noStrings.match(RE_INLINE_ARITH);
 			if (inlineArithMatch) {
 				errors.push({
 					line: lineNum,
@@ -367,23 +485,70 @@ export function semanticValidate(
 			}
 		}
 
-		// ── Check 6: Function registry validation ──
-		if (options?.knownFunctions && noStrings.includes(".")) {
-			const funcMatch = noStrings.match(
-				/^([a-zA-Z_]\w*\.[a-zA-Z_]\w*)/,
-			);
-			if (funcMatch) {
-				const funcName = funcMatch[1].toLowerCase();
-				if (!options.knownFunctions.has(funcName)) {
-					// Don't flag variables like $obj.prop
-					if (!trimmed.startsWith("$")) {
+		// ── Check 7: Function registry validation ──
+		// Checks both built-in functions AND external knownFunctions (from ingested docs)
+		// Matches module.func anywhere in the line (not preceded by $)
+		if (noStrings.includes(".") && !trimmed.startsWith("$")) {
+			// Merge built-in + external registries
+			const externalFns = options?.knownFunctions;
+			const externalModules = externalFns
+				? new Set([...externalFns].map(f => f.split(".")[0]))
+				: new Set<string>();
+
+			const allCalls = noStrings.matchAll(RE_FUNC_CALL);
+			for (const callMatch of allCalls) {
+				const raw = callMatch[1];
+				const matchIndex = callMatch.index!;
+
+				// Skip matches inside JSON object literals to avoid false positives
+				if (isInsideJsonObject(noStrings, matchIndex)) continue;
+
+				const moduleName = raw.split(".")[0];
+				const funcName = raw.split(".")[1];
+				const lookupKey = `${moduleName}.${funcName}`;
+
+				// Check for common LLM module name mistakes (fs → file, fetch → http, etc.)
+				const alias = MODULE_ALIASES[moduleName];
+				if (alias && BUILTIN_MODULE_NAMES.has(alias.target)) {
+					const correctKey = `${alias.target}.${funcName}`;
+					const hasFunc = BUILTIN_FUNCTIONS.has(correctKey);
+					if (alias.confidence === "high") {
 						errors.push({
 							line: lineNum,
 							type: "semantic",
-							error: `Unknown function '${funcMatch[1]}'. Check module name and function name`,
+							error: hasFunc
+								? `Wrong module name '${moduleName}'. Use '${alias.target}.${funcName}' instead of '${raw}'`
+								: `Wrong module name '${moduleName}'. The correct module is '${alias.target}'. Available: ${BUILTIN_MODULES[alias.target].slice(0, 10).join(", ")}`,
+						});
+					} else {
+						errors.push({
+							line: lineNum,
+							type: "semantic",
+							error: hasFunc
+								? `Did you mean '${alias.target}'? Use '${alias.target}.${funcName}' instead of '${raw}'`
+								: `Did you mean '${alias.target}'? The correct module is '${alias.target}'. Available: ${BUILTIN_MODULES[alias.target].slice(0, 10).join(", ")}`,
+						});
+					}
+				} else if (BUILTIN_MODULE_NAMES.has(moduleName)) {
+					// Built-in module — check against built-in registry
+					if (!BUILTIN_FUNCTIONS.has(lookupKey)) {
+						errors.push({
+							line: lineNum,
+							type: "semantic",
+							error: `Unknown function '${raw}'. Module '${moduleName}' has no function '${funcName}'`,
+						});
+					}
+				} else if (externalFns && externalModules.has(moduleName)) {
+					// External module (from ingested docs) — check against external registry
+					if (!externalFns.has(lookupKey)) {
+						errors.push({
+							line: lineNum,
+							type: "semantic",
+							error: `Unknown function '${raw}'. Module '${moduleName}' has no function '${funcName}'`,
 						});
 					}
 				}
+				// If module is not in either registry, skip (could be user-defined)
 			}
 		}
 
@@ -443,6 +608,18 @@ export function semanticValidate(
 	return errors;
 }
 
+// ─── Shared deduplication ────────────────────────────────────────────────────
+
+function deduplicateErrors(errors: ValidationError[]): ValidationError[] {
+	const seen = new Set<string>();
+	return errors.filter((e) => {
+		const key = `${e.line}:${e.error}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
+
 // ─── Combined validation ─────────────────────────────────────────────────────
 
 /**
@@ -469,14 +646,7 @@ export async function validateCode(
 		allErrors.push(...semanticErrors);
 	}
 
-	// Deduplicate errors on same line with same message
-	const seen = new Set<string>();
-	const deduped = allErrors.filter((e) => {
-		const key = `${e.line}:${e.error}`;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
+	const deduped = deduplicateErrors(allErrors);
 
 	return {
 		valid: deduped.length === 0,
@@ -500,93 +670,84 @@ export async function validateCodeDirect(
 	const semanticErrors = semanticValidate(code, options);
 	allErrors.push(...semanticErrors);
 
-	const seen = new Set<string>();
-	const deduped = allErrors.filter((e) => {
-		const key = `${e.line}:${e.error}`;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
+	const deduped = deduplicateErrors(allErrors);
 
 	return { valid: deduped.length === 0, blockCount: 1, errors: deduped };
 }
 
-// ─── Fix prompt builder ──────────────────────────────────────────────────────
+// ─── Fix prompt builder — Pattern dispatch table ─────────────────────────────
 
-/**
- * Build a prompt instructing the LLM to fix validation errors.
- * Used for auto-retry when validation fails.
- */
-export function buildFixPrompt(errors: ValidationError[]): string {
-	const errorDetails = errors
-		.map((e) => `Line ${e.line} [${e.type}]: ${e.error}`)
-		.join("\n");
+interface FixPattern {
+	id: string;
+	severity: "critical" | "warning";
+	test: RegExp;
+	tip: (allErrors: string) => string;
+}
 
-	// Detect specific error patterns to give targeted fix instructions
-	const allErrors = errors.map((e) => e.error).join(" ");
-	const tips: string[] = [];
-
-	// Pattern 1: Parenthesized function calls — the #1 LLM mistake
-	if (/RPAREN|Expected '\)'/.test(allErrors)) {
-		tips.push(
-			`⚠️ CRITICAL: You used parentheses for function calls. RobinPath uses SPACE-SEPARATED arguments, NEVER parentheses.
+const FIX_PATTERNS: FixPattern[] = [
+	{
+		id: "parenthesized-calls",
+		severity: "critical",
+		test: /RPAREN|Expected '\)'|Do NOT use parentheses/,
+		tip: () =>
+			`CRITICAL: You used parentheses for function calls. RobinPath uses SPACE-SEPARATED arguments, NEVER parentheses.
   WRONG: http.get("https://api.example.com")
   WRONG: math.add(1, 2)
   WRONG: string.length("hello")
   RIGHT: http.get "https://api.example.com"
   RIGHT: math.add 1 2
   RIGHT: string.length "hello"
-  RIGHT: array.filter $items (condition) — only use parens for inline expressions, never for function calls`
-		);
-	}
-
-	// Pattern 2: Curly braces for blocks
-	if (/[Cc]urly brace/.test(allErrors)) {
-		tips.push(
-			`⚠️ CRITICAL: You used curly braces {} for blocks. RobinPath uses keyword/endkeyword pairs.
+  RIGHT: array.filter $items (condition) — only use parens for inline expressions, never for function calls`,
+	},
+	{
+		id: "curly-braces",
+		severity: "critical",
+		test: /[Cc]urly brace/,
+		tip: () =>
+			`CRITICAL: You used curly braces {} for blocks. RobinPath uses keyword/endkeyword pairs.
   WRONG: if $x > 5 { log "big" }
   WRONG: for $i in $items { log $i }
   RIGHT: if $x > 5 \\n  log "big" \\n endif
-  RIGHT: for $i in $items \\n  log $i \\n endfor`
-		);
-	}
-
-	// Pattern 3: Unexpected enddo / block mismatch
-	if (/[Uu]nexpected 'enddo'|no matching 'do'/.test(allErrors)) {
-		tips.push(
-			`⚠️ BLOCK MISMATCH: You have an 'enddo' without a matching 'do'. Count your blocks carefully:
+  RIGHT: for $i in $items \\n  log $i \\n endfor`,
+	},
+	{
+		id: "unexpected-enddo",
+		severity: "critical",
+		test: /[Uu]nexpected 'enddo'|no matching 'do'/,
+		tip: () =>
+			`BLOCK MISMATCH: You have an 'enddo' without a matching 'do'. Count your blocks carefully:
   - Every 'do' needs exactly one 'enddo'
   - Every 'if' needs exactly one 'endif'
   - Every 'for' needs exactly one 'endfor'
   - Close the current block BEFORE starting a new @desc section
-  - do/catch uses: do ... catch $err ... enddo (ONE enddo, not two)`
-		);
-	}
-
-	// Pattern 4: @desc unexpected inside expression/block
-	if (/DECORATOR '@desc'/.test(allErrors)) {
-		tips.push(
-			`⚠️ BLOCK NOT CLOSED: You have @desc inside an unclosed block. You MUST close the previous block before starting a new section.
+  - do/catch uses: do ... catch $err ... enddo (ONE enddo, not two)`,
+	},
+	{
+		id: "decorator-desc",
+		severity: "critical",
+		test: /DECORATOR '@desc'/,
+		tip: () =>
+			`BLOCK NOT CLOSED: You have @desc inside an unclosed block. You MUST close the previous block before starting a new section.
   WRONG:
     @desc "Step 1"
     do
       log "hello"
-      @desc "Step 2"    ← ERROR: previous do block not closed!
+      @desc "Step 2"    <- ERROR: previous do block not closed!
       do
   RIGHT:
     @desc "Step 1"
     do
       log "hello"
-    enddo                ← close first!
+    enddo                <- close first!
     @desc "Step 2"
-    do`
-		);
-	}
-
-	// Pattern 4b: def nested inside do
-	if (/nest.*def.*inside.*do|def\/enddef.*outside/i.test(allErrors) || (/DECORATOR '@desc'/.test(allErrors) && /def/.test(allErrors))) {
-		tips.push(
-			`⚠️ DEF INSIDE DO: You nested a function definition inside a 'do' block. This is NOT allowed.
+    do`,
+	},
+	{
+		id: "def-inside-do",
+		severity: "critical",
+		test: /nest.*def.*inside.*do|def\/enddef.*outside/i,
+		tip: () =>
+			`DEF INSIDE DO: You nested a function definition inside a 'do' block. This is NOT allowed.
   WRONG:
     @desc "My function"
     do
@@ -599,61 +760,205 @@ export function buildFixPrompt(errors: ValidationError[]): string {
     def myFunc $arg
       log $arg
     enddef
-  Functions (def/enddef) must be at the TOP LEVEL, not inside do/enddo blocks. Define them in their own @desc section.`
-		);
-	}
-
-	// Pattern 5: Missing endif/endfor/enddo
-	if (/missing end(if|for|do)/.test(allErrors)) {
-		tips.push(
-			`⚠️ UNCLOSED BLOCK: You opened a block but never closed it. Make sure every block has its closing keyword:
-  if → endif, for → endfor, do → enddo, def → enddef
-  Check nested blocks carefully — each one needs its own closing keyword.`
-		);
-	}
-
-	// Pattern 6: Mismatched block pairs
-	if (/[Mm]ismatched/.test(allErrors)) {
-		tips.push(
-			`⚠️ MISMATCHED BLOCKS: Your closing keywords don't match the opening keywords.
+  Functions (def/enddef) must be at the TOP LEVEL, not inside do/enddo blocks. Define them in their own @desc section.`,
+	},
+	{
+		id: "def-inside-do-decorator",
+		severity: "critical",
+		test: /(?=.*DECORATOR '@desc')(?=.*def)/,
+		tip: () =>
+			`DEF INSIDE DO: You nested a function definition inside a 'do' block. This is NOT allowed.
+  WRONG:
+    @desc "My function"
+    do
+      def myFunc $arg
+        log $arg
+      enddef
+    enddo
+  RIGHT:
+    @desc "My function"
+    def myFunc $arg
+      log $arg
+    enddef
+  Functions (def/enddef) must be at the TOP LEVEL, not inside do/enddo blocks. Define them in their own @desc section.`,
+	},
+	{
+		id: "unclosed-block",
+		severity: "critical",
+		test: /missing end(if|for|do)/,
+		tip: () =>
+			`UNCLOSED BLOCK: You opened a block but never closed it. Make sure every block has its closing keyword:
+  if -> endif, for -> endfor, do -> enddo, def -> enddef
+  Check nested blocks carefully — each one needs its own closing keyword.`,
+	},
+	{
+		id: "mismatched-blocks",
+		severity: "critical",
+		test: /[Mm]ismatched/,
+		tip: () =>
+			`MISMATCHED BLOCKS: Your closing keywords don't match the opening keywords.
   WRONG: do ... endfor (should be enddo)
   WRONG: for ... enddo (should be endfor)
-  Make sure each closing keyword matches its opening keyword exactly.`
-		);
-	}
-
-	// Pattern 7: Variable assignment syntax
-	if (/Expected '=' or 'as' after variable/.test(allErrors)) {
-		tips.push(
-			`⚠️ ASSIGNMENT SYNTAX: Variable assignment must use 'set $var as value' or '$var = value'.
+  Make sure each closing keyword matches its opening keyword exactly.`,
+	},
+	{
+		id: "assignment-syntax",
+		severity: "warning",
+		test: /Expected '=' or 'as' after variable/,
+		tip: () =>
+			`ASSIGNMENT SYNTAX: Variable assignment must use 'set $var as value' or '$var = value'.
   WRONG: $result http.get "url"
   RIGHT: http.get "url" into $result
   RIGHT: set $result as http.get "url"
-  To capture function output, use 'into $var' at the end of the command.`
-		);
-	}
-
-	// Pattern 8: Parenthesized expressions / ranges
-	if (/parenthesized|in \(|range/.test(allErrors)) {
-		tips.push(
-			`⚠️ PARENTHESIZED EXPRESSIONS: Don't wrap expressions in parentheses.
+  To capture function output, use 'into $var' at the end of the command.`,
+	},
+	{
+		id: "arrow-functions",
+		severity: "warning",
+		test: /[Aa]rrow function/,
+		tip: () =>
+			`ARROW FUNCTIONS: The '=>' operator does not exist in RobinPath.
+  WRONG: collection.each $items (item) => { log item }
+  WRONG: $items.forEach(item => { log item })
+  RIGHT: for $item in $items
+           log $item
+         endfor
+  Use 'for $item in $collection ... endfor' for iteration.`,
+	},
+	{
+		id: "let-const-var",
+		severity: "warning",
+		test: /No 'let' keyword|No 'const'|No 'var'/,
+		tip: () =>
+			`VARIABLE DECLARATION: No 'let', 'const', or 'var' keywords in RobinPath.
+  WRONG: let x = 5
+  WRONG: const name = "test"
+  RIGHT: set $x = 5
+  RIGHT: $name = "test"
+  Variables always start with $ and use 'set' or direct assignment.`,
+	},
+	{
+		id: "try-catch",
+		severity: "warning",
+		test: /No 'try' keyword/,
+		tip: () =>
+			`ERROR HANDLING: No 'try/catch' in RobinPath. Use 'do/catch/enddo'.
+  WRONG: try { risky() } catch (e) { log(e) }
+  RIGHT: do
+           risky.operation "arg"
+         catch $err
+           log $err
+         enddo`,
+	},
+	{
+		id: "function-keyword",
+		severity: "warning",
+		test: /No 'function' keyword|No 'fn' keyword/,
+		tip: () =>
+			`FUNCTIONS: No 'function' or 'fn' keyword in RobinPath. Use 'def/enddef'.
+  WRONG: function greet(name) { log(name) }
+  RIGHT: def greet $name
+           log $name
+         enddef
+  Use 'respond $value' instead of 'return value'.`,
+	},
+	{
+		id: "wrong-module-name",
+		severity: "warning",
+		test: /Wrong module name|Did you mean/,
+		tip: (allErrors: string) => {
+			const aliasMatches = allErrors.match(/(?:Wrong module name|Did you mean) '(\w+)'[\.\?] (?:Use '([^']+)'|The correct module is '(\w+)')/g);
+			if (aliasMatches) {
+				const fixes: string[] = [];
+				for (const m of aliasMatches) {
+					const parts = m.match(/(?:Wrong module name|Did you mean) '(\w+)'[\.\?] (?:Use '([^']+)'|The correct module is '(\w+)')/);
+					if (parts) {
+						const wrong = parts[1];
+						const correct = parts[2] || parts[3];
+						fixes.push(`WRONG: ${wrong}.xxx  ->  RIGHT: ${correct}`);
+					}
+				}
+				return `WRONG MODULE NAME: RobinPath uses different module names than Node.js.\n  ${fixes.join("\n  ")}\n  Common mappings: fs->file, fetch/request->http, sys->os, exec/spawn->child, time/wait->timer, hash->crypto`;
+			}
+			return `WRONG MODULE NAME: RobinPath uses different module names than Node.js.\n  Common mappings: fs->file, fetch/request->http, sys->os, exec/spawn->child, time/wait->timer, hash->crypto`;
+		},
+	},
+	{
+		id: "unknown-function",
+		severity: "warning",
+		test: /Unknown function/,
+		tip: (allErrors: string) => {
+			const modMatches = allErrors.match(/Module '(\w+)' has no function '(\w+)'/g);
+			if (modMatches) {
+				const suggestions: string[] = [];
+				const seenMods = new Set<string>();
+				for (const m of modMatches) {
+					const parts = m.match(/Module '(\w+)' has no function '(\w+)'/);
+					if (parts && !seenMods.has(parts[1])) {
+						seenMods.add(parts[1]);
+						const mod = parts[1];
+						const fns = BUILTIN_MODULES[mod];
+						if (fns) {
+							suggestions.push(`Module '${mod}' available functions: ${fns.slice(0, 15).join(", ")}${fns.length > 15 ? ", ..." : ""}`);
+						}
+					}
+				}
+				if (suggestions.length > 0) {
+					return `UNKNOWN FUNCTION: You called a function that doesn't exist on the module. Use only real functions.\n  ${suggestions.join("\n  ")}`;
+				}
+			}
+			return `UNKNOWN FUNCTION: You called a function that doesn't exist on the module. Check available functions in the module documentation.`;
+		},
+	},
+	{
+		id: "parenthesized-expressions",
+		severity: "warning",
+		test: /parenthesized|in \(|range/,
+		tip: () =>
+			`PARENTHESIZED EXPRESSIONS: Don't wrap expressions in parentheses.
   WRONG: for $i in (0..$n)
   WRONG: array.get $arr ($i+1)
   WRONG: for $i in (range 0 $n)
   RIGHT: for $i from 0 to $n
   RIGHT: math.add $i 1 into $next \\n array.get $arr $next
-  Compute complex expressions into a variable first, then use that variable.`
-		);
-	}
-
-	// Pattern 9: Comma issues in objects
-	if (/expected comma|COMMA/.test(allErrors)) {
-		tips.push(
-			`⚠️ OBJECT SYNTAX: Object properties MUST be separated by commas.
+  Compute complex expressions into a variable first, then use that variable.`,
+	},
+	{
+		id: "comma-issues",
+		severity: "warning",
+		test: /expected comma|COMMA/,
+		tip: () =>
+			`OBJECT SYNTAX: Object properties MUST be separated by commas.
   WRONG: { "name": "test" "age": 25 }
-  RIGHT: { "name": "test", "age": 25 }`
-		);
-	}
+  RIGHT: { "name": "test", "age": 25 }`,
+	},
+];
+
+/**
+ * Build a prompt instructing the LLM to fix validation errors.
+ * Used for auto-retry when validation fails.
+ */
+export function buildFixPrompt(errors: ValidationError[]): string {
+	const errorDetails = errors
+		.map((e) => `Line ${e.line} [${e.type}]: ${e.error}`)
+		.join("\n");
+
+	// Detect specific error patterns to give targeted fix instructions
+	const allErrors = errors.map((e) => e.error).join(" ");
+
+	// Deduplicate tips by id (def-inside-do and def-inside-do-decorator can overlap)
+	const seenIds = new Set<string>();
+	const tips = FIX_PATTERNS
+		.filter((p) => p.test.test(allErrors))
+		.sort((a, b) => (a.severity === "critical" ? -1 : 1) - (b.severity === "critical" ? -1 : 1))
+		.filter((p) => {
+			// Deduplicate by prefix id (def-inside-do and def-inside-do-decorator produce same tip)
+			const baseId = p.id.replace(/-decorator$/, "");
+			if (seenIds.has(baseId)) return false;
+			seenIds.add(baseId);
+			return true;
+		})
+		.map((p) => p.tip(allErrors));
 
 	const tipsBlock = tips.length > 0 ? `\n\nSPECIFIC FIXES NEEDED:\n${tips.join("\n\n")}` : "";
 

@@ -153,9 +153,9 @@ describe("registry — mixed valid/invalid in same block", () => {
 	const scenarios = [
 		{ valid: "math.add 1 2", invalid: "math.divide 1 2" },
 		{ valid: "string.upper $x", invalid: "string.slugify $x" },
-		{ valid: "math.subtract 5 3", invalid: "http.get $url" },
-		{ valid: "string.lower $x", invalid: "json.parse $data" },
-		{ valid: "math.add $a $b", invalid: "array.sort $items" },
+		{ valid: "math.subtract 5 3", invalid: "math.power 2 8" },
+		{ valid: "string.lower $x", invalid: "string.trim $data" },
+		{ valid: "math.add $a $b", invalid: "math.floor 3.5" },
 	];
 
 	for (const s of scenarios) {

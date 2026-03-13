@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "modules": {
+    "file": ["read","readBinary","write","writeBinary","append","delete","exists","copy","move","rename","list","stat","mkdir","readJSON","writeJSON","size","isFile","isDir","lines","lineCount","temp","cwd"],
+    "path": ["join","resolve","dirname","basename","extname","parse","format","relative","normalize","isAbsolute","sep","delimiter","toNamespacedPath"],
+    "process": ["env","argv","exit","cwd","chdir","pid","ppid","platform","arch","version","versions","memoryUsage","uptime","hrtime","title","execPath","cpuUsage","resourceUsage"],
+    "os": ["hostname","cpus","cpuCount","totalmem","freemem","usedmem","memoryInfo","networkInterfaces","tmpdir","homedir","type","release","uptime","loadavg","userInfo","platform","arch","endianness","machine","version","eol"],
+    "crypto": ["hash","md5","sha1","sha256","sha512","hmac","hmacSha256","hmacSha512","encrypt","decrypt","randomBytes","randomUUID","randomInt","pbkdf2","scrypt","base64Encode","base64Decode","base64UrlEncode","base64UrlDecode","hexEncode","hexDecode","ciphers","hashes"],
+    "buffer": ["alloc","from","toString","toJSON","concat","compare","equals","slice","length","byteLength","isBuffer","fill","indexOf","copy","toHex","fromHex"],
+    "url": ["parse","format","resolve","searchParams","buildQuery","encode","decode","encodeFull","decodeFull","isValid","join"],
+    "child": ["exec","execSync","spawn","wait","kill","running"],
+    "timer": ["sleep","delay","setTimeout","setInterval","clearTimeout","clearInterval","clearAll","active","measure","timestamp","now"],
+    "http": ["get","post","put","patch","delete","head","request","serve","close","servers","download"],
+    "net": ["connect","send","read","close","createServer","isIP","isIPv4","isIPv6","active"],
+    "dns": ["lookup","resolve","resolve4","resolve6","resolveMx","resolveTxt","resolveNs","resolveCname","resolveSrv","resolveSoa","reverse"],
+    "events": ["create","on","once","emit","off","listeners","eventNames","removeAll","destroy","list"],
+    "zlib": ["gzip","gunzip","deflate","inflate","brotliCompress","brotliDecompress","compressSize"],
+    "stream": ["readable","writable","transform","duplex","passThrough","write","read","end","destroy","pipe","pipeline","toBuffer","toString","fromString","fromArray","active","count"],
+    "tls": ["connect","send","read","close","createServer","getCertificate","getPeerCertificate","isEncrypted","getProtocol","getCipher","active"],
+    "util": ["inspect","format","formatWithOptions","isArray","isBoolean","isNull","isUndefined","isNullOrUndefined","isNumber","isString","isObject","isFunction","isRegExp","isDate","isError","isPrimitive","isPromise","isMap","isSet","isTypedArray","isArrayBuffer","typeOf","textEncode","textDecode","deepClone","deepEqual","merge","deepMerge","inherits","deprecate","callbackify","sizeof"],
+    "assert": ["ok","equal","strictEqual","notEqual","deepEqual","notDeepEqual","truthy","falsy","isNull","isNotNull","isType","contains","notContains","match","notMatch","greaterThan","lessThan","between","lengthOf","hasProperty","throws","doesNotThrow","fail"],
+    "stringDecoder": ["create","write","end","decode","destroy","active"],
+    "tty": ["isatty","isStdinTTY","isStdoutTTY","isStderrTTY","columns","rows","size","hasColors","colorDepth","supportsColor","getWindowSize","clearLine","cursorTo","moveCursor"]
+  }
+}

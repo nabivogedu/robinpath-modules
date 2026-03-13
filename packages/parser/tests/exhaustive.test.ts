@@ -246,13 +246,15 @@ describe("validateCode — registry validation comprehensive", () => {
 		});
 	}
 
-	// Unknown functions fail
+	// Unknown functions fail — use functions that don't exist on known modules
+	// Note: only built-in modules (file, http, crypto, etc.) or external knownFunctions modules are checked.
+	// Modules not in either registry (xml, csv, database, redis) are NOT flagged.
 	const invalidCalls = [
 		"math.sin 1", "math.cos 1", "math.log 10",
 		"string.pad 5", "string.format 1",
-		"http.options url", "http.head url",
-		"xml.parse data", "csv.parse data",
-		"database.query sql", "redis.get key",
+		"http.options url", "http.teleport url",
+		"array.banana data", "array.zip data",
+		"json.validate sql", "json.compress key",
 	];
 
 	for (const call of invalidCalls) {
